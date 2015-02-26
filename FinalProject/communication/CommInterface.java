@@ -12,7 +12,7 @@ package FinalProject.communication;
 
 
 
-import FinalProject.ballot.Ballot;
+import FinalProject.Ballot;
 import java.net.InetAddress;
 
 interface CommInterface {

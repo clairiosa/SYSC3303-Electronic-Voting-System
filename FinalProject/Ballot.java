@@ -7,7 +7,7 @@
  */
 
 
-package FinalProject.ballot;
+package FinalProject;
 
 
 public class Ballot {
