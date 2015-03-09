@@ -11,31 +11,47 @@
 package FinalProject.persons;
 
 
+   class Voter extends Person {
+	private String party;
+	private Candidate votedFor;
+	private boolean voted;
+	private boolean registered;
 
-/**
- * Holds voter information and related functions.
- *
- * Extends Person as animals can't vote.
- *
- */
-public class Voter extends Person {
-
-	boolean registered;
-	boolean vote;
-
-
-	/**
-	 * Empty constructor.
-	 */
-	public Voter(){
-		super();
-		registered = false;
-		vote = false;
+	
+	Voter(String name, String party) {
+		super(name);
+		this.party = party;
+		voted = false;
+		votedFor = null;
 	}
+	
 
-	public void setRegistered(){}
-    public void setVoteStatus(){}
-
-	public boolean getVoteStatus() { return vote; }
-    public boolean getRegistered() { return vote; }
-}
+	public String getParty(){
+		return party;
+	}
+	
+	public void setParty(String party){
+		this.party=party;
+	}
+	
+	public boolean hasVoted(){
+		return voted; 
+	}
+	
+	public void setVoted(boolean v){
+		voted=v; 
+	}
+	
+	
+	public void setCandidate(Candidate c){
+		votedFor=c;
+	}
+	
+	public Candidate getCandidate(){
+		return votedFor;
+	}
+	
+	public void setRegistered(boolean reg){registered=reg;}
+	public boolean getRegistered() { return registered; }
+	
+   }
