@@ -7,6 +7,9 @@
  */
 
 
+package FinalProject.masterserver;
+
+
 
 //get data from each district saved in a file 
 //get the file chunk by chunk

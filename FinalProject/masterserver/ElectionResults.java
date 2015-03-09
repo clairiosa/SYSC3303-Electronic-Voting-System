@@ -6,6 +6,9 @@
  *
  */
 
+
+package FinalProject.masterserver;
+
 import java.util.Enumeration;
 import java.util.Hashtable;
 
