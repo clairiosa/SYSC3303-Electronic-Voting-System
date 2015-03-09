@@ -17,8 +17,7 @@ package FinalProject.persons;
  */
 public class Person {
 
-	String first;
-	String last;
+	String name;
 	String address;
 	String postal;
 	String city;
@@ -28,19 +27,18 @@ public class Person {
 	/**
 	 * Empty constructor.
 	 */
-	public Person(){
-		first = last = address = postal = city = province = "";
+	public Person(String name){
+		this.name=name;
+		address = postal = city = province = "";
 	}
 
-	public void setFirst() {}
-	public void setLast() {}
+	public void setName(String name) {this.name=name;}
 	public void setAddress() {}
 	public void setPostal() {}
 	public void setCity() {}
 	public void setProvince() {}
 
-	public String getFirst() { return first; }
-	public String getLast() { return last; }
+	public String getName() { return name; }
 	public String getAddress() { return address; }
 	public String getPostal() { return postal; }
 	public String getCity() { return city; }
