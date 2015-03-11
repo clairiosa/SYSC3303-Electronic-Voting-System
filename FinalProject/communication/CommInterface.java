@@ -31,6 +31,22 @@ interface CommInterface {
     //TODO-dave Add way to specify target (String?)
     public int sendMessage(Ballot ballot);
     public int sendMessage(Candidate candidate);
+    
+   public MasterServerInformation receiveMasterInfo(){
+		
+	}
+	//not sure about params, feel free to remove them
+	public void StartMasterServer(int serverPort, int destinationPort){
+		
+	}
+	
+	public void CloseMasterServer(){
+		
+	}
+	
+	public void sendElectionResults(ElectionResults results){
+		
+	}
 
     /**
      * Returns the message received.  The class using this function needs to determine
