@@ -2,7 +2,7 @@
  *		SYSC 3303 - Electronic Voting System
  *	David Bews, Jonathan Oommen, Nate Bosscher, Damian Polan
  *
- *	CommPackets.java
+ *	Packets.java
  *
  */
 
@@ -16,7 +16,48 @@ import java.util.zip.Checksum;
 
 final class Packets {
 
+    //todo-dave Add these as function parameters, not constants.
+    static final int MAX_PACKET_SIZE = 511;
+    static final int MAX_PACKET_SIZE_BYTES = 4;
+    static final int CHECKSUM_BYTE_SIZE = 8;
+
     private Packets(){}
+
+
+    /**
+     * Creates a packet
+     * @param obj
+     * @return
+     * @throws IOException
+     */
+    static byte[] craftPacket(Object obj) throws IOException {
+        byte[] objectBytes = serialize(obj);
+        byte[] objectLength = ByteBuffer.allocate(8).putInt(objectBytes.length).array();
+
+        byte[] packet = new byte[MAX_PACKET_SIZE-CHECKSUM_BYTE_SIZE-MAX_PACKET_SIZE_BYTES];
+        System.arraycopy(objectLength, 0, packet, 0, MAX_PACKET_SIZE_BYTES);
+        System.arraycopy(objectBytes, 0, packet, MAX_PACKET_SIZE_BYTES, objectLength.length);
+
+        return addChecksum(packet);
+    }
+
+    /**
+     *
+     * @param packet
+     * @return
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
+    static Object decodePacket(byte[] packet) throws IOException, ClassNotFoundException {
+        byte[] data = removeChecksum(packet);
+        byte[] objectLength = new byte[MAX_PACKET_SIZE_BYTES];
+        System.arraycopy(data, 0, objectLength, 0, MAX_PACKET_SIZE_BYTES);
+        byte[] objectBytes = new byte[ByteBuffer.wrap(objectLength).getInt()];
+        System.arraycopy(data, MAX_PACKET_SIZE_BYTES, objectBytes, 0, objectBytes.length);
+
+        return deserialize(objectBytes);
+    }
+
 
     /**
      * Returns a byte array of the given object.  Exceptions must be handled by
@@ -57,7 +98,7 @@ final class Packets {
      */
     static byte[] addChecksum(byte[] data) {
         int length = data.length;
-        byte[] packet = new byte[length+8];
+        byte[] packet = new byte[length+CHECKSUM_BYTE_SIZE];
         Checksum checksum = new CRC32();
         long checksumValue;
         byte[] checksumBytes;
@@ -66,8 +107,8 @@ final class Packets {
         checksumValue = checksum.getValue();
         checksumBytes = ByteBuffer.allocate(8).putLong(checksumValue).array();
 
-        System.arraycopy(checksumBytes, 0, packet, 0, 8);
-        System.arraycopy(data, 0, packet, 8, length);
+        System.arraycopy(checksumBytes, 0, packet, 0, CHECKSUM_BYTE_SIZE);
+        System.arraycopy(data, 0, packet, CHECKSUM_BYTE_SIZE, length);
 
         return packet;
     }
@@ -80,9 +121,9 @@ final class Packets {
      */
     static byte[] removeChecksum(byte[] packet) {
         int length = packet.length;
-        byte[] data = new byte[length-8];
+        byte[] data = new byte[length-CHECKSUM_BYTE_SIZE];
 
-        System.arraycopy(packet, 8, data, 0, length-8);
+        System.arraycopy(packet, CHECKSUM_BYTE_SIZE, data, 0, length-8);
 
         return data;
     }
@@ -97,11 +138,11 @@ final class Packets {
     static boolean validateChecksum(byte[] packet) {
         int length = packet.length;
         Checksum checksum = new CRC32();
-        byte[] checksumBytes = new byte[8];
+        byte[] checksumBytes = new byte[CHECKSUM_BYTE_SIZE];
 
-        System.arraycopy(packet, 0, checksumBytes, 0, 8);
+        System.arraycopy(packet, 0, checksumBytes, 0, CHECKSUM_BYTE_SIZE);
 
-        checksum.update(packet, 8, length-8);
+        checksum.update(packet, CHECKSUM_BYTE_SIZE, length-CHECKSUM_BYTE_SIZE);
         long calculatedChecksumValue = checksum.getValue();
         long givenChecksumValue = ByteBuffer.wrap(checksumBytes).getLong();
 
