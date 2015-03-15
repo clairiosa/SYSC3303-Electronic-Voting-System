@@ -10,6 +10,10 @@ package FinalProject.masterserver;
 
 
 
+import FinalProject.communication.Comm;
+import FinalProject.persons.Candidate;
+import FinalProject.persons.Voter;
+
 import java.util.Enumeration;
 import java.util.Hashtable;
 
