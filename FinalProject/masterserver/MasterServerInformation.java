@@ -11,6 +11,9 @@ package FinalProject.masterserver;
 
 
 
+
+import FinalProject.persons.Candidate;
+import FinalProject.persons.Voter;
 import java.net.DatagramSocket;
 import java.util.*;
 

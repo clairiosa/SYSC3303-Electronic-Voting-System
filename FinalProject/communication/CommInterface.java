@@ -32,7 +32,7 @@ interface CommInterface {
     public int sendMessage(Ballot ballot);
     public int sendMessage(Candidate candidate);
     
-   public MasterServerInformation receiveMasterInfo(){
+    public MasterServerInformation receiveMasterInfo(){
 		
 	}
 	//not sure about params, feel free to remove them

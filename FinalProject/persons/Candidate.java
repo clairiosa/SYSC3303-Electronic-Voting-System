@@ -11,7 +11,7 @@
 package FinalProject.persons;
 
 
-   class Candidate extends Voter {
+public class Candidate extends Voter {
 	private int voteCount;
 	private double votingPercentage;
 	private static int totalVotes;

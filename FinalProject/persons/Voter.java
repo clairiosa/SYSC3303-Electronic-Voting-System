@@ -11,7 +11,7 @@
 package FinalProject.persons;
 
 
-   class Voter extends Person {
+public class Voter extends Person {
 	private String party;
 	private Candidate votedFor;
 	private boolean voted;

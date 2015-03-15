@@ -11,6 +11,7 @@ package FinalProject.masterserver;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
+import FinalProject.persons.Candidate;
 
 
 public class ElectionResults extends Thread {
