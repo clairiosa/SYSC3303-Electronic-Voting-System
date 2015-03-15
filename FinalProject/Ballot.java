@@ -10,5 +10,7 @@
 package FinalProject;
 
 
-public class Ballot {
+import java.io.Serializable;
+
+public class Ballot implements Serializable{
 }

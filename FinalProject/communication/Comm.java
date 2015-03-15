@@ -17,6 +17,9 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
+import java.net.SocketException;
+import java.util.concurrent.TimeoutException;
+
 public class Comm implements CommInterface {
 
     DatagramSocket socket;
@@ -29,8 +32,8 @@ public class Comm implements CommInterface {
      * @return
      */
     @Override
-    public int connect() {
-        return -1;
+    public int connect() throws TimeoutException, SocketException {
+        return 0;
     }
 
     /**
@@ -40,8 +43,8 @@ public class Comm implements CommInterface {
      * @return
      */
     @Override
-    public int connect(InetAddress parentServer, int port) {
-        return -1;
+    public int connect(InetAddress parentServer, int port) throws TimeoutException {
+        return 0;
     }
 
     /**
@@ -50,7 +53,7 @@ public class Comm implements CommInterface {
      */
     @Override
     public int disconnect() {
-        return -1;
+        return 0;
     }
 
     /**

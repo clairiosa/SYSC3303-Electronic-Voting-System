@@ -11,11 +11,12 @@
 package FinalProject.persons;
 
 
+import java.io.Serializable;
 
 /**
  * Parent class for any person.
  */
-public class Person {
+public class Person implements Serializable {
 
 	String name;
 	String address;

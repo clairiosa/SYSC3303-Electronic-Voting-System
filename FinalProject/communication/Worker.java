@@ -9,5 +9,5 @@
 package FinalProject.communication;
 
 
-public class CommWorker {
+class Worker {
 }

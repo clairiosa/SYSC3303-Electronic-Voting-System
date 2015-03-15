@@ -14,9 +14,9 @@ import java.nio.ByteBuffer;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
-final class CommPackets {
+final class Packets {
 
-    private CommPackets(){}
+    private Packets(){}
 
     /**
      * Returns a byte array of the given object.  Exceptions must be handled by
@@ -24,7 +24,7 @@ final class CommPackets {
      *
      * @param   obj         The object to change into a byte array.
      * @return              The byte array.
-     * @throws IOException
+     * @throws java.io.IOException
      */
     static byte[] serialize(Object obj) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -39,7 +39,7 @@ final class CommPackets {
      *
      * @param   data        The byte array to change back into an object.
      * @return              The object.
-     * @throws IOException
+     * @throws java.io.IOException
      * @throws ClassNotFoundException
      */
     static Object deserialize(byte[] data) throws IOException, ClassNotFoundException {
@@ -47,6 +47,7 @@ final class CommPackets {
         ObjectInputStream is = new ObjectInputStream(in);
         return is.readObject();
     }
+
 
     /**
      * Adds an 8 byte checksum to the front of the given byte array.

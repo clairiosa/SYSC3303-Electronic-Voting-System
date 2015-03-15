@@ -12,11 +12,11 @@ package FinalProject.communication;
 import java.io.Serializable;
 import java.net.InetAddress;
 
-public class CommConnection implements Serializable{
+class Connection implements Serializable{
     int port;
     InetAddress address;
 
-    CommConnection(int port, InetAddress address){
+    Connection(int port, InetAddress address){
         this.port = port;
         this.address = address;
     }

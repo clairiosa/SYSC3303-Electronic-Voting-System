@@ -16,10 +16,13 @@ import FinalProject.Ballot;
 import FinalProject.persons.Candidate;
 
 import java.net.InetAddress;
+import java.net.SocketException;
+import java.util.concurrent.TimeoutException;
 
 interface CommInterface {
-	public void connect(InetAddress parentServer, int port);
-	public void disconnect();
+    public int connect() throws TimeoutException, SocketException;
+	public int connect(InetAddress parentServer, int port) throws TimeoutException;
+	public int disconnect();
 
     /**
      * Sends the object specified to the target.  Returns 0 if success, otherwise returns
@@ -31,7 +34,11 @@ interface CommInterface {
     //TODO-dave Add way to specify target (String?)
     public int sendMessage(Ballot ballot);
     public int sendMessage(Candidate candidate);
-    
+
+
+
+    // Master server stuff.
+    /*
     public MasterServerInformation receiveMasterInfo(){
 		
 	}
@@ -47,6 +54,7 @@ interface CommInterface {
 	public void sendElectionResults(ElectionResults results){
 		
 	}
+	*/
 
     /**
      * Returns the message received.  The class using this function needs to determine
