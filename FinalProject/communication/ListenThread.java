@@ -6,7 +6,6 @@
  *
  *  Thread for listening for packets, and handing them off to a worker thread specific to each connection.
  *
- *  TODO-Dave Add comments.  Add disconnect functions.  Add timeout thread + functions if you want to be excessively thorough.
  *
  */
 
@@ -35,7 +34,12 @@ class ListenThread implements Runnable {
     Semaphore queueSemaphore;
 
 
-
+    /**
+     * @param listenPort
+     * @param receivedObjectQueue
+     * @param queueSemaphore
+     * @throws SocketException
+     */
     public ListenThread(int listenPort, BlockingQueue<Object> receivedObjectQueue, Semaphore queueSemaphore) throws SocketException {
         this.listenPort = listenPort;
         listenSocket = new DatagramSocket(listenPort);
@@ -47,9 +51,10 @@ class ListenThread implements Runnable {
 
     @Override
     public void run() {
-        byte[] buffer = new byte[MAX_PACKET_SIZE];
 
         while (true) {
+
+            byte[] buffer = new byte[MAX_PACKET_SIZE];
             DatagramPacket incomingPacket = new DatagramPacket(buffer, buffer.length);
             try {
                 listenSocket.receive(incomingPacket);
@@ -58,7 +63,6 @@ class ListenThread implements Runnable {
             }
 
             String connectionKey = incomingPacket.getAddress().toString() + ":" + incomingPacket.getPort();
-            System.out.println("Message received from " + connectionKey);
             Connection connection = connectionHashMap.get(connectionKey);
             if (connection == null) try {
                 connection = createConnection(incomingPacket.getAddress(), incomingPacket.getPort());
@@ -66,20 +70,12 @@ class ListenThread implements Runnable {
                 break;
             }
 
-
-            System.out.println(connection.getPort());
-
             try {
-                System.out.println("~~~~~~~!~!~!~!~Listener " + Packets.decodePacket(incomingPacket));
-                connection.incomingPacketQueue.put(incomingPacket);
-                System.out.println("################ PLACED IN " + connection.getPort());
+                connection.putIncomingBlocking(incomingPacket);
             } catch (InterruptedException e) {
                 break;
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
             }
+
         }
 
 
@@ -95,6 +91,12 @@ class ListenThread implements Runnable {
     }
 
 
+    /**
+     * @param address
+     * @param port
+     * @return
+     * @throws SocketException
+     */
     Connection createConnection(InetAddress address, int port) throws SocketException {
         Connection newConnection = new Connection(address, port);
         WorkerThread worker = new WorkerThread(newConnection, listenSocket, receivedObjectQueue, queueSemaphore);
@@ -107,6 +109,9 @@ class ListenThread implements Runnable {
         return newConnection;
     }
 
+    /**
+     * @throws InterruptedException
+     */
     void disconnect() throws InterruptedException {
         for (Connection connection : connectionHashMap.values()) {
             connection.getWorkerThread().interrupt();
