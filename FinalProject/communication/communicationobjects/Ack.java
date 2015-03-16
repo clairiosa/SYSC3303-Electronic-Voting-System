@@ -4,6 +4,8 @@
  *
  *	Ack.java
  *
+ * Used for ack packets.
+ *
  * Intended to be sent by Comm so implements Serializable.
  * Serializable makes it so the object can be turned into an array of bytes by Packets.java's functions.
  */
@@ -15,13 +17,17 @@ package FinalProject.communication.communicationobjects;
 import java.io.Serializable;
 
 public class Ack implements Serializable {
-    boolean status;
+    boolean corrupted;
 
-    public Ack(boolean status) {
-        this.status = status;
+    /**
+     *
+     * @param corrupted    True if this ack is being sent in response to a corrupted packet.
+     */
+    public Ack(boolean corrupted) {
+        this.corrupted = corrupted;
     }
 
-    public boolean getStatus() {
-        return status;
+    public boolean getCorrupted() {
+        return corrupted;
     }
 }
