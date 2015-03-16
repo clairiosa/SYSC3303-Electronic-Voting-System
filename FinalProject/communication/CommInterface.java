@@ -73,17 +73,6 @@ interface CommInterface {
 
 
     /**
-     * Sends a test string to every connection present, will send a slightly modified string to the parent.
-     * Will probably be removed in the future, used for testing.
-     *
-     * @param string            String to send to every connection.
-     * @throws IOException
-     * @throws InterruptedException
-     */
-    public void sendTestMessage(String string) throws IOException, InterruptedException;
-
-
-    /**
      * Retrieves the first object available in the queue, null if no objects are available.
      * Received objects from the network are placed in a queue for the class instancing Comm to retrieve.  It is
      * that classes responsibility to determine what the object is.  (Use instanceof).

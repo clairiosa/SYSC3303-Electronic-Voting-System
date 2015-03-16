@@ -29,8 +29,6 @@ public class Comm implements CommInterface {
     private Thread listenThread;
     private Connection parentConnection = null;
 
-    private Semaphore queueSemaphore;
-
     private BlockingQueue<Object> receivedObjectQueue = new LinkedBlockingQueue<Object>();
 
 
@@ -41,7 +39,7 @@ public class Comm implements CommInterface {
      * @throws SocketException
      */
     public Comm(int port) throws SocketException {
-        queueSemaphore = new Semaphore(1);
+        Semaphore queueSemaphore = new Semaphore(1);
         listener = new ListenThread(port, receivedObjectQueue, queueSemaphore);
         listenThread = new Thread(listener);
         listenThread.start();
@@ -127,28 +125,6 @@ public class Comm implements CommInterface {
             DatagramPacket outgoingPacket = Packets.craftPacket(obj, connection.getAddress(), connection.getPort());
             connection.outgoingPacketQueue.put(outgoingPacket);
         }
-    }
-
-
-    /**
-     * Retrieves the first object available in the queue, null if no objects are available.
-     * Received objects from the network are placed in a queue for the class instancing Comm to retrieve.  It is
-     * that classes responsibility to determine what the object is.  (Use instanceof).
-     *
-     * @param string            String to send to every connection.
-     * @throws IOException
-     * @throws InterruptedException
-     */
-    @Override
-    public void sendTestMessage(String string) throws IOException, InterruptedException {
-        for (Connection connection : listener.connectionHashMap.values()) {
-            if (!connection.equals(parentConnection)) {
-                DatagramPacket outgoingPacket = Packets.craftPacket(string, connection.getAddress(), connection.getPort());
-                connection.outgoingPacketQueue.put(outgoingPacket);
-            }
-        }
-        DatagramPacket outgoingPacket = Packets.craftPacket("Parent: " + string, parentConnection.getAddress(), parentConnection.getPort());
-        parentConnection.outgoingPacketQueue.put(outgoingPacket);
     }
 
 
