@@ -24,7 +24,7 @@ import java.util.concurrent.Semaphore;
 
 class ListenThread implements Runnable {
 
-    private static final int MAX_PACKET_SIZE = 512;
+    private static final int MAX_PACKET_SIZE = 8192;
 
 
     HashMap<String, Connection> connectionHashMap = new HashMap<String, Connection>();
