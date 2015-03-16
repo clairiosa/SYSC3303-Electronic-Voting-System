@@ -4,12 +4,16 @@
  *
  *	Packets.java
  *
+ * Static functions for dealing with packets, checksums and byte arrays.
+ *
  */
 
 package FinalProject.communication;
 
 
 import java.io.*;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
 import java.nio.ByteBuffer;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
@@ -17,39 +21,49 @@ import java.util.zip.Checksum;
 final class Packets {
 
     //todo-dave Add these as function parameters, not constants.
-    static final int MAX_PACKET_SIZE = 511;
+    static final int MAX_PACKET_SIZE = 512;
     static final int MAX_PACKET_SIZE_BYTES = 4;
     static final int CHECKSUM_BYTE_SIZE = 8;
 
+
+    /**
+     * Class never gets instanced.
+     */
     private Packets(){}
 
 
     /**
-     * Creates a packet
-     * @param obj
-     * @return
+     * Creates a DatagramPacket given an object, the destination address and the port.
+     *
+     * @param obj           The object to place in the packet.
+     * @param address       The destination IP address.
+     * @param port          The destination port number.
+     * @return              DatagramPacket
      * @throws IOException
      */
-    static byte[] craftPacket(Object obj) throws IOException {
+    static DatagramPacket craftPacket(Object obj, InetAddress address, int port) throws IOException {
         byte[] objectBytes = serialize(obj);
         byte[] objectLength = ByteBuffer.allocate(8).putInt(objectBytes.length).array();
 
         byte[] packet = new byte[MAX_PACKET_SIZE-CHECKSUM_BYTE_SIZE-MAX_PACKET_SIZE_BYTES];
         System.arraycopy(objectLength, 0, packet, 0, MAX_PACKET_SIZE_BYTES);
         System.arraycopy(objectBytes, 0, packet, MAX_PACKET_SIZE_BYTES, objectLength.length);
-
-        return addChecksum(packet);
+        packet = addChecksum(packet);
+        return new DatagramPacket(packet, packet.length, address, port);
     }
 
+
     /**
+     * Decodes the DatagramPacket into an object.
      *
-     * @param packet
-     * @return
+     * @param packet            The packet to decode.
+     * @return                  The object that was inside the packet.
      * @throws IOException
      * @throws ClassNotFoundException
      */
-    static Object decodePacket(byte[] packet) throws IOException, ClassNotFoundException {
-        byte[] data = removeChecksum(packet);
+    static Object decodePacket(DatagramPacket packet) throws IOException, ClassNotFoundException {
+        byte[] packetData = packet.getData();
+        byte[] data = removeChecksum(packetData);
         byte[] objectLength = new byte[MAX_PACKET_SIZE_BYTES];
         System.arraycopy(data, 0, objectLength, 0, MAX_PACKET_SIZE_BYTES);
         byte[] objectBytes = new byte[ByteBuffer.wrap(objectLength).getInt()];
@@ -73,6 +87,7 @@ final class Packets {
         os.writeObject(obj);
         return out.toByteArray();
     }
+
 
     /**
      * Returns an object from an array of bytes.  Not intended to be used when the checksum
@@ -113,6 +128,7 @@ final class Packets {
         return packet;
     }
 
+
     /**
      * Remove the 8 byte checksum from the front of the byte array.
      *
@@ -127,6 +143,7 @@ final class Packets {
 
         return data;
     }
+
 
     /**
      * Validates the checksum at the front of the byte array.  Intended to be used immediately
