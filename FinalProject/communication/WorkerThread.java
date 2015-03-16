@@ -4,6 +4,9 @@
  *
  *	WorkerThread.java
  *
+ *  Does all the 'work' for each connection.  Decodes packets, sends them to the received queue, and encodes packets
+ *  and sends them to the connected server.
+ *
  */
 
 package FinalProject.communication;
@@ -29,10 +32,12 @@ class WorkerThread implements Runnable{
     BlockingQueue<Object> receivedObjectQueue;
 
     /**
-     * @param connection
-     * @param socket
-     * @param receivedObjectQueue
-     * @param queueSemaphore
+     * Constructor for the worker thread.
+     *
+     * @param connection            Connection object associated with the worker thread.
+     * @param socket                Socket to send messages out on.
+     * @param receivedObjectQueue   Queue to put received messages on.
+     * @param queueSemaphore        Semaphore governing access to the queue.
      * @throws SocketException
      */
     public WorkerThread(Connection connection, DatagramSocket socket, BlockingQueue<Object> receivedObjectQueue, Semaphore queueSemaphore) throws SocketException {
@@ -82,11 +87,10 @@ class WorkerThread implements Runnable{
                             if (obj instanceof Ack) {
                                 waitingOnReply = false;
                                 Ack receivedAck = (Ack) obj;
-                                if (receivedAck.getStatus()) {
+                                if (receivedAck.getCorrupted()) {
                                     lastSentPacketTime = sendPacket(lastPacketSent, !lastPacketSentAck);
                                 }
                             } else if (obj instanceof Connect) {
-                                Connect connect = (Connect) obj;
                                 sendAck(false);
                             } else if (obj instanceof Disconnect) {
                                 cleanDisconnect = true;
@@ -115,9 +119,8 @@ class WorkerThread implements Runnable{
 
 
             // Sending
-            outgoingPacket = connection.outgoingPacketQueue.poll();
-
             try {
+                outgoingPacket = connection.getOutgoingNonBlocking();
                 if (outgoingPacket != null) {
                     lastSentPacketTime = sendPacket(outgoingPacket, true);
                     lastPacketSentAck = false;
@@ -154,8 +157,9 @@ class WorkerThread implements Runnable{
 
 
     /**
-     * @param lastSentPacketTime
-     * @return
+     *
+     * @param lastSentPacketTime    System time the last message was sent.
+     * @return                      True if timeout, false if not.
      */
     private boolean timeoutOnLastPacket(long lastSentPacketTime) {
         return lastSentPacketTime > 0 && (System.currentTimeMillis() - lastSentPacketTime) > 2000;
@@ -163,9 +167,11 @@ class WorkerThread implements Runnable{
 
 
     /**
-     * @param packet
-     * @param waiting
-     * @return
+     * Sends a packet
+     *
+     * @param packet        Packet to send.
+     * @param waiting       Set if the packet requires a timeout.
+     * @return              Time the packet is sent.
      * @throws IOException
      */
     private long sendPacket(DatagramPacket packet, boolean waiting) throws IOException {
@@ -176,7 +182,9 @@ class WorkerThread implements Runnable{
 
 
     /**
-     * @param corrupted
+     * Sends an ack.
+     *
+     * @param corrupted     True if the packet was corrupted and the ack is requesting a retransmission
      * @throws IOException
      */
     private void sendAck(boolean corrupted) throws IOException {
