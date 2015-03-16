@@ -16,7 +16,7 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
+//import java.util.concurrent.TimeUnit; // Functions associated with this are unused.
 
 class Connection implements Serializable{
     private int port;
@@ -78,26 +78,38 @@ class Connection implements Serializable{
     }
 
 
+
+    //*** incomingPacketQueue Methods ***\\\
+
+
     /**
+     * UNUSED.
+     * Blocks until there's an object in the incoming queue, then returns it.
      *
      * @return              The first object in the queue.
      * @throws InterruptedException
      */
+    /*
     DatagramPacket getIncomingBlocking() throws InterruptedException {
         return incomingPacketQueue.take();
     }
+    */
 
 
     /**
+     * UNUSED.
+     * Blocks for the specified duration or until there's an object in the incoming queue, then returns it.
      *
      * @param timeDuration      The time to spend waiting on an object.
      * @param timeUnit          The unit of time for the aforementioned.
      * @return                  The first object in the queue.
      * @throws InterruptedException
      */
+    /*
     DatagramPacket getIncomingBlocking(long timeDuration, TimeUnit timeUnit) throws InterruptedException {
         return incomingPacketQueue.poll(timeDuration, timeUnit);
     }
+    */
 
 
     /**
@@ -120,26 +132,38 @@ class Connection implements Serializable{
     }
 
 
+
+    //*** outgoingPacketQueue Methods ***\\\
+
+
     /**
+     * UNUSED.
+     * Blocks until there's an object in the outgoing queue, then returns it.
      *
      * @return              The first object in the queue.
      * @throws InterruptedException
      */
+    /*
     DatagramPacket getOutgoingBlocking() throws InterruptedException {
         return outgoingPacketQueue.take();
     }
+    */
 
 
     /**
+     * UNUSED.
+     * Blocks for the specified duration or until there's an object in the outgoing queue, then returns it.
      *
      * @param timeDuration      The time to spend waiting on an object.
      * @param timeUnit          The unit of time for the aforementioned.
      * @return                  The first object in the queue.
      * @throws InterruptedException
      */
+    /*
     DatagramPacket getOutgoingBlocking(long timeDuration, TimeUnit timeUnit) throws InterruptedException {
         return outgoingPacketQueue.poll(timeDuration, timeUnit);
     }
+    */
 
 
     /**
