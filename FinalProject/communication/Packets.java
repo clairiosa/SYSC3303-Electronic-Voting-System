@@ -21,7 +21,7 @@ import java.util.zip.Checksum;
 final class Packets {
 
     //todo-dave Add these as function parameters, not constants.
-    static final int MAX_PACKET_SIZE = 512;
+    static final int MAX_PACKET_SIZE = 8192;
     static final int MAX_PACKET_SIZE_BYTES = 4;
     static final int CHECKSUM_BYTE_SIZE = 8;
 
@@ -43,12 +43,7 @@ final class Packets {
      */
     static DatagramPacket craftPacket(Object obj, InetAddress address, int port) throws IOException {
         byte[] objectBytes = serialize(obj);
-        byte[] objectLength = ByteBuffer.allocate(8).putInt(objectBytes.length).array();
-
-        byte[] packet = new byte[MAX_PACKET_SIZE-CHECKSUM_BYTE_SIZE-MAX_PACKET_SIZE_BYTES];
-        System.arraycopy(objectLength, 0, packet, 0, MAX_PACKET_SIZE_BYTES);
-        System.arraycopy(objectBytes, 0, packet, MAX_PACKET_SIZE_BYTES, objectLength.length);
-        packet = addChecksum(packet);
+        byte[] packet = addChecksum(objectBytes);
         return new DatagramPacket(packet, packet.length, address, port);
     }
 
@@ -63,13 +58,8 @@ final class Packets {
      */
     static Object decodePacket(DatagramPacket packet) throws IOException, ClassNotFoundException {
         byte[] packetData = packet.getData();
-        byte[] data = removeChecksum(packetData);
-        byte[] objectLength = new byte[MAX_PACKET_SIZE_BYTES];
-        System.arraycopy(data, 0, objectLength, 0, MAX_PACKET_SIZE_BYTES);
-        byte[] objectBytes = new byte[ByteBuffer.wrap(objectLength).getInt()];
-        System.arraycopy(data, MAX_PACKET_SIZE_BYTES, objectBytes, 0, objectBytes.length);
-
-        return deserialize(objectBytes);
+        byte[] objectBytes = Packets.removeChecksum(packetData);
+        return deserialize(objectBytes, 0, objectBytes.length);
     }
 
 
@@ -98,9 +88,9 @@ final class Packets {
      * @throws java.io.IOException
      * @throws ClassNotFoundException
      */
-    static Object deserialize(byte[] data) throws IOException, ClassNotFoundException {
-        ByteArrayInputStream in = new ByteArrayInputStream(data);
-        ObjectInputStream is = new ObjectInputStream(in);
+    static Object deserialize(byte[] data, int offset, int length) throws IOException, ClassNotFoundException {
+        ByteArrayInputStream in = new ByteArrayInputStream(data, offset, length);
+        ObjectInputStream is = new ObjectInputStream(new BufferedInputStream(in));
         return is.readObject();
     }
 
@@ -152,8 +142,7 @@ final class Packets {
      * @param   packet  Byte array to validate the checksum for.
      * @return          Boolean indicating if the checksum passed or not.
      */
-    static boolean validateChecksum(byte[] packet) {
-        int length = packet.length;
+    static boolean validateChecksum(byte[] packet, int length) {
         Checksum checksum = new CRC32();
         byte[] checksumBytes = new byte[CHECKSUM_BYTE_SIZE];
 
@@ -164,5 +153,13 @@ final class Packets {
         long givenChecksumValue = ByteBuffer.wrap(checksumBytes).getLong();
 
         return (calculatedChecksumValue == givenChecksumValue);
+    }
+
+
+
+    static long calculateChecksum(byte[] data, int length) {
+        Checksum checksum = new CRC32();
+        checksum.update(data, 0, length);
+        return checksum.getValue();
     }
 }

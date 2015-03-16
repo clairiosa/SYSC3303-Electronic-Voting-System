@@ -12,12 +12,15 @@
 package FinalProject.communication;
 
 
+import FinalProject.communication.communicationobjects.Connect;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 public class Comm implements CommInterface {
@@ -25,6 +28,8 @@ public class Comm implements CommInterface {
     private ListenThread listener;
     private Thread listenThread;
     private Connection parentConnection = null;
+
+    private Semaphore queueSemaphore;
 
     private BlockingQueue<Object> receivedObjectQueue = new LinkedBlockingQueue<Object>();
 
@@ -36,7 +41,8 @@ public class Comm implements CommInterface {
      * @throws SocketException
      */
     public Comm(int port) throws SocketException {
-        listener = new ListenThread(port, receivedObjectQueue);
+        queueSemaphore = new Semaphore(1);
+        listener = new ListenThread(port, receivedObjectQueue, queueSemaphore);
         listenThread = new Thread(listener);
         listenThread.start();
     }
@@ -53,7 +59,7 @@ public class Comm implements CommInterface {
     @Override
     public void connectToParent(InetAddress parentServer, int port) throws IOException, InterruptedException {
         parentConnection = listener.createConnection(parentServer, port);
-        DatagramPacket outgoingPacket = Packets.craftPacket("INSERT NEW CONNECTION OBJECT HERE", parentConnection.getAddress(), parentConnection.getPort());
+        DatagramPacket outgoingPacket = Packets.craftPacket(new Connect(port), parentConnection.getAddress(), parentConnection.getPort());
         parentConnection.outgoingPacketQueue.put(outgoingPacket);
 
     }
@@ -102,8 +108,7 @@ public class Comm implements CommInterface {
         if (parentConnection == null){
             //TODO-Dave Custom Exception.
         } else {
-            DatagramPacket outgoingPacket;
-            outgoingPacket = Packets.craftPacket(obj, parentConnection.getAddress(), parentConnection.getPort());
+            DatagramPacket outgoingPacket = Packets.craftPacket(obj, parentConnection.getAddress(), parentConnection.getPort());
             parentConnection.outgoingPacketQueue.put(outgoingPacket);
         }
     }
@@ -118,9 +123,8 @@ public class Comm implements CommInterface {
      */
     @Override
     public void broadcastMessage(Object obj) throws IOException, InterruptedException {
-        DatagramPacket outgoingPacket;
         for (Connection connection : listener.connectionHashMap.values()) {
-            outgoingPacket = Packets.craftPacket(obj, connection.getAddress(), connection.getPort());
+            DatagramPacket outgoingPacket = Packets.craftPacket(obj, connection.getAddress(), connection.getPort());
             connection.outgoingPacketQueue.put(outgoingPacket);
         }
     }
@@ -137,14 +141,13 @@ public class Comm implements CommInterface {
      */
     @Override
     public void sendTestMessage(String string) throws IOException, InterruptedException {
-        DatagramPacket outgoingPacket;
         for (Connection connection : listener.connectionHashMap.values()) {
             if (!connection.equals(parentConnection)) {
-                outgoingPacket = Packets.craftPacket(string, connection.getAddress(), connection.getPort());
+                DatagramPacket outgoingPacket = Packets.craftPacket(string, connection.getAddress(), connection.getPort());
                 connection.outgoingPacketQueue.put(outgoingPacket);
             }
         }
-        outgoingPacket = Packets.craftPacket("Parent: " + string, parentConnection.getAddress(), parentConnection.getPort());
+        DatagramPacket outgoingPacket = Packets.craftPacket("Parent: " + string, parentConnection.getAddress(), parentConnection.getPort());
         parentConnection.outgoingPacketQueue.put(outgoingPacket);
     }
 

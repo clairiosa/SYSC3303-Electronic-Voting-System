@@ -21,6 +21,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Semaphore;
 
 class ListenThread implements Runnable {
 
@@ -31,13 +32,15 @@ class ListenThread implements Runnable {
     int listenPort;
     DatagramSocket listenSocket;
     BlockingQueue<Object> receivedObjectQueue;
+    Semaphore queueSemaphore;
 
 
 
-    public ListenThread(int listenPort, BlockingQueue<Object> receivedObjectQueue) throws SocketException {
+    public ListenThread(int listenPort, BlockingQueue<Object> receivedObjectQueue, Semaphore queueSemaphore) throws SocketException {
         this.listenPort = listenPort;
         listenSocket = new DatagramSocket(listenPort);
         this.receivedObjectQueue = receivedObjectQueue;
+        this.queueSemaphore = queueSemaphore;
     }
 
 
@@ -45,10 +48,9 @@ class ListenThread implements Runnable {
     @Override
     public void run() {
         byte[] buffer = new byte[MAX_PACKET_SIZE];
-        DatagramPacket incomingPacket;
 
         while (true) {
-            incomingPacket = new DatagramPacket(buffer, buffer.length);
+            DatagramPacket incomingPacket = new DatagramPacket(buffer, buffer.length);
             try {
                 listenSocket.receive(incomingPacket);
             } catch (IOException e) {
@@ -56,6 +58,7 @@ class ListenThread implements Runnable {
             }
 
             String connectionKey = incomingPacket.getAddress().toString() + ":" + incomingPacket.getPort();
+            System.out.println("Message received from " + connectionKey);
             Connection connection = connectionHashMap.get(connectionKey);
             if (connection == null) try {
                 connection = createConnection(incomingPacket.getAddress(), incomingPacket.getPort());
@@ -63,10 +66,19 @@ class ListenThread implements Runnable {
                 break;
             }
 
+
+            System.out.println(connection.getPort());
+
             try {
+                System.out.println("~~~~~~~!~!~!~!~Listener " + Packets.decodePacket(incomingPacket));
                 connection.incomingPacketQueue.put(incomingPacket);
+                System.out.println("################ PLACED IN " + connection.getPort());
             } catch (InterruptedException e) {
                 break;
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
 
@@ -85,7 +97,7 @@ class ListenThread implements Runnable {
 
     Connection createConnection(InetAddress address, int port) throws SocketException {
         Connection newConnection = new Connection(address, port);
-        WorkerThread worker = new WorkerThread(newConnection, listenPort, receivedObjectQueue);
+        WorkerThread worker = new WorkerThread(newConnection, listenSocket, receivedObjectQueue, queueSemaphore);
         Thread workerThread = new Thread(worker);
         newConnection.setWorkerThread(workerThread);
 
@@ -95,7 +107,11 @@ class ListenThread implements Runnable {
         return newConnection;
     }
 
-    void disconnect() {
+    void disconnect() throws InterruptedException {
+        for (Connection connection : connectionHashMap.values()) {
+            connection.getWorkerThread().interrupt();
+            connection.getWorkerThread().join();
+        }
         listenSocket.close();
     }
 
