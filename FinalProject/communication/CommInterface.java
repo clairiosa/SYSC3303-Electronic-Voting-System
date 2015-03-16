@@ -4,65 +4,116 @@
  *
  *	CommInterface.java
  *
+ *
+ *  Public functions used for sending and receiving objects.
+ *
+ *  Received objects from the network are placed in a queue for the class instancing Comm to retrieve.  It is
+ *  that classes responsibility to determine what the object is.  (Use instanceof).
+ *
  */
-
 
 
 package FinalProject.communication;
 
 
-
-import FinalProject.Ballot;
-import FinalProject.persons.Candidate;
-
+import java.io.IOException;
 import java.net.InetAddress;
-import java.net.SocketException;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.TimeUnit;
 
 interface CommInterface {
-    public int connect() throws TimeoutException, SocketException;
-	public int connect(InetAddress parentServer, int port) throws TimeoutException;
-	public int disconnect();
+
 
     /**
-     * Sends the object specified to the target.  Returns 0 if success, otherwise returns
-     * an error code.
+     * Initializes a connection to the parent server of this particular server/client.  Should only be called once.
      *
-     * @param ballot
-     * @return
+     * @param parentServer      The IP Address of the parent server.
+     * @param port              The port of the parent server.
+     * @throws IOException
+     * @throws InterruptedException
      */
-    //TODO-dave Add way to specify target (String?)
-    public int sendMessage(Ballot ballot);
-    public int sendMessage(Candidate candidate);
+    public void connectToParent(InetAddress parentServer, int port) throws IOException, InterruptedException;
 
-
-
-    // Master server stuff.
-    /*
-    public MasterServerInformation receiveMasterInfo(){
-		
-	}
-	//not sure about params, feel free to remove them
-	public void StartMasterServer(int serverPort, int destinationPort){
-		
-	}
-	
-	public void CloseMasterServer(){
-		
-	}
-	
-	public void sendElectionResults(ElectionResults results){
-		
-	}
-	*/
 
     /**
-     * Returns the message received.  The class using this function needs to determine
-     * the type of message being received using instanceof or getClass().
+     * Closes all threads and connections gracefully in preparation for shutting down the application.
      *
-     * @return      The object
+     * @throws InterruptedException
      */
-	public <T> T receiveMessage();
+    public void shutdown() throws InterruptedException;
 
-    //TODO-dave Add other methods of receiving message (ie only receive ballot)
+
+    /**
+     * Sends the object to each client connected to this server.
+     *
+     * @param obj               Object to send to each client.
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public void sendMessageClient(Object obj) throws IOException, InterruptedException;
+
+
+    /**
+     * Sends the object to the connected parent server.
+     *
+     * @param obj               Object to send to the parent.
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public void sendMessageParent(Object obj) throws IOException, InterruptedException;
+
+
+    /**
+     * Sends the object to every connection present.
+     *
+     * @param obj               Object to broadcast to every connection.
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public void broadcastMessage(Object obj) throws IOException, InterruptedException;
+
+
+    /**
+     * Sends a test string to every connection present, will send a slightly modified string to the parent.
+     * Will probably be removed in the future, used for testing.
+     *
+     * @param string            String to send to every connection.
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public void sendTestMessage(String string) throws IOException, InterruptedException;
+
+
+    /**
+     * Retrieves the first object available in the queue, null if no objects are available.
+     * Received objects from the network are placed in a queue for the class instancing Comm to retrieve.  It is
+     * that classes responsibility to determine what the object is.  (Use instanceof).
+     *
+     * @return      The first object in the queue.
+     */
+    public Object getMessageNonBlocking();
+
+
+    /**
+     * Waits to retrieve the first object in the queue, blocks operation.
+     * Received objects from the network are placed in a queue for the class instancing Comm to retrieve.  It is
+     * that classes responsibility to determine what the object is.  (Use instanceof).
+     *
+     * @return      The first object in the queue.
+     * @throws InterruptedException
+     */
+    public Object getMessageBlocking() throws InterruptedException;
+
+
+    /**
+     * Waits for a specified duration for an object to appear in the queue, blocks operation until then.
+     * Received objects from the network are placed in a queue for the class instancing Comm to retrieve.  It is
+     * that classes responsibility to determine what the object is.  (Use instanceof).
+     *
+     * @param timeDuration      The time to spend waiting on an object.
+     * @param timeUnit          The unit of time for the aforementioned.
+     * @return                  The first object in the queue.
+     * @throws InterruptedException
+     */
+    public Object getMessageBlocking(long timeDuration, TimeUnit timeUnit) throws InterruptedException;
 }
+
