@@ -27,7 +27,7 @@ class ListenThread implements Runnable {
     private static final int MAX_PACKET_SIZE = 8192;
 
 
-    private HashMap<String, Connection> connectionHashMap = new HashMap<String, Connection>();
+    HashMap<String, Connection> connectionHashMap = new HashMap<String, Connection>();
     private DatagramSocket listenSocket;
     private BlockingQueue<Object> receivedObjectQueue;
     private Semaphore queueSemaphore;
