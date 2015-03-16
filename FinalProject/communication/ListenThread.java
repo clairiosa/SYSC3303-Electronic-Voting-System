@@ -27,33 +27,36 @@ class ListenThread implements Runnable {
     private static final int MAX_PACKET_SIZE = 8192;
 
 
-    HashMap<String, Connection> connectionHashMap = new HashMap<String, Connection>();
-    int listenPort;
-    DatagramSocket listenSocket;
-    BlockingQueue<Object> receivedObjectQueue;
-    Semaphore queueSemaphore;
+    private HashMap<String, Connection> connectionHashMap = new HashMap<String, Connection>();
+    private DatagramSocket listenSocket;
+    private BlockingQueue<Object> receivedObjectQueue;
+    private Semaphore queueSemaphore;
 
 
     /**
-     * @param listenPort
-     * @param receivedObjectQueue
-     * @param queueSemaphore
+     * Sole constructor for the ListenThread object.  Only one is expected to exist for each implementation of Comm.
+     *
+     * @param listenPort            Port to open the listen socket on.
+     * @param receivedObjectQueue   The queue to place received objects into for access from the class using Comm.
+     * @param queueSemaphore        A semaphore preventing multiple workers from writing to the queue at once.
+     *                              Potentially unnecessary, added as a precaution while bug testing.
      * @throws SocketException
      */
     public ListenThread(int listenPort, BlockingQueue<Object> receivedObjectQueue, Semaphore queueSemaphore) throws SocketException {
-        this.listenPort = listenPort;
         listenSocket = new DatagramSocket(listenPort);
         this.receivedObjectQueue = receivedObjectQueue;
         this.queueSemaphore = queueSemaphore;
     }
 
 
-
+    /**
+     * Thread run, grabs packets off the socket and sends them to their respective worker threads
+     */
     @Override
     public void run() {
 
         while (true) {
-
+            // Grab the packet.
             byte[] buffer = new byte[MAX_PACKET_SIZE];
             DatagramPacket incomingPacket = new DatagramPacket(buffer, buffer.length);
             try {
@@ -62,14 +65,18 @@ class ListenThread implements Runnable {
                 break;
             }
 
+            // Grab the associated open connection.
             String connectionKey = incomingPacket.getAddress().toString() + ":" + incomingPacket.getPort();
             Connection connection = connectionHashMap.get(connectionKey);
+
+            // If we do not have a connection open.
             if (connection == null) try {
                 connection = createConnection(incomingPacket.getAddress(), incomingPacket.getPort());
             } catch (SocketException e) {
                 break;
             }
 
+            // Pass the packet to the connections worker thread.
             try {
                 connection.putIncomingBlocking(incomingPacket);
             } catch (InterruptedException e) {
@@ -78,7 +85,8 @@ class ListenThread implements Runnable {
 
         }
 
-
+        // In case of not closing gracefully.
+        // Sending an interrupt to each worker thread then waiting for them to join.
         for (Connection connection : connectionHashMap.values()) {
             connection.getWorkerThread().interrupt();
             try {
@@ -92,9 +100,12 @@ class ListenThread implements Runnable {
 
 
     /**
-     * @param address
-     * @param port
-     * @return
+     * Creates a new connection object, adds it to the hashMap keeping track of them,
+     * and then returns the connection object.
+     *
+     * @param address       Address of server/client to open the connection with.
+     * @param port          Port of server/client to open the connection with.
+     * @return              Connection object.
      * @throws SocketException
      */
     Connection createConnection(InetAddress address, int port) throws SocketException {
@@ -110,6 +121,8 @@ class ListenThread implements Runnable {
     }
 
     /**
+     * Closes the worker threads and then closes the socket, causing an exception and closing this thread.
+     *
      * @throws InterruptedException
      */
     void disconnect() throws InterruptedException {
