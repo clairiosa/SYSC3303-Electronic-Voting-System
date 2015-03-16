@@ -20,9 +20,6 @@ import java.util.zip.Checksum;
 
 final class Packets {
 
-    //todo-dave Add these as function parameters, not constants.
-    static final int MAX_PACKET_SIZE = 8192;
-    static final int MAX_PACKET_SIZE_BYTES = 4;
     static final int CHECKSUM_BYTE_SIZE = 8;
 
 
