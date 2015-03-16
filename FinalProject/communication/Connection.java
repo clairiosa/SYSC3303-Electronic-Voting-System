@@ -24,7 +24,7 @@ class Connection implements Serializable{
     private Thread workerThread;
 
     private BlockingQueue<DatagramPacket> incomingPacketQueue;
-    BlockingQueue<DatagramPacket> outgoingPacketQueue;
+    private BlockingQueue<DatagramPacket> outgoingPacketQueue;
 
 
     /**
@@ -46,7 +46,7 @@ class Connection implements Serializable{
      *
      * @return  The port number of the destination.
      */
-    public int getPort() {
+    int getPort() {
         return port;
     }
 
@@ -55,7 +55,7 @@ class Connection implements Serializable{
      *
      * @return  The ip address of the destination
      */
-    public InetAddress getAddress() {
+    InetAddress getAddress() {
         return address;
     }
 
@@ -64,7 +64,7 @@ class Connection implements Serializable{
      *
      * @return  The thread object currently working on this connection.
      */
-    public Thread getWorkerThread() {
+    Thread getWorkerThread() {
         return workerThread;
     }
 
@@ -73,7 +73,7 @@ class Connection implements Serializable{
      *
      * @param workerThread  The thread object intended to work on this connection
      */
-    public void setWorkerThread(Thread workerThread) {
+    void setWorkerThread(Thread workerThread) {
         this.workerThread = workerThread;
     }
 
@@ -83,7 +83,7 @@ class Connection implements Serializable{
      * @return              The first object in the queue.
      * @throws InterruptedException
      */
-    public DatagramPacket getIncomingBlocking() throws InterruptedException {
+    DatagramPacket getIncomingBlocking() throws InterruptedException {
         return incomingPacketQueue.take();
     }
 
@@ -95,7 +95,7 @@ class Connection implements Serializable{
      * @return                  The first object in the queue.
      * @throws InterruptedException
      */
-    public DatagramPacket getIncomingBlocking(long timeDuration, TimeUnit timeUnit) throws InterruptedException {
+    DatagramPacket getIncomingBlocking(long timeDuration, TimeUnit timeUnit) throws InterruptedException {
         return incomingPacketQueue.poll(timeDuration, timeUnit);
     }
 
@@ -105,7 +105,7 @@ class Connection implements Serializable{
      * @return                  The first object in the queue.
      * @throws InterruptedException
      */
-    public DatagramPacket getIncomingNonBlocking() throws InterruptedException {
+    DatagramPacket getIncomingNonBlocking() throws InterruptedException {
         return incomingPacketQueue.poll();
     }
 
@@ -115,7 +115,49 @@ class Connection implements Serializable{
      * @param packet            Packet to place at the tail of the queue.
      * @throws InterruptedException
      */
-    public void putIncomingBlocking(DatagramPacket packet) throws InterruptedException {
+    void putIncomingBlocking(DatagramPacket packet) throws InterruptedException {
         incomingPacketQueue.put(packet);
+    }
+
+
+    /**
+     *
+     * @return              The first object in the queue.
+     * @throws InterruptedException
+     */
+    DatagramPacket getOutgoingBlocking() throws InterruptedException {
+        return outgoingPacketQueue.take();
+    }
+
+
+    /**
+     *
+     * @param timeDuration      The time to spend waiting on an object.
+     * @param timeUnit          The unit of time for the aforementioned.
+     * @return                  The first object in the queue.
+     * @throws InterruptedException
+     */
+    DatagramPacket getOutgoingBlocking(long timeDuration, TimeUnit timeUnit) throws InterruptedException {
+        return outgoingPacketQueue.poll(timeDuration, timeUnit);
+    }
+
+
+    /**
+     *
+     * @return                  The first object in the queue.
+     * @throws InterruptedException
+     */
+    DatagramPacket getOutgoingNonBlocking() throws InterruptedException {
+        return outgoingPacketQueue.poll();
+    }
+
+
+    /**
+     *
+     * @param packet            Packet to place at the tail of the queue.
+     * @throws InterruptedException
+     */
+    void putOutgoingBlocking(DatagramPacket packet) throws InterruptedException {
+        outgoingPacketQueue.put(packet);
     }
 }
