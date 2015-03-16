@@ -55,6 +55,15 @@ public class CommTest {
         String objectExample; // Our test object to send.
 
 
+        /******************************************************************
+         **************************** IMPORTANT ***************************
+         ******************************************************************/
+        /*
+         * Each custom class sent over Comm MUST IMPLEMENT Serializable.
+         * See any object in FinalProject.communication.communicationobjects for details.
+         */
+
+
 
         // MasterServer -> District Servers
         System.out.println("\nMasterServer -> District Servers");
