@@ -153,7 +153,13 @@ final class Packets {
     }
 
 
-
+    /**
+     * Calculates a checksum given an array of bytes.
+     *
+     * @param data      The byte array to checksum
+     * @param length    Length of the byte array.
+     * @return          The checksum value.
+     */
     static long calculateChecksum(byte[] data, int length) {
         Checksum checksum = new CRC32();
         checksum.update(data, 0, length);
