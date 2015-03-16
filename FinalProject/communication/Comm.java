@@ -6,6 +6,10 @@
  *
  * Implementation of CommInterface.
  *
+ * Responsible for all network traffic within the Electronic Voting System.  Simulates TCP/IP through UDP (Uses
+ * ACKs, Checksums and requests retransmission of corrupted packets).  Each server/client implements an instance
+ * of this class.
+ *
  */
 
 
@@ -58,7 +62,7 @@ public class Comm implements CommInterface {
     public void connectToParent(InetAddress parentServer, int port) throws IOException, InterruptedException {
         parentConnection = listener.createConnection(parentServer, port);
         DatagramPacket outgoingPacket = Packets.craftPacket(new Connect(port), parentConnection.getAddress(), parentConnection.getPort());
-        parentConnection.outgoingPacketQueue.put(outgoingPacket);
+        parentConnection.putOutgoingBlocking(outgoingPacket);
 
     }
 
@@ -88,7 +92,7 @@ public class Comm implements CommInterface {
         for (Connection connection : listener.connectionHashMap.values()) {
             if (!connection.equals(parentConnection)) {
                 outgoingPacket = Packets.craftPacket(obj, connection.getAddress(), connection.getPort());
-                connection.outgoingPacketQueue.put(outgoingPacket);
+                connection.putOutgoingBlocking(outgoingPacket);
             }
         }
     }
@@ -103,12 +107,11 @@ public class Comm implements CommInterface {
      */
     @Override
     public void sendMessageParent(Object obj) throws IOException, InterruptedException {
-        if (parentConnection == null){
-            //TODO-Dave Custom Exception.
-        } else {
+        if (parentConnection != null){
             DatagramPacket outgoingPacket = Packets.craftPacket(obj, parentConnection.getAddress(), parentConnection.getPort());
-            parentConnection.outgoingPacketQueue.put(outgoingPacket);
+            parentConnection.putOutgoingBlocking(outgoingPacket);
         }
+        //TODO-Dave Custom Exception if the parent connection is null.
     }
 
 
@@ -123,7 +126,7 @@ public class Comm implements CommInterface {
     public void broadcastMessage(Object obj) throws IOException, InterruptedException {
         for (Connection connection : listener.connectionHashMap.values()) {
             DatagramPacket outgoingPacket = Packets.craftPacket(obj, connection.getAddress(), connection.getPort());
-            connection.outgoingPacketQueue.put(outgoingPacket);
+            connection.putOutgoingBlocking(outgoingPacket);
         }
     }
 
