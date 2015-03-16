@@ -38,7 +38,7 @@ public class CommTest {
         Comm clientServer3 = new Comm(2103);
         Comm clientServer4 = new Comm(2104);
 
-        // Always connect to the parent before having children connection
+        // Always connect to the parent before having children connect
         districtServer1.connectToParent(InetAddress.getByName("127.0.0.1"), 2000);
         clientServer1.connectToParent(InetAddress.getByName("127.0.0.1"), 2011);
         clientServer2.connectToParent(InetAddress.getByName("127.0.0.1"), 2011);
