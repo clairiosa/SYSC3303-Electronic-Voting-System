@@ -29,7 +29,7 @@ class WorkerThread implements Runnable{
     DatagramSocket socket;
     Semaphore queueSemaphore;
 
-    BlockingQueue<Object> receivedObjectQueue;
+    BlockingQueue<CommTuple> receivedObjectQueue;
 
     /**
      * Constructor for the worker thread.
@@ -40,7 +40,7 @@ class WorkerThread implements Runnable{
      * @param queueSemaphore        Semaphore governing access to the queue.
      * @throws SocketException
      */
-    public WorkerThread(Connection connection, DatagramSocket socket, BlockingQueue<Object> receivedObjectQueue, Semaphore queueSemaphore) throws SocketException {
+    public WorkerThread(Connection connection, DatagramSocket socket, BlockingQueue<CommTuple> receivedObjectQueue, Semaphore queueSemaphore) throws SocketException {
         threadId = Thread.currentThread().getId();
         this.connection = connection;
 
@@ -97,7 +97,7 @@ class WorkerThread implements Runnable{
                                 break;
                             } else {
                                 queueSemaphore.acquire();
-                                receivedObjectQueue.put(obj);
+                                receivedObjectQueue.put(new CommTuple(obj, connection));
                                 queueSemaphore.release();
                                 sendAck(false);
                             }

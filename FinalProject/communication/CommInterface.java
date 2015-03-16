@@ -104,5 +104,15 @@ interface CommInterface {
      * @throws InterruptedException
      */
     public Object getMessageBlocking(long timeDuration, TimeUnit timeUnit) throws InterruptedException;
+
+
+    /**
+     * Replies to the last message taking off the queue.
+     *
+     * @param obj               Object to reply with.
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public void replyToLastMessage(Object obj) throws IOException, InterruptedException;
 }
 

@@ -32,9 +32,9 @@ public class Comm implements CommInterface {
     private ListenThread listener;
     private Thread listenThread;
     private Connection parentConnection = null;
+    private Connection replyConnection = null;
 
-    private BlockingQueue<Object> receivedObjectQueue = new LinkedBlockingQueue<Object>();
-
+    private BlockingQueue<CommTuple> receivedObjectQueue = new LinkedBlockingQueue<CommTuple>();
 
     /**
      * Sole constructor for the Comm objects, initializes the listener threads.
@@ -61,7 +61,7 @@ public class Comm implements CommInterface {
     @Override
     public void connectToParent(InetAddress parentServer, int port) throws IOException, InterruptedException {
         parentConnection = listener.createConnection(parentServer, port);
-        DatagramPacket outgoingPacket = Packets.craftPacket(new Connect(port), parentConnection.getAddress(), parentConnection.getPort());
+        DatagramPacket outgoingPacket = Packets.craftPacket(new Connect(), parentConnection.getAddress(), parentConnection.getPort());
         parentConnection.putOutgoingBlocking(outgoingPacket);
 
     }
@@ -140,7 +140,9 @@ public class Comm implements CommInterface {
      */
     @Override
     public Object getMessageNonBlocking() {
-        return receivedObjectQueue.poll();
+        CommTuple receivedCommTuple = receivedObjectQueue.poll();
+        replyConnection = receivedCommTuple.getConnection();
+        return receivedCommTuple.getObj();
     }
 
 
@@ -154,7 +156,9 @@ public class Comm implements CommInterface {
      */
     @Override
     public Object getMessageBlocking() throws InterruptedException {
-        return receivedObjectQueue.take();
+        CommTuple receivedCommTuple = receivedObjectQueue.take();
+        replyConnection = receivedCommTuple.getConnection();
+        return receivedCommTuple.getObj();
     }
 
 
@@ -173,4 +177,17 @@ public class Comm implements CommInterface {
         return receivedObjectQueue.poll(timeDuration, timeUnit);
     }
 
+
+    /**
+     * Replies to the last message taking off the queue.
+     *
+     * @param obj               Object to reply with.
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    @Override
+    public void replyToLastMessage(Object obj) throws IOException, InterruptedException {
+        DatagramPacket outgoingPacket = Packets.craftPacket(obj, replyConnection.getAddress(), replyConnection.getPort());
+        replyConnection.putOutgoingBlocking(outgoingPacket);
+    }
 }

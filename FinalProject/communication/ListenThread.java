@@ -29,7 +29,7 @@ class ListenThread implements Runnable {
 
     HashMap<String, Connection> connectionHashMap = new HashMap<String, Connection>();
     private DatagramSocket listenSocket;
-    private BlockingQueue<Object> receivedObjectQueue;
+    private BlockingQueue<CommTuple> receivedObjectQueue;
     private Semaphore queueSemaphore;
 
 
@@ -42,7 +42,7 @@ class ListenThread implements Runnable {
      *                              Potentially unnecessary, added as a precaution while bug testing.
      * @throws SocketException
      */
-    public ListenThread(int listenPort, BlockingQueue<Object> receivedObjectQueue, Semaphore queueSemaphore) throws SocketException {
+    public ListenThread(int listenPort, BlockingQueue<CommTuple> receivedObjectQueue, Semaphore queueSemaphore) throws SocketException {
         listenSocket = new DatagramSocket(listenPort);
         this.receivedObjectQueue = receivedObjectQueue;
         this.queueSemaphore = queueSemaphore;
