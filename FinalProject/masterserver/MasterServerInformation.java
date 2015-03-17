@@ -14,78 +14,75 @@ package FinalProject.masterserver;
 
 import FinalProject.persons.Candidate;
 import FinalProject.persons.Voter;
-import java.net.DatagramSocket;
-import java.util.*;
+import java.io.Serializable;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class MasterServerInformation {
-	//private ArrayList<Voter> voterList;
-	//private ArrayList<Candidate> candidateList;
-	protected Hashtable<String, Candidate> candidates;
-	protected Hashtable<String, Voter> voters;
-	private DatagramSocket districtServer;
+public class MasterServerInformation implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	protected ConcurrentHashMap<String, Candidate> candidates;
+	protected ConcurrentHashMap<String, Voter> voters;
 	private int districtID;
-	
-	public MasterServerInformation(){
-		candidates = new Hashtable<String, Candidate>();
-		voters = new Hashtable<String, Voter>();
-	}
-	
-	public MasterServerInformation(Hashtable<String, Candidate> candidates, Hashtable<String, Voter> voters){
-		this.candidates = candidates; 
-		this.voters = voters; 
-	}
-	
-	public Hashtable<String, Voter> getVoters(){
-		return voters; 
-	}
-	
-	public Hashtable<String, Candidate> getCandidates(){
-		return candidates; 
-	}
-	
-	public DatagramSocket getDistrictServer(){
-		return districtServer; 
-	}
-	public int getDistrictID(){
-		return districtID; 
-	}
-	
-	public boolean addCandidate(Candidate c){
-		candidates.put(c.getName(), c);
-		return true; 
-	}
-	
-	public boolean addVoter(Voter v){
-		if(v.hasVoted()){
-			voters.put(v.getName(), v);
-			return true;
-		}
-		System.out.printf("Voter %s has already voted.");
-		return false;
 
+	public MasterServerInformation() {
+		candidates = new ConcurrentHashMap<String, Candidate>();
+		voters = new ConcurrentHashMap<String, Voter>();
 	}
-	
-	   /** Retrieve a voter object
-	    **/
-	public Voter getVoter(String voter)  {
-	      Voter v = voters.get(voter);
-	      if (v == null) {
-	    	  System.out.println("Not a voter.");
-	    	  return null;
-	      }
-	      return v;
-	   }
-	   
-	   /** Retrieve a candidate object
-	   **/
-	public Candidate getCandidate(String name)  {
-	      Candidate c = candidates.get(name);
-	      if (c == null) {
-	    	  System.out.println("Not a candidate.");
-	    	  return null;
-	      }
-	      return c;
-	   }
-	
-	
+
+	public MasterServerInformation(ConcurrentHashMap<String, Candidate> candidates,
+			ConcurrentHashMap<String, Voter> voters) {
+		this.candidates = candidates;
+		this.voters = voters;
+	}
+
+	public ConcurrentHashMap<String, Voter> getVoters() {
+		return voters;
+	}
+
+	public ConcurrentHashMap<String, Candidate> getCandidates() {
+		return candidates;
+	}
+
+
+	public int getDistrictID() {
+		return districtID;
+	}
+
+	public boolean addCandidate(Candidate c) {
+		candidates.put(c.getName(), c);
+		return true;
+	}
+
+	public boolean addVoter(Voter v) {
+		voters.put(v.getName(), v);
+		return true;
+	}
+
+	/**
+	 * Retrieve a voter object
+	 **/
+	public Voter getVoter(String voter) {
+		Voter v = voters.get(voter);
+		if (v == null) {
+			System.out.println("Not a voter.");
+			return null;
+		}
+		return v;
+	}
+
+	/**
+	 * Retrieve a candidate object
+	 **/
+	public Candidate getCandidate(String name) {
+		Candidate c = candidates.get(name);
+		if (c == null) {
+			System.out.println("Not a candidate.");
+			return null;
+		}
+		return c;
+	}
+
 }
