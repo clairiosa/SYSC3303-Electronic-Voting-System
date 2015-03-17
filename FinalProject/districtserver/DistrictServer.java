@@ -11,6 +11,7 @@ import FinalProject.communication.Comm;
 import FinalProject.masterserver.ElectionResults;
 import FinalProject.masterserver.MasterServerInformation;
 import FinalProject.persons.Person;
+import FinalProject.persons.Voter;
 
 public class DistrictServer implements Runnable {
 
@@ -67,27 +68,41 @@ public class DistrictServer implements Runnable {
 			// voters
 			// periodically receive ElectionResults
 			// periodically send MasterServerInformation to master server
-			
+
 			// from client:
 			// "status" -> ElectionResults
 			// Person -> "true" or "false" registration confirmed or not
 			// Ballot -> "true" or "false" vote valid (must be registered)
-			
+
 			if (recievedMessage instanceof MasterServerInformation) {
 				this.masterServerInfo = (MasterServerInformation) recievedMessage;
+
 			} else if (recievedMessage instanceof ElectionResults) {
+				this.results = (ElectionResults) recievedMessage;
+
+			} else if (recievedMessage instanceof Person) { // register the
+															// person
+				Voter localVoter = this.masterServerInfo
+						.getVoter(((Person) recievedMessage).getName());
 				
-			} else if (recievedMessage instanceof Person) {
+				if(localVoter != null)
+				{
+					localVoter.setRegistered(true);
+					districtComm.sendMessageReply("true");	
+				}
+				else
+					districtComm.sendMessageReply("false");	
 				
-			} else if (recievedMessage instanceof Ballot) {
+			} else if (recievedMessage instanceof Ballot) { // vote with this
+															// person
 				
+
 			} else if (recievedMessage instanceof String) {
 				if (recievedMessage.equals("status")) {
-					//send back the ElectionResults to booth
+					// send back the ElectionResults to booth
 					districtComm.sendMessageReply(results);
 				}
 			}
-
 
 		} catch (Exception e) {
 			e.printStackTrace();
