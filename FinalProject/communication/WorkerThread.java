@@ -28,6 +28,7 @@ class WorkerThread implements Runnable{
     DatagramPacket lastPacketReceived;
     DatagramSocket socket;
     Semaphore queueSemaphore;
+    int maxTimeouts;
 
     BlockingQueue<CommTuple> receivedObjectQueue;
 
@@ -48,6 +49,9 @@ class WorkerThread implements Runnable{
         this.receivedObjectQueue = receivedObjectQueue;
 
         this.queueSemaphore = queueSemaphore;
+
+        maxTimeouts = 5;
+
     }
 
 
@@ -66,6 +70,9 @@ class WorkerThread implements Runnable{
 
         lastPacketSentAck = false;
 
+
+        int currentTimeouts = 0;
+
         while (true) {
 
             // Receiving.
@@ -74,21 +81,41 @@ class WorkerThread implements Runnable{
                 incomingPacket = connection.getIncomingNonBlocking();
                 if (incomingPacket == null) {
                     if (timeoutOnLastPacket(lastSentPacketTime) && waitingOnReply) {
-                        lastSentPacketTime = sendPacket(lastPacketSent, true);
-                        lastPacketSentAck = false;
+                        currentTimeouts++;
+                        if (currentTimeouts == maxTimeouts) {
+                            lastSentPacketTime = 0;
+                            synchronized(connection.waitAckSync) {
+                                connection.setAckResultReady(true);
+                                connection.setAckResult(false);
+                                connection.waitAckSync.notify();
+                            }
+                        } else {
+                            lastSentPacketTime = sendPacket(lastPacketSent, true);
+                            lastPacketSentAck = false;
+                        }
                     }
 
                 } else {
+                    currentTimeouts = 0;
                     if (Packets.validateChecksum(incomingPacket.getData(), incomingPacket.getLength())) {
-                        if (lastPacketReceivedChecksum == Packets.calculateChecksum(incomingPacket.getData(), incomingPacket.getLength())) { //Duplicate
+                        obj = Packets.decodePacket(incomingPacket);
+                        if ((lastPacketReceivedChecksum == Packets.calculateChecksum(incomingPacket.getData(), incomingPacket.getLength())) && !(obj instanceof Ack)) { //Duplicate
                             sendAck(false);
                         } else { // Not duplicate.
-                            obj = Packets.decodePacket(incomingPacket);
                             if (obj instanceof Ack) {
-                                waitingOnReply = false;
-                                Ack receivedAck = (Ack) obj;
-                                if (receivedAck.getCorrupted()) {
-                                    lastSentPacketTime = sendPacket(lastPacketSent, !lastPacketSentAck);
+                                if (waitingOnReply) {
+                                    synchronized(connection.waitAckSync) {
+                                        connection.setAckResultReady(true);
+                                        connection.setAckResult(true);
+                                        connection.waitAckSync.notify();
+                                    }
+                                    waitingOnReply = false;
+                                    Ack receivedAck = (Ack) obj;
+                                    if (receivedAck.isCorrupted()) {
+                                        lastSentPacketTime = sendPacket(lastPacketSent, !lastPacketSentAck);
+                                    } else if (receivedAck.isParentAck()) {
+                                        receivedObjectQueue.put(new CommTuple(obj, connection));
+                                    }
                                 }
                             } else if (obj instanceof Connect) {
                                 sendAck(false);
@@ -128,7 +155,7 @@ class WorkerThread implements Runnable{
                 }
 
                 if (outgoingPacket == null && incomingPacket == null) {
-                    Thread.sleep(10);
+                    Thread.sleep(5);
                 }
 
                 if (Thread.interrupted()) {
@@ -162,7 +189,7 @@ class WorkerThread implements Runnable{
      * @return                      True if timeout, false if not.
      */
     private boolean timeoutOnLastPacket(long lastSentPacketTime) {
-        return lastSentPacketTime > 0 && (System.currentTimeMillis() - lastSentPacketTime) > 2000;
+        return lastSentPacketTime > 0 && (System.currentTimeMillis() - lastSentPacketTime) > 1000;
     }
 
 
@@ -189,6 +216,22 @@ class WorkerThread implements Runnable{
      */
     private void sendAck(boolean corrupted) throws IOException {
         DatagramPacket ackPacket = Packets.craftPacket(new Ack(corrupted), connection.getAddress(), connection.getPort());
+        lastPacketSent = ackPacket;
+        sendPacket(ackPacket, false);
+        lastPacketSentAck = true;
+    }
+
+
+    /**
+     * Sends a parent connection aack.
+     *
+     * @param corrupted     True if the packet was corrupted and the ack is requesting a retransmission
+     * @throws IOException
+     */
+    private void sendAck(boolean corrupted, boolean parentAck) throws IOException {
+        Ack ack = new Ack(corrupted);
+        ack.setParentAck(parentAck);
+        DatagramPacket ackPacket = Packets.craftPacket(ack , connection.getAddress(), connection.getPort());
         lastPacketSent = ackPacket;
         sendPacket(ackPacket, false);
         lastPacketSentAck = true;

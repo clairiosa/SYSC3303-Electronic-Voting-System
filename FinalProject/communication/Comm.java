@@ -59,11 +59,31 @@ public class Comm implements CommInterface {
      * @throws InterruptedException
      */
     @Override
-    public void connectToParent(InetAddress parentServer, int port) throws IOException, InterruptedException {
+    public int connectToParent(InetAddress parentServer, int port) throws IOException, InterruptedException {
         parentConnection = listener.createConnection(parentServer, port);
         DatagramPacket outgoingPacket = Packets.craftPacket(new Connect(), parentConnection.getAddress(), parentConnection.getPort());
         parentConnection.putOutgoingBlocking(outgoingPacket);
 
+        /*
+        Object obj = getMessageBlocking(6000, TimeUnit.MILLISECONDS);
+        if (obj == null) throw new CommException("Unable to Connect: Timeout");
+        if (obj instanceof Ack) {
+            Ack ack = (Ack) obj;
+            if (!ack.isParentAck()) throw new CommException("Unable to Connect: Invalid ACK Message");
+        } else {
+            parentConnection = null;
+            throw new CommException("Unable to Connect: Unexpected Message.");
+        }*/
+
+        synchronized (parentConnection.waitAckSync) {
+            if (!parentConnection.isAckResultReady()) parentConnection.waitAckSync.wait();
+            if (!parentConnection.isAckResult()) {
+                parentConnection = null;
+                return CommError.ERROR_TIMEOUT;
+            }
+            parentConnection.setAckResultReady(false);
+        }
+        return 0;
     }
 
 
@@ -87,7 +107,7 @@ public class Comm implements CommInterface {
      * @throws InterruptedException
      */
     @Override
-    public void sendMessageClient(Object obj) throws IOException, InterruptedException {
+    public int sendMessageClient(Object obj) throws IOException, InterruptedException {
         DatagramPacket outgoingPacket;
         for (Connection connection : listener.connectionHashMap.values()) {
             if (!connection.equals(parentConnection)) {
@@ -95,6 +115,17 @@ public class Comm implements CommInterface {
                 connection.putOutgoingBlocking(outgoingPacket);
             }
         }
+
+        for (Connection connection : listener.connectionHashMap.values()) {
+            if (!connection.equals(parentConnection)) {
+                synchronized (connection.waitAckSync) {
+                    if (!connection.isAckResultReady()) connection.waitAckSync.wait();
+                    if (!connection.isAckResult()) return CommError.ERROR_TIMEOUT;
+                    connection.setAckResultReady(false);
+                }
+            }
+        }
+        return 0;
     }
 
 
@@ -106,12 +137,19 @@ public class Comm implements CommInterface {
      * @throws InterruptedException
      */
     @Override
-    public void sendMessageParent(Object obj) throws IOException, InterruptedException {
+    public int sendMessageParent(Object obj) throws IOException, InterruptedException {
         if (parentConnection != null){
             DatagramPacket outgoingPacket = Packets.craftPacket(obj, parentConnection.getAddress(), parentConnection.getPort());
             parentConnection.putOutgoingBlocking(outgoingPacket);
+
+            synchronized (parentConnection.waitAckSync) {
+                if (!parentConnection.isAckResultReady()) parentConnection.waitAckSync.wait();
+                if (!parentConnection.isAckResult()) return CommError.ERROR_TIMEOUT;
+                parentConnection.setAckResultReady(false);
+            }
+            return 0;
         }
-        //TODO-Dave Custom Exception if the parent connection is null.
+        return CommError.ERROR_NO_PARENT;
     }
 
 
@@ -123,11 +161,27 @@ public class Comm implements CommInterface {
      * @throws InterruptedException
      */
     @Override
-    public void sendMessageBroadcast(Object obj) throws IOException, InterruptedException {
+    public int sendMessageBroadcast(Object obj) throws IOException, InterruptedException {
+        int status;
+        status = sendMessageParent(obj);
+        if (status == 0) status = sendMessageClient(obj);
+        return status;
+        /*
+
         for (Connection connection : listener.connectionHashMap.values()) {
             DatagramPacket outgoingPacket = Packets.craftPacket(obj, connection.getAddress(), connection.getPort());
             connection.putOutgoingBlocking(outgoingPacket);
         }
+
+        for (Connection connection : listener.connectionHashMap.values()) {
+            synchronized (connection.waitAckSync) {
+                if (!connection.isAckResultReady()) connection.waitAckSync.wait();
+                if (!connection.isAckResult()) return CommError.ERROR_TIMEOUT;
+                connection.setAckResultReady(false);
+            }
+        }
+        return 0;
+        */
     }
 
 
@@ -139,9 +193,16 @@ public class Comm implements CommInterface {
      * @throws InterruptedException
      */
     @Override
-    public void sendMessageReply(Object obj) throws IOException, InterruptedException {
+    public int sendMessageReply(Object obj) throws IOException, InterruptedException {
         DatagramPacket outgoingPacket = Packets.craftPacket(obj, replyConnection.getAddress(), replyConnection.getPort());
         replyConnection.putOutgoingBlocking(outgoingPacket);
+
+        synchronized (replyConnection.waitAckSync) {
+            if (!replyConnection.isAckResultReady()) replyConnection.waitAckSync.wait();
+            if (!replyConnection.isAckResult()) return CommError.ERROR_TIMEOUT;
+            replyConnection.setAckResultReady(false);
+        }
+        return 0;
     }
 
 
@@ -155,6 +216,7 @@ public class Comm implements CommInterface {
     @Override
     public Object getMessageNonBlocking() {
         CommTuple receivedCommTuple = receivedObjectQueue.poll();
+        if (replyConnection == null) return null;
         replyConnection = receivedCommTuple.getConnection();
         return receivedCommTuple.getObj();
     }
@@ -188,6 +250,9 @@ public class Comm implements CommInterface {
      */
     @Override
     public Object getMessageBlocking(long timeDuration, TimeUnit timeUnit) throws InterruptedException {
-        return receivedObjectQueue.poll(timeDuration, timeUnit);
+        CommTuple receivedCommTuple = receivedObjectQueue.poll(timeDuration, timeUnit);
+        if (replyConnection == null) return null;
+        replyConnection = receivedCommTuple.getConnection();
+        return receivedCommTuple.getObj();
     }
 }

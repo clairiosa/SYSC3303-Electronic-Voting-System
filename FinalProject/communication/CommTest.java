@@ -11,6 +11,7 @@
 
 package FinalProject.communication;
 
+import FinalProject.communication.CommError;
 import java.io.IOException;
 import java.net.InetAddress;
 
@@ -30,6 +31,7 @@ public class CommTest {
          * clientServer1         clientServer2      clientServer3   clientServer4
          *
          */
+        System.out.println("Starting the Servers");
         Comm masterServer = new Comm(2000);
         Comm districtServer1 = new Comm(2011);
         Comm clientServer1 = new Comm(2101);
@@ -39,6 +41,7 @@ public class CommTest {
         Comm clientServer4 = new Comm(2104);
 
         // Always connect to the parent before having children connect
+        System.out.println("Connection to Parents");
         districtServer1.connectToParent(InetAddress.getByName("127.0.0.1"), 2000);
         clientServer1.connectToParent(InetAddress.getByName("127.0.0.1"), 2011);
         clientServer2.connectToParent(InetAddress.getByName("127.0.0.1"), 2011);
@@ -47,9 +50,15 @@ public class CommTest {
         clientServer3.connectToParent(InetAddress.getByName("127.0.0.1"), 2012);
         clientServer4.connectToParent(InetAddress.getByName("127.0.0.1"), 2012);
 
-        // Sleep for a bit to let connection to parent be established.
-        // connectToParent might become part of the constructor in the future.
-        Thread.sleep(1000);
+        System.out.println("~~~All Proper Parent Connections Established~~~");
+
+        System.out.println("connectToParent -> Timeout");
+
+        int sentMessage = masterServer.connectToParent(InetAddress.getByName("127.0.0.1"), 1000);
+        if (sentMessage == CommError.ERROR_TIMEOUT) {
+            System.out.println(CommError.ERROR_TIMEOUT + ": Timeout");
+        }
+
 
         Object obj; // Our received object.
         String objectExample; // Our test object to send.
@@ -81,6 +90,16 @@ public class CommTest {
         if (obj instanceof String) {
             String receivedString = (String) obj;
             System.out.println("D2 : " + receivedString);
+        }
+
+
+
+        // MasterServer -> Parent (error)
+        System.out.println("\nMasterServer -> Parent (error)");
+        objectExample = "This message will never make it";
+        sentMessage = masterServer.sendMessageParent(objectExample);
+        if (sentMessage == CommError.ERROR_NO_PARENT) {
+            System.out.println(CommError.ERROR_NO_PARENT + ": No Parent");
         }
 
 

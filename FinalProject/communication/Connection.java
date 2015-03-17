@@ -26,6 +26,10 @@ class Connection implements Serializable{
     private BlockingQueue<DatagramPacket> incomingPacketQueue;
     private BlockingQueue<DatagramPacket> outgoingPacketQueue;
 
+    private boolean ackResultReady;
+    private boolean ackResult;
+    final Object waitAckSync;
+
 
     /**
      * Sole constructor for the Connection class.
@@ -39,6 +43,8 @@ class Connection implements Serializable{
 
         incomingPacketQueue = new LinkedBlockingQueue<DatagramPacket>();
         outgoingPacketQueue = new LinkedBlockingQueue<DatagramPacket>();
+        waitAckSync = new Object();
+        ackResultReady = false;
     }
 
 
@@ -183,5 +189,22 @@ class Connection implements Serializable{
      */
     void putOutgoingBlocking(DatagramPacket packet) throws InterruptedException {
         outgoingPacketQueue.put(packet);
+    }
+
+
+    public boolean isAckResultReady() {
+        return ackResultReady;
+    }
+
+    public void setAckResultReady(boolean ackResultReady) {
+        this.ackResultReady = ackResultReady;
+    }
+
+    public boolean isAckResult() {
+        return ackResult;
+    }
+
+    public void setAckResult(boolean ackResult) {
+        this.ackResult = ackResult;
     }
 }

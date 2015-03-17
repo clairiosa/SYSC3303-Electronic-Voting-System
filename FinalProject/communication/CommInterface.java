@@ -31,7 +31,7 @@ interface CommInterface {
      * @throws IOException
      * @throws InterruptedException
      */
-    public void connectToParent(InetAddress parentServer, int port) throws IOException, InterruptedException;
+    public int connectToParent(InetAddress parentServer, int port) throws IOException, InterruptedException;
 
 
     /**
@@ -49,7 +49,7 @@ interface CommInterface {
      * @throws IOException
      * @throws InterruptedException
      */
-    public void sendMessageClient(Object obj) throws IOException, InterruptedException;
+    public int sendMessageClient(Object obj) throws IOException, InterruptedException;
 
 
     /**
@@ -59,7 +59,7 @@ interface CommInterface {
      * @throws IOException
      * @throws InterruptedException
      */
-    public void sendMessageParent(Object obj) throws IOException, InterruptedException;
+    public int sendMessageParent(Object obj) throws IOException, InterruptedException;
 
 
     /**
@@ -69,7 +69,7 @@ interface CommInterface {
      * @throws IOException
      * @throws InterruptedException
      */
-    public void sendMessageBroadcast(Object obj) throws IOException, InterruptedException;
+    public int sendMessageBroadcast(Object obj) throws IOException, InterruptedException;
 
 
     /**
@@ -79,7 +79,7 @@ interface CommInterface {
      * @throws IOException
      * @throws InterruptedException
      */
-    public void sendMessageReply(Object obj) throws IOException, InterruptedException;
+    public int sendMessageReply(Object obj) throws IOException, InterruptedException;
 
 
     /**

@@ -17,7 +17,8 @@ package FinalProject.communication.communicationobjects;
 import java.io.Serializable;
 
 public class Ack implements Serializable {
-    boolean corrupted;
+    private boolean corrupted;
+    private boolean parentAck;
 
     /**
      *
@@ -27,7 +28,15 @@ public class Ack implements Serializable {
         this.corrupted = corrupted;
     }
 
-    public boolean getCorrupted() {
+    public boolean isCorrupted() {
         return corrupted;
+    }
+
+    public boolean isParentAck() {
+        return parentAck;
+    }
+
+    public void setParentAck(boolean parentAck) {
+        this.parentAck = parentAck;
     }
 }
