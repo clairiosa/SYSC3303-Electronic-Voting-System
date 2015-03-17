@@ -11,7 +11,6 @@
 
 package FinalProject.communication;
 
-import FinalProject.communication.CommError;
 import java.io.IOException;
 import java.net.InetAddress;
 

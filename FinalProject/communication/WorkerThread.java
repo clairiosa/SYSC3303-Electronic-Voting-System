@@ -113,8 +113,6 @@ class WorkerThread implements Runnable{
                                     Ack receivedAck = (Ack) obj;
                                     if (receivedAck.isCorrupted()) {
                                         lastSentPacketTime = sendPacket(lastPacketSent, !lastPacketSentAck);
-                                    } else if (receivedAck.isParentAck()) {
-                                        receivedObjectQueue.put(new CommTuple(obj, connection));
                                     }
                                 }
                             } else if (obj instanceof Connect) {
@@ -216,22 +214,6 @@ class WorkerThread implements Runnable{
      */
     private void sendAck(boolean corrupted) throws IOException {
         DatagramPacket ackPacket = Packets.craftPacket(new Ack(corrupted), connection.getAddress(), connection.getPort());
-        lastPacketSent = ackPacket;
-        sendPacket(ackPacket, false);
-        lastPacketSentAck = true;
-    }
-
-
-    /**
-     * Sends a parent connection aack.
-     *
-     * @param corrupted     True if the packet was corrupted and the ack is requesting a retransmission
-     * @throws IOException
-     */
-    private void sendAck(boolean corrupted, boolean parentAck) throws IOException {
-        Ack ack = new Ack(corrupted);
-        ack.setParentAck(parentAck);
-        DatagramPacket ackPacket = Packets.craftPacket(ack , connection.getAddress(), connection.getPort());
         lastPacketSent = ackPacket;
         sendPacket(ackPacket, false);
         lastPacketSentAck = true;

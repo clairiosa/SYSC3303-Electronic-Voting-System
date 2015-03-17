@@ -18,7 +18,6 @@ import java.io.Serializable;
 
 public class Ack implements Serializable {
     private boolean corrupted;
-    private boolean parentAck;
 
     /**
      *
@@ -32,11 +31,5 @@ public class Ack implements Serializable {
         return corrupted;
     }
 
-    public boolean isParentAck() {
-        return parentAck;
-    }
 
-    public void setParentAck(boolean parentAck) {
-        this.parentAck = parentAck;
-    }
 }
