@@ -19,6 +19,7 @@ public class Voter extends Person {
 	private boolean voted;
 	private boolean registered;
 
+
 	public Voter(String name, String party) {
 		super(name);
 		this.party = party;

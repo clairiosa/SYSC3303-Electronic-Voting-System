@@ -1,5 +1,5 @@
 
-package FinalProject.booth;
+package _booth;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -8,13 +8,15 @@ import java.net.UnknownHostException;
 
 import javax.swing.JFrame;
 
-import FinalProject.Ballot;
-import FinalProject.communication.Comm;
-import FinalProject.masterserver.ElectionResults;
-import FinalProject.persons.Person;
+import communication.Comm;
+import masterserver.ElectionResults;
+import persons.Candidate;
+import persons.Person;
+import persons.Voter;
 
 public class Booth extends Thread { 
-	Comm clientServer;
+	private Comm clientServer;
+	private Voter voter;
 	
 	public Booth(){
 		
@@ -51,7 +53,7 @@ public class Booth extends Thread {
 		return res;
 	}
 
-	public boolean register(Person p){
+	public boolean register(Voter p){
 		try {
 			this.clientServer.sendMessageParent(p);
 		} catch (IOException | InterruptedException e) {
@@ -69,13 +71,17 @@ public class Booth extends Thread {
 			return false;
 		}
 		
+		this.voter = p;
+		
 		return (s == "true");
 	}
 
-	public boolean vote(Ballot b){
+	public boolean vote(Candidate c){
+		
+		this.voter.setCandidate(c);
 		
 		try {
-			this.clientServer.sendMessageParent(b);
+			this.clientServer.sendMessageParent(this.voter);
 		} catch (IOException | InterruptedException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -90,8 +96,9 @@ public class Booth extends Thread {
 			e.printStackTrace();
 			return false;
 		}
-		return (s == "true");
 		
+		this.voter = null;
+		return (s == "true");
 	}
 
 	public static void main(String args[]) {
