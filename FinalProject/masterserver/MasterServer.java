@@ -73,7 +73,7 @@ public class MasterServer {
 				BufferedReader br2 = new BufferedReader(new InputStreamReader(fis2));
 				while ((party = br2.readLine()) != null) {
 					candidate=br2.readLine();
-					lists.addCandidate(new Candidate(party,candidate));	
+					lists.addCandidate(new Candidate(candidate, party));	
 				}
 		 
 				br2.close();
