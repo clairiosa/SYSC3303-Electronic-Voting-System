@@ -21,6 +21,10 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.concurrent.ConcurrentHashMap;
 
+import FinalProject.communication.Comm;
+import FinalProject.persons.Candidate;
+import FinalProject.persons.Voter;
+
 public class MasterServer {
 
 	public MasterServer() {

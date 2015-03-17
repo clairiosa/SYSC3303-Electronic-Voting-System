@@ -17,6 +17,9 @@ import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
 
+import FinalProject.communication.Comm;
+import FinalProject.persons.Candidate;
+
 
 public class ElectionResults extends Thread implements Serializable{
 	/**
