@@ -22,6 +22,11 @@ public class Candidate extends Voter {
 		votingPercentage=0.0;
 	}
 	
+	public void addVotes(int votes){
+		voteCount+=votes; 
+		totalVotes+=votes;
+	}
+	
 
 	public int getVoteCount(){
 		return voteCount;
