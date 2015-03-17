@@ -123,11 +123,25 @@ public class Comm implements CommInterface {
      * @throws InterruptedException
      */
     @Override
-    public void broadcastMessage(Object obj) throws IOException, InterruptedException {
+    public void sendMessageBroadcast(Object obj) throws IOException, InterruptedException {
         for (Connection connection : listener.connectionHashMap.values()) {
             DatagramPacket outgoingPacket = Packets.craftPacket(obj, connection.getAddress(), connection.getPort());
             connection.putOutgoingBlocking(outgoingPacket);
         }
+    }
+
+
+    /**
+     * Replies to the last message taking off the queue.
+     *
+     * @param obj               Object to reply with.
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    @Override
+    public void sendMessageReply(Object obj) throws IOException, InterruptedException {
+        DatagramPacket outgoingPacket = Packets.craftPacket(obj, replyConnection.getAddress(), replyConnection.getPort());
+        replyConnection.putOutgoingBlocking(outgoingPacket);
     }
 
 
@@ -175,19 +189,5 @@ public class Comm implements CommInterface {
     @Override
     public Object getMessageBlocking(long timeDuration, TimeUnit timeUnit) throws InterruptedException {
         return receivedObjectQueue.poll(timeDuration, timeUnit);
-    }
-
-
-    /**
-     * Replies to the last message taking off the queue.
-     *
-     * @param obj               Object to reply with.
-     * @throws IOException
-     * @throws InterruptedException
-     */
-    @Override
-    public void replyToLastMessage(Object obj) throws IOException, InterruptedException {
-        DatagramPacket outgoingPacket = Packets.craftPacket(obj, replyConnection.getAddress(), replyConnection.getPort());
-        replyConnection.putOutgoingBlocking(outgoingPacket);
     }
 }

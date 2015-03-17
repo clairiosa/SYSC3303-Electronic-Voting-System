@@ -69,7 +69,17 @@ interface CommInterface {
      * @throws IOException
      * @throws InterruptedException
      */
-    public void broadcastMessage(Object obj) throws IOException, InterruptedException;
+    public void sendMessageBroadcast(Object obj) throws IOException, InterruptedException;
+
+
+    /**
+     * Replies to the last message taking off the queue.
+     *
+     * @param obj               Object to reply with.
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    public void sendMessageReply(Object obj) throws IOException, InterruptedException;
 
 
     /**
@@ -104,15 +114,5 @@ interface CommInterface {
      * @throws InterruptedException
      */
     public Object getMessageBlocking(long timeDuration, TimeUnit timeUnit) throws InterruptedException;
-
-
-    /**
-     * Replies to the last message taking off the queue.
-     *
-     * @param obj               Object to reply with.
-     * @throws IOException
-     * @throws InterruptedException
-     */
-    public void replyToLastMessage(Object obj) throws IOException, InterruptedException;
 }
 

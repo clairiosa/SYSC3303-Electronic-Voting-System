@@ -194,7 +194,7 @@ public class CommTest {
         // DistrictServer1 ---Broadcast--> Master and Clients
         System.out.println("\nDistrictServer1 ---Broadcast--> Master and Clients");
         objectExample = "Broadcast Message from DistrictServer1";
-        districtServer1.broadcastMessage(objectExample);
+        districtServer1.sendMessageBroadcast(objectExample);
 
         // Getting the message from the queues.  Normally you would have a separate thread.
         // Intentionally verbose so you can understand the workings.
@@ -212,6 +212,30 @@ public class CommTest {
         if (obj instanceof String) {
             String receivedString = (String) obj;
             System.out.println("MA : " + receivedString);
+        }
+
+
+
+        // ClientServer1 -> DistrictServer1 --Reply-> ClientServer1
+        System.out.println("\nClientServer1 -> DistrictServer1 --Reply-> ClientServer1");
+        objectExample = "Reply needed message for DistrictServer1 from Client 1";
+        clientServer1.sendMessageParent(objectExample);
+
+        // Getting the message from the queues.  Normally you would have a separate thread.
+        // Intentionally verbose so you can understand the workings.
+        obj = districtServer1.getMessageBlocking();
+        if (obj instanceof String) {
+            String receivedString = (String) obj;
+            System.out.println("D1 : " + receivedString);
+
+            // Sending the reply.
+            objectExample = "Reply message for Client 1 from DistrictServer1";
+            districtServer1.sendMessageReply(objectExample);
+        }
+        obj = clientServer1.getMessageBlocking();
+        if (obj instanceof String) {
+            String receivedString = (String) obj;
+            System.out.println("C2 : " + receivedString);
         }
 
         System.out.println("\nShutting Down Gracefully");
