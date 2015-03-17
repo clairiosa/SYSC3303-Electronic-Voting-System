@@ -8,7 +8,7 @@
 
 
 
-package FinalProject.persons;
+package persons;
 
 
 public class Voter extends Person {
@@ -18,7 +18,7 @@ public class Voter extends Person {
 	private boolean registered;
 
 	
-	Voter(String name, String party) {
+	public Voter(String name, String party) {
 		super(name);
 		this.party = party;
 		voted = false;

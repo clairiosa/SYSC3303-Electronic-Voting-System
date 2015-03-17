@@ -8,7 +8,7 @@
 
 
 
-package FinalProject.persons;
+package persons;
 
 
 import java.io.Serializable;
