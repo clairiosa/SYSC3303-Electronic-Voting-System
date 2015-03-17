@@ -16,7 +16,10 @@ public class Candidate extends Voter {
 	private double votingPercentage;
 	private static int totalVotes;
 	
-	Candidate(String name, String party) {
+	
+	
+	
+	public Candidate(String name, String party) {
 		super(name, party);
 		voteCount = 0;
 		votingPercentage=0.0;
