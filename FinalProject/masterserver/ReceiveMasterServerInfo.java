@@ -15,37 +15,60 @@ import FinalProject.persons.Candidate;
 import FinalProject.persons.Voter;
 
 import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class ReceiveMasterServerInfo extends Thread {
 
-		private Hashtable<String, Candidate> candidates = new Hashtable<String, Candidate>();
-		private Hashtable<String, Voter> voters = new Hashtable<String, Voter>();
+		private ConcurrentHashMap<String, Candidate> candidates = new ConcurrentHashMap<String, Candidate>();
+		private ConcurrentHashMap<String, Voter> voters = new ConcurrentHashMap<String, Voter>();
 		private StringBuffer OfficialRecord = new StringBuffer();
 		public int votes=0; 
+		private boolean electionDone=false;
 		private Comm comm;
+	    private int districtCount; 
 	    
 	    public ReceiveMasterServerInfo(Comm comm){
 	    	this.comm=comm;
+	    	districtCount=0;
 	    }
 	    
 	    public void run() {
 	    	while(true){
-           	MasterServerInformation mInfo = comm.receiveMasterInfo();
-               System.out.printf("District %d Information Received.\n",mInfo.getDistrictID());
-               candidates = mInfo.getCandidates();
-               voters = mInfo.getVoters();
+	    	   Object info = comm.getMessageBlocking();
+	    	   if(info instanceof MasterServerInformation){
+	    		   MasterServerInformation mInfo = (MasterServerInformation)info;
+	    		   System.out.printf("District %d Information Received.\n",mInfo.getDistrictID());
+	    		   ConcurrentHashMap<String, Candidate> tempCandidates = mInfo.getCandidates();
+	    		   addInformation(tempCandidates);
+	    		   districtCount++;
+	    	   }
+               //voters = mInfo.getVoters();
+               //tallyVotes();
                
-               tallyVotes();
+               if(electionDone==true){
+            	   System.out.println("Election is completed");
+            	   System.exit(1);
+               }
                
-               
-
-            	
-            	
-
+  	
 	    	}
 	    }
+	    
+	    public int getDistrictCount(){
+	    	return districtCount;
+	    }
+	    public void addInformation (ConcurrentHashMap<String, Candidate> tempCandidates){
+	    	Enumeration<Candidate> it = tempCandidates.elements();
+	     	while(it.hasMoreElements()) {
+	     		Candidate c = it.nextElement();
+	     		candidates.get(c.getName()).addVotes(c.getVoteCount());
+	     	}
+	    }
+	    public void setElectionDone (boolean a){
+	    	electionDone=a; 	
+	    }
+	    
 	    public void tallyVotes(){
            /** tally votes from district **/
         	log("Tally");
@@ -103,7 +126,7 @@ public class ReceiveMasterServerInfo extends Thread {
 	        return c;
 	     }
 
-		public Hashtable<String, Candidate> getCandidates() {
+		public ConcurrentHashMap<String, Candidate> getCandidates() {
 			return candidates;
 		}
 	    
