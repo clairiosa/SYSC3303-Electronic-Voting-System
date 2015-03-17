@@ -6,52 +6,64 @@
  *
  */
 
-
-
 package FinalProject.persons;
 
-
 public class Voter extends Person {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private String party;
 	private Candidate votedFor;
 	private boolean voted;
 	private boolean registered;
 
-	
-	Voter(String name, String party) {
+	public Voter(String name, String party) {
 		super(name);
 		this.party = party;
 		voted = false;
 		votedFor = null;
 	}
-	
 
-	public String getParty(){
+	public Voter(String name, String party, String districtId) {
+		super(name);
+		this.party = party;
+		this.districtId = districtId;
+		voted = false;
+		votedFor = null;
+	}
+
+	public String getParty() {
 		return party;
 	}
-	
-	public void setParty(String party){
-		this.party=party;
+
+	public void setParty(String party) {
+		this.party = party;
 	}
-	
-	public boolean hasVoted(){
-		return voted; 
+
+	public boolean hasVoted() {
+		return voted;
 	}
-	
-	public void setVoted(boolean v){
-		voted=v; 
+
+	public void setVoted(boolean v) {
+		voted = v;
 	}
-	
-	
-	public void setCandidate(Candidate c){
-		votedFor=c;
+
+	public void setCandidate(Candidate c) {
+		votedFor = c;
 	}
-	
-	public Candidate getCandidate(){
+
+	public Candidate getCandidate() {
 		return votedFor;
 	}
-	
-	public void setRegistered(boolean reg){registered=reg;}
-	public boolean getRegistered() { return registered; }
-	
-   }
+
+	public void setRegistered(boolean reg) {
+		registered = reg;
+	}
+
+	public boolean getRegistered() {
+		return registered;
+	}
+
+}

@@ -13,34 +13,62 @@ import FinalProject.masterserver.MasterServerInformation;
 import FinalProject.persons.Person;
 import FinalProject.persons.Voter;
 
+/**
+ * Acts as an intermediate between Booth and MasterServer
+ * 
+ * @author damianpolan
+ * 
+ */
 public class DistrictServer implements Runnable {
 
 	public static void main(String args[]) {
-
+		if (args.length >= 4) {
+			DistrictServer district = new DistrictServer(
+					Integer.parseInt(args[0]), args[1],
+					Integer.parseInt(args[2]), args[3]);
+			district.start();
+		} else {
+			System.out
+					.println("Arguments[4]: port, masterAddress, masterPort, uniqueDistrictId");
+		}
 	}
 
+	// communication portal for this district server
 	Comm districtComm;
 
+	// connection information
 	String masterAddress;
 	int masterPort;
 	int port;
-	int uniqueDistrictId;
+	String uniqueDistrictId;
 
 	// election data table. The table contains the profile of each voter and the
 	// list of candidates.
-	MasterServerInformation masterServerInfo;
+	MasterServerInformation masterServerInfo; // TEMPORARY until MasterServer
+												// rework
 
 	// Election results. pulled from master server
 	ElectionResults results;
 
+	/**
+	 * Constructor
+	 * 
+	 * @param port
+	 * @param masterAddress
+	 * @param masterPort
+	 * @param uniqueDistrictId
+	 */
 	public DistrictServer(int port, String masterAddress, int masterPort,
-			int uniqueDistrictId) {
+			String uniqueDistrictId) {
 		this.port = port;
 		this.masterAddress = masterAddress;
 		this.masterPort = masterPort;
 		this.uniqueDistrictId = uniqueDistrictId;
 	}
 
+	/**
+	 * Starts the server
+	 */
 	public void start() {
 		System.out.println("DistrictServer Started\n");
 		try {
@@ -84,18 +112,37 @@ public class DistrictServer implements Runnable {
 															// person
 				Voter localVoter = this.masterServerInfo
 						.getVoter(((Person) recievedMessage).getName());
-				
-				if(localVoter != null)
-				{
+
+				if (localVoter != null
+						&& localVoter.getDistrictId().equals(uniqueDistrictId)) {
 					localVoter.setRegistered(true);
-					districtComm.sendMessageReply("true");	
-				}
-				else
-					districtComm.sendMessageReply("false");	
-				
+					districtComm.sendMessageReply("true");
+				} else
+					districtComm.sendMessageReply("false");
+
 			} else if (recievedMessage instanceof Ballot) { // vote with this
 															// person
-				
+				Ballot voteBallot = (Ballot) recievedMessage;
+
+				// district must be matching to vote AND must be registered
+				if (voteBallot.district.equals(uniqueDistrictId)
+						&& voteBallot.voter.getRegistered()
+						&& voteBallot.voter.getDistrictId().equals(
+								uniqueDistrictId)) {
+
+					Voter localVoter = this.masterServerInfo
+							.getVoter(voteBallot.voter.getName());
+
+					// make the vote
+					localVoter.setCandidate(voteBallot.candidate);
+					localVoter.setVoted(true);
+					districtComm.sendMessageReply("true");
+
+					// TEMPORARY - until structure rework with Jon.
+					districtComm.sendMessageParent(masterServerInfo);
+
+				} else
+					districtComm.sendMessageReply("false");
 
 			} else if (recievedMessage instanceof String) {
 				if (recievedMessage.equals("status")) {
