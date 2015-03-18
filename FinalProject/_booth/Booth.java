@@ -18,14 +18,18 @@ public class Booth extends Thread {
 	private Comm clientServer;
 	private Voter voter;
 	
-	public Booth(){
-		
+	private InetAddress parentIP;
+	private int parentPort;
+	
+	public Booth(String parentServer, int port) throws UnknownHostException{
+		parentIP = InetAddress.getByName(parentServer);
+		parentPort = port;
 	}
 	
-	public void connect() throws IOException, InterruptedException{
-//		this.clientServer = new Comm(2101);
-//		clientServer.connectToParent(InetAddress.getByName("127.0.0.1"), 2011);
-//		Thread.sleep(1000);
+	public void connect(int listenPort) throws IOException, InterruptedException{
+		this.clientServer = new Comm(listenPort);
+		clientServer.connectToParent(parentIP, parentPort);
+		Thread.sleep(1000);
 	}
 	
 	public void run(){
@@ -103,9 +107,26 @@ public class Booth extends Thread {
 
 	public static void main(String args[]) {
 		
-		Booth booth = new Booth();
+		if(args.length < 3){
+			System.out.print("Booth serverIp serverPort listenPort");
+			return;
+		}
+		
+		Booth booth;
+		try {
+			booth = new Booth(args[0], Integer.parseInt(args[1]));
+		}catch(NumberFormatException e){
+			System.out.println("Invalid port number");
+			return;
+		} catch (UnknownHostException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+			System.out.println("Unknown host error");
+			return;
+		}
+		
 		try{
-			booth.connect();
+			booth.connect(Integer.parseInt(args[2]));
 		}catch(IOException e){
 			System.out.println("IO exception");
 			return;

@@ -7,6 +7,7 @@ import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
+import masterserver.ElectionResults;
 import persons.Candidate;
 import persons.Voter;
 
