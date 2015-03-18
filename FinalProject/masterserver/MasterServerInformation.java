@@ -66,7 +66,7 @@ public class MasterServerInformation implements Serializable {
 	 * Retrieve a voter object
 	 **/
 	public Voter getVoter(String voter) {
-		Voter v = voters.get(voter);
+		Voter v = voters.get(voter.trim());
 		if (v == null) {
 			System.out.println("Not a voter.");
 			return null;
