@@ -41,8 +41,8 @@ class Connection implements Serializable{
         this.port = port;
         this.address = address;
 
-        incomingPacketQueue = new LinkedBlockingQueue<DatagramPacket>();
-        outgoingPacketQueue = new LinkedBlockingQueue<DatagramPacket>();
+        incomingPacketQueue = new LinkedBlockingQueue<>();
+        outgoingPacketQueue = new LinkedBlockingQueue<>();
         waitAckSync = new Object();
         ackResultReady = false;
     }

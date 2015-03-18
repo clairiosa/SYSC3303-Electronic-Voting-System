@@ -13,7 +13,6 @@ package FinalProject.communication;
 
 
 import java.io.IOException;
-import java.lang.Thread;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -27,7 +26,7 @@ class ListenThread implements Runnable {
     private static final int MAX_PACKET_SIZE = 8192;
 
 
-    HashMap<String, Connection> connectionHashMap = new HashMap<String, Connection>();
+    HashMap<String, Connection> connectionHashMap = new HashMap<>();
     private DatagramSocket listenSocket;
     private BlockingQueue<CommTuple> receivedObjectQueue;
     private Semaphore queueSemaphore;
@@ -36,10 +35,10 @@ class ListenThread implements Runnable {
     /**
      * Sole constructor for the ListenThread object.  Only one is expected to exist for each implementation of Comm.
      *
-     * @param listenPort            Port to open the listen socket on.
-     * @param receivedObjectQueue   The queue to place received objects into for access from the class using Comm.
-     * @param queueSemaphore        A semaphore preventing multiple workers from writing to the queue at once.
-     *                              Potentially unnecessary, added as a precaution while bug testing.
+     * @param listenPort          Port to open the listen socket on.
+     * @param receivedObjectQueue The queue to place received objects into for access from the class using Comm.
+     * @param queueSemaphore      A semaphore preventing multiple workers from writing to the queue at once.
+     *                            Potentially unnecessary, added as a precaution while bug testing.
      * @throws SocketException
      */
     public ListenThread(int listenPort, BlockingQueue<CommTuple> receivedObjectQueue, Semaphore queueSemaphore) throws SocketException {
@@ -103,9 +102,9 @@ class ListenThread implements Runnable {
      * Creates a new connection object, adds it to the hashMap keeping track of them,
      * and then returns the connection object.
      *
-     * @param address       Address of server/client to open the connection with.
-     * @param port          Port of server/client to open the connection with.
-     * @return              Connection object.
+     * @param address Address of server/client to open the connection with.
+     * @param port    Port of server/client to open the connection with.
+     * @return Connection object.
      * @throws SocketException
      */
     Connection createConnection(InetAddress address, int port) throws SocketException {
