@@ -160,8 +160,6 @@ class BoothUI extends JPanel implements ActionListener{
 			System.out.println("STATS ERROR");
 			return;
 		}
-//		if(true)
-//			return;
 		
 		DefaultTableModel model = (DefaultTableModel)tblResults.getModel();
 		
@@ -169,10 +167,10 @@ class BoothUI extends JPanel implements ActionListener{
 			model.removeRow(1);
 		}
 		
+		String n; int c;
 		for(int i=0; i < r.results.length;i++){
-			String n = r.results[i].candidate.getName();
-			int c = r.results[i].count;
-			
+			n = r.results[i].candidate.getName();
+			c = r.results[i].count;
 			model.addRow(new Object[]{ n, c });
 		}
 		
@@ -200,7 +198,6 @@ class BoothUI extends JPanel implements ActionListener{
 	
 	public void showVerify(){
 		lblVerifyStatus.setText("");
-		model.clearVoter();
 		
 		CardLayout layout = (CardLayout)(this.getLayout());
 		layout.show(this, "verify");
