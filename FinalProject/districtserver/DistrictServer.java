@@ -5,9 +5,12 @@
 package FinalProject.districtserver;
 
 import java.net.InetAddress;
+import java.util.Date;
 import java.util.Enumeration;
 
 import FinalProject.Ballot;
+import FinalProject.BoothElectionResult;
+import FinalProject.BoothElectionResults;
 import FinalProject.Credential;
 import FinalProject.communication.Comm;
 import FinalProject.masterserver.ElectionResults;
@@ -73,18 +76,42 @@ public class DistrictServer implements Runnable {
 
 	boolean fake = false;
 
+	private BoothElectionResults electionResults;
+
 	public void fakeData() {
 
 		masterServerInfo = new MasterServerInformation();
 		masterServerInfo.addCandidate(new Candidate("Nate", "Liberal"));
 		masterServerInfo.addCandidate(new Candidate("David", "NDP"));
+		
 		masterServerInfo.addVoter(new Voter("Damian", "", "", "", "", "0",
 				"Damian", "0", "", null, false, false));
+		masterServerInfo.addVoter(new Voter("Nate", "", "", "", "", "0",
+				"Nate", "9", "", null, false, false));
+		masterServerInfo.addVoter(new Voter("Nate Bosscher", "", "", "", "", "0",
+				"Nate Bosscher", "9", "", null, false, false));
 
 		masterServerInfo.addVoter(new Voter("Jon", "", "", "", "", "1", "Jon",
 				"0", "", null, false, false));
-
-		results = new ElectionResults(null, 1000, null);
+		
+		Enumeration<Candidate> c = masterServerInfo.getCandidates().elements();
+		int i = 0;
+		while(c.hasMoreElements()){
+			c.nextElement();
+			i++;
+		}
+		
+		BoothElectionResult[] r = new BoothElectionResult[i];
+		BoothElectionResult r1;
+		c = masterServerInfo.getCandidates().elements();
+		i = 0;
+		while(c.hasMoreElements()){
+			r[i++] = new BoothElectionResult(c.nextElement(), 0);
+			
+		}
+		
+		electionResults = new BoothElectionResults(r, 0);
+		
 		fake = true;
 	}
 
@@ -130,15 +157,15 @@ public class DistrictServer implements Runnable {
                         this.masterServerInfo = (MasterServerInformation) recievedMessage;
 
                 } else if (recievedMessage instanceof ElectionResults) {
-                    this.results = (ElectionResults) recievedMessage;
-
+//                    this.results = (BoothElectionResults) recievedMessage;
+                    
                 } else if (recievedMessage instanceof Person) { // register the
                     // person
                     Voter localVoter = this.masterServerInfo
                             .getVoter(((Person) recievedMessage).getName());
 
                     if (localVoter != null
-                            && localVoter.getDistrictId().equals(uniqueDistrictId)) {
+                            && localVoter.getDistrictId().equals(uniqueDistrictId) && localVoter.getRegistered() == false) {
                         localVoter.setRegistered(true);
                         districtComm.sendMessageReply("true");
                     } else
@@ -149,25 +176,33 @@ public class DistrictServer implements Runnable {
                     Ballot voteBallot = (Ballot) recievedMessage;
 
                     // district must be matching to vote AND must be registered
-                    if (voteBallot.getDistrict().equals(uniqueDistrictId)
-                            && voteBallot.getVoter().getRegistered()
-                            && voteBallot.getVoter().getDistrictId()
-                            .equals(uniqueDistrictId)) {
-
+                    Voter v = voteBallot.getVoter();
+                    
+                    if (masterServerInfo.getVoter(v.getName()).getRegistered()) {
                         Voter localVoter = this.masterServerInfo
                                 .getVoter(voteBallot.getVoter().getName());
 
                         // make the vote
                         localVoter.setCandidate(voteBallot.getCandidate());
                         localVoter.setVoted(true);
+                        
+                        for(int i=0;i<electionResults.results.length;i++)
+                        	if(electionResults.results[i].candidate.equals(voteBallot.getCandidate())){
+                        		electionResults.results[i].count++;
+                        	}
+                        
+                        electionResults.totalVotes++;
+                        electionResults.generated = new Date();
+                        
                         districtComm.sendMessageReply("true");
 
                         // TEMPORARY - until structure rework with Jon.
                         if (!fake)
                             districtComm.sendMessageParent(masterServerInfo);
 
-                    } else
+                    } else{
                         districtComm.sendMessageReply("false");
+                    }
 
                 } else if (recievedMessage instanceof Credential) {
                     Credential creds = (Credential) recievedMessage;
@@ -185,7 +220,8 @@ public class DistrictServer implements Runnable {
                 } else if (recievedMessage instanceof String) {
                     if (recievedMessage.equals("status")) {
                         // send back the ElectionResults to booth
-                        districtComm.sendMessageReply(results);
+                    	
+                        districtComm.sendMessageReply(electionResults);
                     }
                     else if(recievedMessage.equals("candidates")){
 
@@ -200,7 +236,7 @@ public class DistrictServer implements Runnable {
                             c[i] = masterServerInfo.getCandidates().get(s);
                             i++;
                         }
-                        districtComm.sendMessageReply();
+                        districtComm.sendMessageReply(c);
 
                     }
                 }

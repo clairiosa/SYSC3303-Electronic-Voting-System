@@ -163,8 +163,8 @@ class BoothUI extends JPanel implements ActionListener{
 		
 		DefaultTableModel model = (DefaultTableModel)tblResults.getModel();
 		
-		while(model.getRowCount() > 1){
-			model.removeRow(1);
+		while(model.getRowCount() > 0){
+			model.removeRow(0);
 		}
 		
 		String n; int c;

@@ -40,6 +40,10 @@ public class Voter extends Person {
 		voted = false;
 		votedFor = null;
 	}
+	
+	public boolean equals(Voter v){
+		return (v.party.equals(this.party) && v.name.equals(this.name));
+	}
 
 	public String getParty() {
 		return party;

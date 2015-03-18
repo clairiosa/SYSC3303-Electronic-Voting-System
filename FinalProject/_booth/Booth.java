@@ -10,6 +10,7 @@ import java.net.UnknownHostException;
 
 import javax.swing.JFrame;
 
+import FinalProject.Ballot;
 import FinalProject.BoothElectionResult;
 import FinalProject.BoothElectionResults;
 import FinalProject.Credential;
@@ -43,6 +44,7 @@ public class Booth extends Thread {
 	public void run(){
 		final BoothUI window = new BoothUI(this);
 		window.start();
+//		return;
 		
 		(new Thread() {
 		    public void run() {
@@ -249,11 +251,12 @@ public class Booth extends Thread {
 			return false;
 		}
 		String s;
-		this.voter.setCandidate(c);
+		
+		Ballot b = new Ballot(null, this.voter, c);
 		
 		synchronized(cmdInProgress){
 			try {
-				this.clientServer.sendMessageParent(this.voter);
+				this.clientServer.sendMessageParent(b);
 			} catch (IOException | InterruptedException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();

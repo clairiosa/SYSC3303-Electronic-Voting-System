@@ -13,7 +13,7 @@
  */
 
 
-package FinalProject.test;
+package FinalProject;
 
 import FinalProject._booth.Booth;
 //import FinalProject.masterserver.MasterServer;
