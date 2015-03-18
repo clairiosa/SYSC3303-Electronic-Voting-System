@@ -132,16 +132,30 @@ public class Booth extends Thread {
 	}
 	
 	public void testCommand(String cmd, String[] args){
+		Voter v;
 		switch(cmd){
 		case "register":
-			Voter v = new Voter(args[1], null);
+			v = new Voter(args[1], null);
 			if(register(v)){
 				System.out.println("Register voter " + args[1] + " SUCCESS");
 			}else{
 				System.out.println("Register voter " + args[1] + " FAIL");
 			}
 			break;
-		case "":
+		case "verify":
+			if(verify(args[1])){
+				System.out.println("Verify voter " + this.voter.getName() + " with pwd " +args[2] +" SUCCESS");
+		    }else{
+		    	System.out.println("Verify voter " + this.voter.getName() + " with pwd " +args[2] +" FAIL");
+		    }
+			break;
+		case "vote":
+			Candidate c = new Candidate(args[1], args[2]);
+			if(vote(c)){
+				System.out.println("Vote: voter " + this.voter.getName() + " with vote " + c.getName() +" SUCCESS");
+		    }else{
+		    	System.out.println("Vote: voter " + this.voter.getName() + " with vote " + c.getName() +" FAIL");
+		    }
 			break;
 		}
 	}
@@ -262,10 +276,11 @@ public class Booth extends Thread {
 
 	public static void main(String args[]) {
 		
-		if(args.length < 3){
-			System.out.print("Booth serverIp serverPort listenPort");
+		if(args.length != 3 && args.length != 4){
+			System.out.print("Booth serverIp serverPort listenPort [test file.txt]");
 			return;
 		}
+		
 		
 		Booth booth;
 		try {
@@ -292,7 +307,11 @@ public class Booth extends Thread {
 			return;
 		}
 		
-		booth.run();
+		if(args.length == 4){
+			booth.parse(args[0]);
+		}else{
+			booth.run();
+		}
 		
 	}
 }
