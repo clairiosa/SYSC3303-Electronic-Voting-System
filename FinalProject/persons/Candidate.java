@@ -8,7 +8,7 @@
 
 
 
-package persons;
+package FinalProject.persons;
 
 
 public class Candidate extends Voter {

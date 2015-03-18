@@ -1,4 +1,4 @@
-package persons;
+package FinalProject.persons;
 
 public class ElectionResult implements java.io.Serializable {
 	public Candidate candidate;

@@ -1,4 +1,4 @@
-package persons;
+package FinalProject.persons;
 
 import java.util.Date;
 
