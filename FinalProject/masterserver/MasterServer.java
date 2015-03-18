@@ -71,7 +71,7 @@ public class MasterServer {
 		    			e.printStackTrace();
 		    		}
 	            }
-	        };
+	        }.start();
 
 			
 			
