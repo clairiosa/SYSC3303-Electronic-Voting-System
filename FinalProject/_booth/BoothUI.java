@@ -264,8 +264,9 @@ class BoothUI extends JPanel implements ActionListener{
 			
 			break;
 		case "Register":
-			
-			final Voter v = new Voter(txtFirstName.getText() + " " + txtLastName.getText(), null);
+			String name = txtFirstName.getText() + " " + txtLastName.getText();
+			name = name.trim();
+			final Voter v = new Voter(name, null);
 			lblRegisterStatus.setText("Searching...");
 			
 			(new Thread() {
