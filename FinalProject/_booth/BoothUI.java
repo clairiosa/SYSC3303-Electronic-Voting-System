@@ -20,7 +20,7 @@ import java.util.Enumeration;
 
 class BoothUI extends JPanel implements ActionListener{
 	
-	private Booth model;
+	private final Booth model;
 	
 	private ButtonGroup candidateGroup;
 	private JPanel candidatePanel;
@@ -73,7 +73,7 @@ class BoothUI extends JPanel implements ActionListener{
         
         layout.setVerticalGroup(
         		layout.createParallelGroup()
-        			.addComponent(pnlStatus)
+        			.addComponent(pnlStatus, 400, 400, 400)
         			.addComponent(this)
         			);
        

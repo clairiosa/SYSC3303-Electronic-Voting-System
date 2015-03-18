@@ -65,30 +65,32 @@ public class Booth extends Thread {
 	}
 	
 	public Candidate[] getCandidates(){
-		Candidate[] clist = new Candidate[2];
-		clist[0] = new Candidate("Jack", "Conservative");
-		clist[1] = new Candidate("Bob", "Liberal");
+		if(dummyData){
+			Candidate[] clist = new Candidate[2];
+			clist[0] = new Candidate("Jack", "Conservative");
+			clist[1] = new Candidate("Bob", "Liberal");
+			
+			return clist;
+		}else{
+			try {
+				this.clientServer.sendMessageParent("candidates");
+			} catch (IOException | InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return null;
+			}
+			
+			Candidate[] res;
+			try {
+				res = (Candidate[]) this.clientServer.getMessageBlocking();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return null;
+			}
+		}
 		
-		return clist;
-		
-//		try {
-//			this.clientServer.sendMessageParent("candidates");
-//		} catch (IOException | InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//			return null;
-//		}
-//		
-//		Candidate[] res;
-//		try {
-//			res = (Candidate[]) this.clientServer.getMessageBlocking();
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//			return null;
-//		}
-//		
-//		return res;
+		return res;
 	}
 
 	public BoothElectionResults getElectionStatus(){
