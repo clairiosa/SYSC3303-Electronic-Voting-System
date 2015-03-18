@@ -24,6 +24,10 @@ import java.net.SocketException;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 
+import FinalProject.communication.Comm;
+import FinalProject.persons.Candidate;
+import FinalProject.persons.Voter;
+
 public class MasterServer {
 	public static boolean electionDone=false;
 	public MasterServer() {
@@ -92,7 +96,7 @@ public class MasterServer {
 				while ((line = br1.readLine()) != null) {
 					district=Integer.valueOf(line);
 					voter=br1.readLine();
-					lists.addVoter(new Voter(voter,"",district));
+					lists.addVoter(new Voter(voter,"",district+""));
 				}
 				br1.close();
 			}catch(Exception e){
@@ -161,3 +165,4 @@ public class MasterServer {
 	}
 
 }
+
