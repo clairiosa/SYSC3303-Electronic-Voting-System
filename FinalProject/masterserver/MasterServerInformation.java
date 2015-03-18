@@ -12,10 +12,11 @@ package FinalProject.masterserver;
 
 
 
-import FinalProject.persons.Candidate;
-import FinalProject.persons.Voter;
 import java.io.Serializable;
 import java.util.concurrent.ConcurrentHashMap;
+
+import FinalProject.persons.Candidate;
+import FinalProject.persons.Voter;
 
 public class MasterServerInformation implements Serializable {
 
@@ -86,3 +87,4 @@ public class MasterServerInformation implements Serializable {
 	}
 
 }
+
