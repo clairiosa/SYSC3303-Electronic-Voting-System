@@ -22,7 +22,7 @@ public class MasterServerInformation implements Serializable {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	//private static final long serialVersionUID = 1L;
 	protected ConcurrentHashMap<String, Candidate> candidates;
 	protected ConcurrentHashMap<String, Voter> voters;
 	private int districtID;
