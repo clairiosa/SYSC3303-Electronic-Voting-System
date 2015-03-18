@@ -39,6 +39,19 @@ public class Booth extends Thread {
 	public void run(){
 		BoothUI window = new BoothUI(this);
 		window.start();
+//		
+//		try {
+//			Thread.sleep(1000);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		
+//		Candidate[] clist = new Candidate[2];
+//		clist[0] = new Candidate("Jack", "Conservative");
+//		clist[1] = new Candidate("Bob", "Liberal");
+//		
+//		window.updateCandidateList(clist);
 	}
 
 	public ElectionResults getElectionStatus(){
@@ -86,6 +99,10 @@ public class Booth extends Thread {
 	}
 
 	public boolean vote(Candidate c){
+		if(this.voter == null){
+			System.out.println("Unknown State");
+			return false;
+		}
 		
 		this.voter.setCandidate(c);
 		
