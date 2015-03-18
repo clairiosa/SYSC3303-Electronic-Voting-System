@@ -1,0 +1,3 @@
+register nate bosscher
+verify 10
+vote bob liberal 

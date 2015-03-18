@@ -281,7 +281,6 @@ public class Booth extends Thread {
 			return;
 		}
 		
-		
 		Booth booth;
 		try {
 			booth = new Booth(args[0], Integer.parseInt(args[1]));
