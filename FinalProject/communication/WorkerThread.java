@@ -104,15 +104,16 @@ class WorkerThread implements Runnable{
                         } else { // Not duplicate.
                             if (obj instanceof Ack) {
                                 if (waitingOnReply) {
-                                    synchronized(connection.waitAckSync) {
-                                        connection.setAckResultReady(true);
-                                        connection.setAckResult(true);
-                                        connection.waitAckSync.notify();
-                                    }
                                     waitingOnReply = false;
                                     Ack receivedAck = (Ack) obj;
                                     if (receivedAck.isCorrupted()) {
                                         lastSentPacketTime = sendPacket(lastPacketSent, !lastPacketSentAck);
+                                    } else {
+                                        synchronized(connection.waitAckSync) {
+                                            connection.setAckResultReady(true);
+                                            connection.setAckResult(true);
+                                            connection.waitAckSync.notify();
+                                        }
                                     }
                                 }
                             } else if (obj instanceof Connect) {
