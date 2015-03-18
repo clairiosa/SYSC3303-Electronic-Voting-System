@@ -35,7 +35,12 @@ public class MasterServer {
 		System.out.println("MasterServer Started\n");
 		ConcurrentHashMap<String, Candidate> candidates;
 		int port=4323;
-		final Comm comm = new Comm(port);
+		Comm comm=null;
+		try{
+			comm = new Comm(port);
+		}catch(SocketException e){
+			e.printStackTrace();
+		}
 
 		if (args.length < 4) {
 			System.out.println("java MasterServer <voterFilename> <CandidatesFilename> <refreshrate> <Number of Districts>");
@@ -60,7 +65,7 @@ public class MasterServer {
 				while ((line = br1.readLine()) != null) {
 					district=Integer.valueOf(line);
 					voter=br1.readLine();
-					lists.addVoter(new Voter(voter, "", district + ""));
+					lists.addVoter(new Voter(voter,"",district));
 				}
 				br1.close();
 			}catch(Exception e){
@@ -77,7 +82,7 @@ public class MasterServer {
 				BufferedReader br2 = new BufferedReader(new InputStreamReader(fis2));
 				while ((party = br2.readLine()) != null) {
 					candidate=br2.readLine();
-					lists.addCandidate(new Candidate(candidate, party));	
+					lists.addCandidate(new Candidate(candidate,party));	
 				}
 		 
 				br2.close();
@@ -85,7 +90,13 @@ public class MasterServer {
 				System.out.println("Error reading Candidates file.");
 				System.exit(-1);
 			}
-			comm.sendMessageClient((Object) lists);
+			try{
+				comm.sendMessageClient((Object) lists);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			
 			
 
@@ -114,9 +125,12 @@ public class MasterServer {
 		catch (Exception e) {
 			System.out.println(e.getMessage());
 		} finally {
-			comm.shutdown();
+			try {
+				comm.shutdown();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
 }
-
