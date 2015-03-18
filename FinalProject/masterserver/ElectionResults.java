@@ -14,9 +14,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
-import java.net.SocketException;
 import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
+
+import FinalProject.communication.Comm;
+import FinalProject.persons.Candidate;
 
 
 public class ElectionResults extends Thread implements Serializable {
