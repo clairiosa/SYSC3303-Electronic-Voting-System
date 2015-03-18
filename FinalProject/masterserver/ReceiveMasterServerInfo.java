@@ -35,7 +35,14 @@ public class ReceiveMasterServerInfo extends Thread {
 	    
 	    public void run() {
 	    	while(true){
-	    	   Object info = comm.getMessageBlocking();
+	    	   Object info;
+			try {
+				info = comm.getMessageBlocking();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return;
+			}
 	    	   if(info instanceof MasterServerInformation){
 	    		   MasterServerInformation mInfo = (MasterServerInformation)info;
 	    		   System.out.printf("District %d Information Received.\n",mInfo.getDistrictID());

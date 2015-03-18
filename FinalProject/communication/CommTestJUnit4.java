@@ -4,11 +4,7 @@
 
 package FinalProject.communication;
 
-import org.junit.*;
-
 import java.net.InetAddress;
-
-import static org.junit.Assert.*;
 
 public class CommTestJUnit4 {
 

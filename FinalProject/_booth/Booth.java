@@ -1,5 +1,5 @@
 
-package _booth;
+package FinalProject._booth;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -8,11 +8,11 @@ import java.net.UnknownHostException;
 
 import javax.swing.JFrame;
 
-import communication.Comm;
-import masterserver.ElectionResults;
-import persons.Candidate;
-import persons.Person;
-import persons.Voter;
+import FinalProject.communication.Comm;
+import FinalProject.masterserver.ElectionResults;
+import FinalProject.persons.Candidate;
+import FinalProject.persons.Person;
+import FinalProject.persons.Voter;
 
 public class Booth extends Thread { 
 	private Comm clientServer;

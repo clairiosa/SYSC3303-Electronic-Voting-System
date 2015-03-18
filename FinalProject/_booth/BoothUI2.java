@@ -1,4 +1,4 @@
-package _booth;
+package FinalProject._booth;
 
 import javax.swing.JPanel;
 import javax.swing.GroupLayout;

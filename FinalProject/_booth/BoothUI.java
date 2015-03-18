@@ -1,5 +1,5 @@
 
-package _booth;
+package FinalProject._booth;
 
 import java.awt.event.*;
 
@@ -7,9 +7,9 @@ import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
-import masterserver.ElectionResults;
-import persons.Candidate;
-import persons.Voter;
+import FinalProject.masterserver.ElectionResults;
+import FinalProject.persons.Candidate;
+import FinalProject.persons.Voter;
 
 import java.awt.*;
 import java.util.Enumeration;

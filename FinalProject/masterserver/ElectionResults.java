@@ -42,11 +42,24 @@ public class ElectionResults extends Thread implements Serializable{
 	public void run(){
 		while(true){
 			displayResults(); 
-			comm.sendMessageClient((Object) this); //send periodic results
+			try {
+				comm.sendMessageClient((Object) this);
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} //send periodic results
 			try {
 				Thread.sleep(refreshRate);
 	            if(electionDone==true){
-	            	comm.sendMessageClient((Object) this); //send final results
+	            	try {
+						comm.sendMessageClient((Object) this);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} //send final results
 	            	System.exit(1);
 	            }
 			} catch (InterruptedException e) {
