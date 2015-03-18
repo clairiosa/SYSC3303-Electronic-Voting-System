@@ -156,6 +156,10 @@ class BoothUI extends JPanel implements ActionListener{
 	public void updateStats(BoothElectionResults r){
 		if(tblResults == null)
 			return;
+		if(r == null){
+			System.out.println("STATS ERROR");
+			return;
+		}
 //		if(true)
 //			return;
 		
