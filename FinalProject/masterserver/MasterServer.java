@@ -63,7 +63,7 @@ public class MasterServer {
 		    		try{
 	    				Scanner scanner = new Scanner(System.in);
 		    			s=scanner.nextLine();
-		    			if(s.equalsIgnoreCase("done")){
+		    			if(s.trim().equalsIgnoreCase("done")){
 		    				electionDone=true;
 		    				System.exit(1);
 		    			}
