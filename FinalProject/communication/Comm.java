@@ -34,12 +34,12 @@ public class Comm implements CommInterface {
     private Connection parentConnection = null;
     private Connection replyConnection = null;
 
-    private BlockingQueue<CommTuple> receivedObjectQueue = new LinkedBlockingQueue<CommTuple>();
+    private BlockingQueue<CommTuple> receivedObjectQueue = new LinkedBlockingQueue<>();
 
     /**
      * Sole constructor for the Comm objects, initializes the listener threads.
      *
-     * @param port          Port to listen on for packets.
+     * @param port Port to listen on for packets.
      * @throws SocketException
      */
     public Comm(int port) throws SocketException {
@@ -53,8 +53,8 @@ public class Comm implements CommInterface {
     /**
      * Initializes a connection to the parent server of this particular server/client.  Should only be called once.
      *
-     * @param parentServer      The IP Address of the parent server.
-     * @param port              The port of the parent server.
+     * @param parentServer The IP Address of the parent server.
+     * @param port         The port of the parent server.
      * @throws IOException
      * @throws InterruptedException
      */
@@ -102,7 +102,7 @@ public class Comm implements CommInterface {
     /**
      * Sends the object to each client connected to this server.
      *
-     * @param obj               Object to send to each client.
+     * @param obj Object to send to each client.
      * @throws IOException
      * @throws InterruptedException
      */
@@ -124,6 +124,9 @@ public class Comm implements CommInterface {
                     connection.setAckResultReady(false);
                 }
             }
+            if (connection.equals(parentConnection) && listener.connectionHashMap.size() == 1){
+                return CommError.NO_CLIENTS;
+            }
         }
         return 0;
     }
@@ -132,13 +135,13 @@ public class Comm implements CommInterface {
     /**
      * Sends the object to the connected parent server.
      *
-     * @param obj               Object to send to the parent.
+     * @param obj Object to send to the parent.
      * @throws IOException
      * @throws InterruptedException
      */
     @Override
     public int sendMessageParent(Object obj) throws IOException, InterruptedException {
-        if (parentConnection != null){
+        if (parentConnection != null) {
             DatagramPacket outgoingPacket = Packets.craftPacket(obj, parentConnection.getAddress(), parentConnection.getPort());
             parentConnection.putOutgoingBlocking(outgoingPacket);
 
@@ -156,7 +159,7 @@ public class Comm implements CommInterface {
     /**
      * Sends the object to every connection present.
      *
-     * @param obj               Object to broadcast to every connection.
+     * @param obj Object to broadcast to every connection.
      * @throws IOException
      * @throws InterruptedException
      */
@@ -188,7 +191,7 @@ public class Comm implements CommInterface {
     /**
      * Replies to the last message taking off the queue.
      *
-     * @param obj               Object to reply with.
+     * @param obj Object to reply with.
      * @throws IOException
      * @throws InterruptedException
      */
@@ -211,7 +214,7 @@ public class Comm implements CommInterface {
      * Received objects from the network are placed in a queue for the class instancing Comm to retrieve.  It is
      * that classes responsibility to determine what the object is.  (Use instanceof).
      *
-     * @return      The first object in the queue.
+     * @return The first object in the queue.
      */
     @Override
     public Object getMessageNonBlocking() {
@@ -227,7 +230,7 @@ public class Comm implements CommInterface {
      * Received objects from the network are placed in a queue for the class instancing Comm to retrieve.  It is
      * that classes responsibility to determine what the object is.  (Use instanceof).
      *
-     * @return                  The first object in the queue.
+     * @return The first object in the queue.
      * @throws InterruptedException
      */
     @Override
@@ -243,9 +246,9 @@ public class Comm implements CommInterface {
      * Received objects from the network are placed in a queue for the class instancing Comm to retrieve.  It is
      * that classes responsibility to determine what the object is.  (Use instanceof).
      *
-     * @param timeDuration      The time to spend waiting on an object.
-     * @param timeUnit          The unit of time for the aforementioned.
-     * @return                  The first object in the queue.
+     * @param timeDuration The time to spend waiting on an object.
+     * @param timeUnit     The unit of time for the aforementioned.
+     * @return The first object in the queue.
      * @throws InterruptedException
      */
     @Override
