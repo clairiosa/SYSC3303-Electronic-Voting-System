@@ -14,18 +14,16 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
+import java.net.SocketException;
 import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
 
-import FinalProject.communication.Comm;
-import FinalProject.persons.Candidate;
 
-
-public class ElectionResults extends Thread implements Serializable{
+public class ElectionResults extends Thread implements Serializable {
 	/**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	//private static final long serialVersionUID = 1L;
 	private ConcurrentHashMap<String, Candidate> candidates = new ConcurrentHashMap<String, Candidate>();
 	private StringBuffer OfficialRecord = new StringBuffer();
 	private int refreshRate;
@@ -42,29 +40,20 @@ public class ElectionResults extends Thread implements Serializable{
 	public void run(){
 		while(true){
 			displayResults(); 
+
 			try {
-				comm.sendMessageClient((Object) this);
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} //send periodic results
-			try {
+				comm.sendMessageClient((Object) this); //send periodic results
 				Thread.sleep(refreshRate);
 	            if(electionDone==true){
-	            	try {
-						comm.sendMessageClient((Object) this);
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} //send final results
+	            	comm.sendMessageClient((Object) this); //send final results
 	            	System.exit(1);
 	            }
 			} catch (InterruptedException e) {
 				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
+			
 		}
 		
 	}
@@ -115,4 +104,5 @@ public class ElectionResults extends Thread implements Serializable{
         System.out.println(s);
      }
 }
+
 
