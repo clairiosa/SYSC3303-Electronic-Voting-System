@@ -88,9 +88,9 @@ public class Booth extends Thread {
 				e.printStackTrace();
 				return null;
 			}
+			
+			return res;
 		}
-		
-		return res;
 	}
 
 	public BoothElectionResults getElectionStatus(){
