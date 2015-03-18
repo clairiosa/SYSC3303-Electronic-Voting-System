@@ -32,11 +32,8 @@ public class Booth extends Thread {
 	}
 	
 	public void connect(int listenPort) throws IOException, InterruptedException{
-		this.clientServer = new Comm(listenPort);
-		
-		if(false){
-			clientServer.connectToParent(parentIP, parentPort);
-		}
+		clientServer = new Comm(listenPort);
+		clientServer.connectToParent(parentIP, parentPort);
 		
 		Thread.sleep(1000);
 	}
