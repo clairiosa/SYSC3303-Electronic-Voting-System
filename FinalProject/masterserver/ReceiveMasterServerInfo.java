@@ -8,6 +8,8 @@
 
 package FinalProject.masterserver;
 
+import FinalProject.persons.*;
+import FinalProject.communication.Comm;
 
 
 public class ReceiveMasterServerInfo extends Thread {

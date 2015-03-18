@@ -9,6 +9,9 @@
 
 package FinalProject.masterserver;
 
+import FinalProject.persons.*;
+import FinalProject.communication.Comm;
+
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
 import java.io.IOException;
