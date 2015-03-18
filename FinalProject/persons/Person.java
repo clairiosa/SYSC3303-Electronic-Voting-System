@@ -27,26 +27,47 @@ public class Person implements Serializable {
 	String province;
 	String districtId;
 
-	public String getDistrictId() {
-		return districtId;
-	}
-
-	public void setDistrictId(String districtId) {
-		this.districtId = districtId;
-	}
+	String user;
+	String pin;
 
 	/**
 	 * Empty constructor.
 	 */
 	public Person(String name) {
-		this.name = name;
-		address = postal = city = province = "";
+		this(name, "");
 	}
 
 	public Person(String name, String districtId) {
 		this.name = name;
 		this.districtId = districtId;
 		address = postal = city = province = "";
+
+		this.user = name;
+		this.pin = "0000";
+	}
+
+	public String getUser() {
+		return user;
+	}
+
+	public void setUser(String user) {
+		this.user = user;
+	}
+
+	public String getPin() {
+		return pin;
+	}
+
+	public void setPin(String pin) {
+		this.pin = pin;
+	}
+
+	public String getDistrictId() {
+		return districtId;
+	}
+
+	public void setDistrictId(String districtId) {
+		this.districtId = districtId;
 	}
 
 	public void setName(String name) {

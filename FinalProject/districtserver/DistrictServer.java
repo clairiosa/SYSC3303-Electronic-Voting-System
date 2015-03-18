@@ -7,6 +7,7 @@ package FinalProject.districtserver;
 import java.net.InetAddress;
 
 import FinalProject.Ballot;
+import FinalProject.Credential;
 import FinalProject.communication.Comm;
 import FinalProject.masterserver.ElectionResults;
 import FinalProject.masterserver.MasterServerInformation;
@@ -125,16 +126,16 @@ public class DistrictServer implements Runnable {
 				Ballot voteBallot = (Ballot) recievedMessage;
 
 				// district must be matching to vote AND must be registered
-				if (voteBallot.district.equals(uniqueDistrictId)
-						&& voteBallot.voter.getRegistered()
-						&& voteBallot.voter.getDistrictId().equals(
+				if (voteBallot.getDistrict().equals(uniqueDistrictId)
+						&& voteBallot.getVoter().getRegistered()
+						&& voteBallot.getVoter().getDistrictId().equals(
 								uniqueDistrictId)) {
 
 					Voter localVoter = this.masterServerInfo
-							.getVoter(voteBallot.voter.getName());
+							.getVoter(voteBallot.getVoter().getName());
 
 					// make the vote
-					localVoter.setCandidate(voteBallot.candidate);
+					localVoter.setCandidate(voteBallot.getCandidate());
 					localVoter.setVoted(true);
 					districtComm.sendMessageReply("true");
 
@@ -143,6 +144,19 @@ public class DistrictServer implements Runnable {
 
 				} else
 					districtComm.sendMessageReply("false");
+
+			} else if (recievedMessage instanceof Credential) {
+				Credential creds = (Credential) recievedMessage;
+				// check user match
+				if (masterServerInfo.getVoter(creds.getUser()).getUser()
+						.equals(creds.getUser())
+						&& masterServerInfo.getVoter(creds.getUser()).getPin()
+								.equals(creds.getPin())) {
+
+					districtComm.sendMessageReply("true");
+				} else {
+					districtComm.sendMessageReply("false");
+				}
 
 			} else if (recievedMessage instanceof String) {
 				if (recievedMessage.equals("status")) {
