@@ -85,7 +85,6 @@ public class MasterServer {
 				System.out.println("Error reading Candidates file.");
 				System.exit(-1);
 			}
-			comm.StartMasterServer();
 			comm.sendMessageClient((Object) lists);
 			
 			
