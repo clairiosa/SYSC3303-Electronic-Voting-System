@@ -8,11 +8,11 @@ import java.net.UnknownHostException;
 
 import javax.swing.JFrame;
 
+import FinalProject.BoothElectionResult;
+import FinalProject.BoothElectionResults;
 import FinalProject.Credential;
 import FinalProject.communication.Comm;
-import FinalProject.masterserver.ElectionResults;
 import FinalProject.persons.Candidate;
-import FinalProject.persons.Person;
 import FinalProject.persons.Voter;
 
 public class Booth extends Thread { 
@@ -21,10 +21,14 @@ public class Booth extends Thread {
 	
 	private InetAddress parentIP;
 	private int parentPort;
+	private Object cmdInProgress;
+	private boolean dummyData;
 	
 	public Booth(String parentServer, int port) throws UnknownHostException{
 		parentIP = InetAddress.getByName(parentServer);
 		parentPort = port;
+		dummyData = false;
+		cmdInProgress = new Object();
 	}
 	
 	public void connect(int listenPort) throws IOException, InterruptedException{
@@ -38,21 +42,24 @@ public class Booth extends Thread {
 	}
 	
 	public void run(){
-		BoothUI window = new BoothUI(this);
+		final BoothUI window = new BoothUI(this);
 		window.start();
-//		
-//		try {
-//			Thread.sleep(1000);
-//		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
 		
-//		Candidate[] clist = new Candidate[2];
-//		clist[0] = new Candidate("Jack", "Conservative");
-//		clist[1] = new Candidate("Bob", "Liberal");
-//		
-//		window.updateCandidateList(clist);
+		(new Thread() {
+		    public void run() {
+				while(true){
+					synchronized(cmdInProgress){
+						window.updateStats(getElectionStatus());
+					}
+					
+					try {
+						Thread.sleep(5000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+		  }}).start();
 	}
 	
 	
@@ -61,90 +68,120 @@ public class Booth extends Thread {
 	}
 	
 	public Candidate[] getCandidates(){
-		try {
-			this.clientServer.sendMessageParent("candidates");
-		} catch (IOException | InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
+		Candidate[] clist = new Candidate[2];
+		clist[0] = new Candidate("Jack", "Conservative");
+		clist[1] = new Candidate("Bob", "Liberal");
 		
-		Candidate[] res;
-		try {
-			res = (Candidate[]) this.clientServer.getMessageBlocking();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
+		return clist;
 		
-		return res;
+//		try {
+//			this.clientServer.sendMessageParent("candidates");
+//		} catch (IOException | InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//			return null;
+//		}
+//		
+//		Candidate[] res;
+//		try {
+//			res = (Candidate[]) this.clientServer.getMessageBlocking();
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//			return null;
+//		}
+//		
+//		return res;
 	}
 
-	public ElectionResults getElectionStatus(){
-		try {
-			this.clientServer.sendMessageParent("status");
-		} catch (IOException | InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
+	public BoothElectionResults getElectionStatus(){
 		
-		ElectionResults res;
-		try {
-			res = (ElectionResults) this.clientServer.getMessageBlocking();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
+		if(dummyData){
+			BoothElectionResult[] rs = new BoothElectionResult[2];
+			
+			Candidate c1 = new Candidate("Bob", "Liberal");
+			Candidate c2 = new Candidate("Fred", "Conservative");
+			
+			rs[0] = new BoothElectionResult(c1, 2);
+			rs[1] = new BoothElectionResult(c2, 1);
+			
+			BoothElectionResults r = new BoothElectionResults(rs,3);
+			
+			return r;
+		}else{
+			try {
+				this.clientServer.sendMessageParent("status");
+			} catch (IOException | InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return null;
+			}
+			
+			BoothElectionResults res;
+			try {
+				res = (BoothElectionResults) this.clientServer.getMessageBlocking();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return null;
+			}
+			
+			return res;
 		}
+	}
+	
+	public void parse(String textFile){
 		
-		return res;
 	}
 
 	public boolean register(Voter p){
-		try {
-			this.clientServer.sendMessageParent(p);
-		} catch (IOException | InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return false;
-		}
-		
 		String s;
-		try {
-			s = (String) this.clientServer.getMessageBlocking();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return false;
-		}
 		
-		this.voter = p;
+		synchronized(cmdInProgress){
+			try {
+				this.clientServer.sendMessageParent(p);
+			} catch (IOException | InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return false;
+			}
+			
+			
+			try {
+				s = (String) this.clientServer.getMessageBlocking();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return false;
+			}
+			
+			this.voter = p;
+		}
 		
 		return (s == "true");
 	}
 	
 	public boolean verify(String pin){
 		Credential c = new Credential(voter.getName(), pin);
-		
-		try {
-			this.clientServer.sendMessageParent(c);
-		} catch (IOException | InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return false;
-		}
-		
 		String s;
-		try {
-			s = (String) this.clientServer.getMessageBlocking();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return false;
-		}
 		
+		synchronized(cmdInProgress){
+			try {
+				this.clientServer.sendMessageParent(c);
+			} catch (IOException | InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return false;
+			}
+			
+			try {
+				s = (String) this.clientServer.getMessageBlocking();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return false;
+			}
+		}
 		return (s == "true");
 	}
 
@@ -153,24 +190,26 @@ public class Booth extends Thread {
 			System.out.println("Unknown State");
 			return false;
 		}
-		
+		String s;
 		this.voter.setCandidate(c);
 		
-		try {
-			this.clientServer.sendMessageParent(this.voter);
-		} catch (IOException | InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-			return false;
-		}
-		
-		String s;
-		try {
-			s = (String) this.clientServer.getMessageBlocking();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return false;
+		synchronized(cmdInProgress){
+			try {
+				this.clientServer.sendMessageParent(this.voter);
+			} catch (IOException | InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+				return false;
+			}
+			
+			
+			try {
+				s = (String) this.clientServer.getMessageBlocking();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return false;
+			}
 		}
 		
 		this.voter = null;

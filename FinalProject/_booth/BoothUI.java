@@ -6,14 +6,16 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import FinalProject.masterserver.ElectionResults;
+import FinalProject.BoothElectionResults;
 import FinalProject.persons.Candidate;
 import FinalProject.persons.Voter;
 
 import java.awt.*;
+import java.sql.Date;
 import java.util.Enumeration;
 
 class BoothUI extends JPanel implements ActionListener{
@@ -37,22 +39,45 @@ class BoothUI extends JPanel implements ActionListener{
 	private JPanel pnlVote;
 	private JPanel voteOptions;
 	private JPanel pnlStatus;
-	private JPanel pnlAction;
 
 	private JTable tblResults;
 	
 	public BoothUI(Booth model){
 		super();
 		this.model = model;
+		tblResults = null;
 //		c.addLayoutComponent(this, "layoutComponent");
 	}
 	
 	public void start(){
+		pnlStatus = new JPanel();
+		
+		pnlStatus.setBackground(new Color(100, 100, 100));
+		pnlStatus.setPreferredSize(new Dimension(200, 400));
+		
+		setPreferredSize(new Dimension(600, 400));
+		setBackground(new Color(255, 255, 255));
+		setLocation(200,0);
+		
 		JFrame frame = new JFrame("Voter Booth");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setPreferredSize(new Dimension(800, 400));
-
-        frame.getContentPane().add(this);
+        
+        GroupLayout layout = new GroupLayout(frame.getContentPane());
+        
+        layout.setHorizontalGroup(
+        		layout.createSequentialGroup()
+        			.addComponent(pnlStatus, 200, 200, 200)
+        			.addComponent(this, 400, 400, layout.DEFAULT_SIZE)
+        		);
+        
+        layout.setVerticalGroup(
+        		layout.createParallelGroup()
+        			.addComponent(pnlStatus)
+        			.addComponent(this)
+        			);
+       
+        frame.getContentPane().setLayout(layout);
 
         //Display the window.
         frame.pack();
@@ -70,10 +95,9 @@ class BoothUI extends JPanel implements ActionListener{
 		pnlRegister = new JPanel();
 		pnlVerify = new JPanel();
 		pnlVote = new JPanel();
-		pnlStatus = new JPanel();
-		pnlAction = new JPanel();
 		
 		voteOptions = new JPanel(new GridLayout(0, 1));
+		candidateGroup = new ButtonGroup();
 		
 		JButton btnRegister = new JButton("Register"); btnRegister.addActionListener(this);
 		JButton btnVerify = new JButton("Verify"); btnVerify.addActionListener(this);
@@ -86,13 +110,24 @@ class BoothUI extends JPanel implements ActionListener{
 		lblRegisterStatus = new JLabel();
 		lblVerifyStatus = new JLabel();
 		lblVoteStatus = new JLabel();
+
+
+		tblResults = new JTable(0,2);
+		tblResults.getColumnModel().getColumn(0).setHeaderValue("Candidate");
+		tblResults.getColumnModel().getColumn(1).setHeaderValue("Votes");
 		
-		tblResults = new JTable(); tblResults.addColumn(new TableColumn()); tblResults.addColumn(new TableColumn());
-		TableColumnModel headers = tblResults.getTableHeader().getColumnModel(); 
-		headers.getColumn(0).setHeaderValue("Candidate"); headers.getColumn(1).setHeaderValue("Votes");
-		tblResults.repaint();
 		
-		pnlStatus.add(tblResults);
+		GroupLayout tblLayout = new GroupLayout(pnlStatus);
+		
+		tblLayout.setHorizontalGroup(
+				tblLayout.createSequentialGroup()
+					.addComponent(tblResults));
+		
+		tblLayout.setVerticalGroup(
+				tblLayout.createSequentialGroup()
+					.addComponent(tblResults));
+		
+		pnlStatus.setLayout(tblLayout);
 	
 		pnlRegister.add(lblRegisterStatus);
 		pnlRegister.add(txtFirstName);
@@ -109,60 +144,76 @@ class BoothUI extends JPanel implements ActionListener{
 		pnlVote.add(btnVote);
 		
 		CardLayout c = new CardLayout();
-		pnlAction.setLayout(c);
+		this.setLayout(c);
 		
-		pnlAction.add(pnlRegister, "register");
-		pnlAction.add(pnlVerify, "verify");
-		pnlAction.add(pnlVote, "vote");
+		add(pnlRegister, "register");
+		add(pnlVerify, "verify");
+		add(pnlVote, "vote");
 		
-		this.add(pnlAction);
-//		this.add(tblResults);
-		
-		
+		pnlStatus.add(tblResults);
 	}
 	
-	public void updateStats(ElectionResults r){
+	public void updateStats(BoothElectionResults r){
+		if(tblResults == null)
+			return;
+//		if(true)
+//			return;
 		
+		DefaultTableModel model = (DefaultTableModel)tblResults.getModel();
+		
+		while(model.getRowCount() > 1){
+			model.removeRow(1);
+		}
+		
+		for(int i=0; i < r.results.length;i++){
+			String n = r.results[i].candidate.getName();
+			int c = r.results[i].count;
+			
+			model.addRow(new Object[]{ n, c });
+		}
+		
+		model.addRow(new Object[]{ "", ""});
+		
+		int t = r.totalVotes;
+		String dt = r.generated.toGMTString();
+		
+		model.addRow(new Object[]{ "Total", t });
+		model.addRow(new Object[]{ "Updated", dt });
+		
+		tblResults.setModel(model);
+		tblResults.repaint();
 	}
 	
-	public void updateCandidateList(Candidate[] candidates){
+	public void updateCandidateList(){
 		JRadioButton rdbtnCandidate;
-		
-		//Put the radio buttons in a column in a panel.
-		JPanel radioPanel = new JPanel(new GridLayout(0, 1));
 		
 		for(int i=0;i<candidates.length;i++){	
 			rdbtnCandidate = new JRadioButton(candidates[i].getName());
-			radioPanel.add(rdbtnCandidate);
+			voteOptions.add(rdbtnCandidate);
 			candidateGroup.add(rdbtnCandidate);
-		}
-		
-		candidatePanel.add(radioPanel, BorderLayout.LINE_START);
-		candidatePanel.setBorder(BorderFactory.createEmptyBorder(20,20,20,20));
-		
-		System.out.println("added candidates");
-		
-		this.candidates = candidates;
+		}	
 	}
 	
 	public void showVerify(){
 		lblVerifyStatus.setText("");
-		CardLayout layout = (CardLayout)(pnlAction.getLayout());
-		layout.show(pnlAction, "verify");
+		model.clearVoter();
+		
+		CardLayout layout = (CardLayout)(this.getLayout());
+		layout.show(this, "verify");
 	}
 	
 	public void showRegister(){
 		lblRegisterStatus.setText("");
-		CardLayout layout = (CardLayout)(pnlAction.getLayout());
-		layout.show(pnlAction, "register");
+		CardLayout layout = (CardLayout)(this.getLayout());
+		layout.show(this, "register");
 	}
 	
 	public boolean showVoting(){
-		
 		if(this.candidates == null){
 			(new Thread() {
 			    public void run() {
 			    	candidates = model.getCandidates();
+			    	updateCandidateList();
 			    	showVoting();
 			    }
 			}).start();
@@ -171,8 +222,8 @@ class BoothUI extends JPanel implements ActionListener{
 		}
 		
 		lblVoteStatus.setText("");
-		CardLayout layout = (CardLayout)(pnlAction.getLayout());
-		layout.show(pnlAction, "vote");
+		CardLayout layout = (CardLayout)(this.getLayout());
+		layout.show(this, "vote");
 		
 		return true;
 	}
@@ -183,33 +234,33 @@ class BoothUI extends JPanel implements ActionListener{
 		
 		switch(e.getActionCommand()){
 		case "Vote":
-			showRegister();
-//			if(candidates.length == 0){
-//				System.out.println("Load candidates");
-//				return;
-//			}
-//			
-//			Enumeration<AbstractButton> lst = this.candidateGroup.getElements();
-//			AbstractButton b;
-//			
-//			int i = 0;
-//			while(lst.hasMoreElements()){
-//				b = lst.nextElement();
-//				
-//				if(b.isSelected()){
-//					if(this.model.vote(candidates[i])){
-//						showWelcome();
-//						model.clearVoter();
-//					}else{
-//						// model error
-//					}
-//					return;
-//				}
-//				
-//				i++;
-//			}
-//			
-//			System.out.println("No one selected");
+
+			if(candidates.length == 0){
+				System.out.println("Load candidates");
+				return;
+			}
+			
+			Enumeration<AbstractButton> lst = candidateGroup.getElements();
+			AbstractButton b;
+			
+			int i = 0;
+			while(lst.hasMoreElements()){
+				b = lst.nextElement();
+				
+				if(b.isSelected()){
+					if(this.model.vote(candidates[i])){
+						showRegister();
+						model.clearVoter();
+					}else{
+						// model error
+					}
+					return;
+				}
+				
+				i++;
+			}
+			
+			System.out.println("No one selected");
 			
 			break;
 		case "Register":
@@ -219,14 +270,12 @@ class BoothUI extends JPanel implements ActionListener{
 			
 			(new Thread() {
 			    public void run() {
-			    	showVerify();
-			    	return;
-//			    	if(model.register(v)){
-//						showVerify();
-//					}else{
-//						// model error
-//						lblRegisterStatus.setText("Invalid!");
-//					}
+			    	if(model.register(v)){
+						showVerify();
+					}else{
+						// model error
+						lblRegisterStatus.setText("Invalid!");
+					}
 			    }
 			}).start();
 			
@@ -236,18 +285,14 @@ class BoothUI extends JPanel implements ActionListener{
 			
 			(new Thread() {
 			    public void run() {
-			    	
-			    	if(!showVoting()){
-			    		lblVerifyStatus.setText("Loading Candidates...");
-			    	}
-			    	
-//			    	if(model.verify(v)){
-//						showVoting();
-//					}else{
+			    	if(model.verify(txtPin.getText())){
+				    	if(!showVoting()){
+				    		lblVerifyStatus.setText("Loading Candidates...");
+				    	}
+					}else{
 //						// model error
-//						lblVerifyStatus.setText("Incorrect!");
-//					}
-			    	
+						lblVerifyStatus.setText("Incorrect!");
+					}
 			    }
 			}).start();
 			

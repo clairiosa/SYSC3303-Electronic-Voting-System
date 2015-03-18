@@ -10,15 +10,11 @@
 
 package FinalProject.persons;
 
-
 public class Candidate extends Voter {
 	private int voteCount;
 	private double votingPercentage;
 	private static int totalVotes;
-	
-	
-	
-	
+
 	public Candidate(String name, String party) {
 		super(name, party);
 		voteCount = 0;
