@@ -8,8 +8,13 @@
 
 package FinalProject.masterserver;
 
-import FinalProject.persons.*;
+import java.util.Enumeration;
+import java.util.concurrent.ConcurrentHashMap;
+
 import FinalProject.communication.Comm;
+import FinalProject.persons.Candidate;
+import FinalProject.persons.Voter;
+
 
 
 public class ReceiveMasterServerInfo extends Thread {
@@ -130,5 +135,6 @@ public class ReceiveMasterServerInfo extends Thread {
 		}
 	    
 }
+
 
 
