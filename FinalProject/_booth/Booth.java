@@ -28,12 +28,17 @@ public class Booth extends Thread {
 	
 	public void connect(int listenPort) throws IOException, InterruptedException{
 		this.clientServer = new Comm(listenPort);
-		clientServer.connectToParent(parentIP, parentPort);
+		
+		if(false){
+			clientServer.connectToParent(parentIP, parentPort);
+		}
+		
 		Thread.sleep(1000);
 	}
 	
 	public void run(){
 		BoothUI window = new BoothUI(this);
+		window.start();
 	}
 
 	public ElectionResults getElectionStatus(){
@@ -128,9 +133,11 @@ public class Booth extends Thread {
 		try{
 			booth.connect(Integer.parseInt(args[2]));
 		}catch(IOException e){
+			e.printStackTrace();
 			System.out.println("IO exception");
 			return;
 		}catch(InterruptedException e){
+			e.printStackTrace();
 			System.out.println("Interrupted IO exception");
 			return;
 		}

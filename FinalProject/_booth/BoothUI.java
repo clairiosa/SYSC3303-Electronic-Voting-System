@@ -32,47 +32,69 @@ class BoothUI extends JPanel implements ActionListener{
 		this.model = model;
 	}
 	
+	public void start(){
+		JFrame frame = new JFrame("Voter Booth");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setPreferredSize(new Dimension(800, 400));
+
+        frame.getContentPane().add(this);
+
+        //Display the window.
+        frame.pack();
+        frame.setVisible(true);
+	}
+	
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		
 		/*
 		 * Welcome panel
-		 * 
+		 *	
 		 */
-		
 		panel = new JPanel();
 		
 		txtFirstName = new JTextField();
-		txtFirstName.setText("First Name");
 		txtFirstName.setColumns(10);
 		
 		txtLastName = new JTextField();
-		txtLastName.setText("Last Name");
 		txtLastName.setColumns(10);
 		
 		JButton btnRegister = new JButton("Register");
+		btnRegister.addActionListener(this);
+		
+		JLabel lblFirstName = new JLabel("First Name");
+		
+		JLabel lblLastName = new JLabel("Last Name");
 		GroupLayout gl_panel = new GroupLayout(panel);
 		gl_panel.setHorizontalGroup(
 			gl_panel.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_panel.createSequentialGroup()
-					.addGap(25)
-					.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING, false)
-						.addComponent(txtLastName, Alignment.LEADING)
-						.addComponent(txtFirstName, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 220, Short.MAX_VALUE))
-					.addContainerGap(20, Short.MAX_VALUE))
-				.addGroup(gl_panel.createSequentialGroup()
-					.addContainerGap(164, Short.MAX_VALUE)
-					.addComponent(btnRegister)
-					.addContainerGap())
+					.addContainerGap(25, Short.MAX_VALUE)
+					.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel.createSequentialGroup()
+							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
+								.addComponent(lblLastName)
+								.addComponent(lblFirstName)
+								.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING, false)
+									.addComponent(txtLastName, Alignment.LEADING)
+									.addComponent(txtFirstName, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 220, GroupLayout.PREFERRED_SIZE)))
+							.addGap(20))
+						.addGroup(Alignment.TRAILING, gl_panel.createSequentialGroup()
+							.addComponent(btnRegister)
+							.addContainerGap())))
 		);
 		gl_panel.setVerticalGroup(
 			gl_panel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel.createSequentialGroup()
-					.addGap(25)
+					.addGap(18)
+					.addComponent(lblFirstName)
+					.addGap(3)
 					.addComponent(txtFirstName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGap(4)
+					.addComponent(lblLastName)
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(txtLastName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED, 32, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED, 29, Short.MAX_VALUE)
 					.addComponent(btnRegister)
 					.addContainerGap())
 		);
@@ -81,19 +103,18 @@ class BoothUI extends JPanel implements ActionListener{
 		groupLayout.setHorizontalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
-					.addGap(86)
+					.addGap(268)
 					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 265, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(99, Short.MAX_VALUE))
+					.addContainerGap(267, Short.MAX_VALUE))
 		);
 		groupLayout.setVerticalGroup(
 			groupLayout.createParallelGroup(Alignment.LEADING)
 				.addGroup(groupLayout.createSequentialGroup()
-					.addGap(24)
-					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 160, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(116, Short.MAX_VALUE))
+					.addGap(97)
+					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 183, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(120, Short.MAX_VALUE))
 		);
 		setLayout(groupLayout);
-		
 		
 		
 		/*
@@ -178,8 +199,9 @@ class BoothUI extends JPanel implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		System.out.println(e.getActionCommand());
 		switch(e.getActionCommand()){
-		case "vote":
+		case "Vote":
 			Enumeration<AbstractButton> lst = this.candidateGroup.getElements();
 			AbstractButton b;
 			
@@ -196,7 +218,7 @@ class BoothUI extends JPanel implements ActionListener{
 				i++;
 			}
 			break;
-		case "register":
+		case "Register":
 			
 			Voter v = new Voter(txtFirstName + " " + txtLastName, null);
 			if(this.model.register(v)){
