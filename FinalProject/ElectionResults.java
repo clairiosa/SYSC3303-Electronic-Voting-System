@@ -1,15 +1,15 @@
-/* 
-* @Author: natebosscher
-* @Date:   2015-03-16
-* @Last Modified by:   natebosscher
-* @Last Modified time: 2015-03-16
-*/
-
 package FinalProject;
 
-import java.sql.Date;
+import java.util.Date;
 
-public class ElectionResults{
-	ElectionResult[] results;
-	Date generated;
+public class ElectionResults implements java.io.Serializable {
+	public ElectionResult[] results;
+	public int totalVotes;
+	public Date generated;
+	
+	ElectionResults(ElectionResult[] results, int totalVotes){
+		this.results = results;
+		this.totalVotes = totalVotes;
+		this.generated = new Date();
+	}
 }

@@ -9,9 +9,6 @@
 package FinalProject.persons;
 
 public class Voter extends Person {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	private String party;

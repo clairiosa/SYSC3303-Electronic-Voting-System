@@ -8,6 +8,7 @@ import java.net.UnknownHostException;
 
 import javax.swing.JFrame;
 
+import FinalProject.Credential;
 import FinalProject.communication.Comm;
 import FinalProject.masterserver.ElectionResults;
 import FinalProject.persons.Candidate;
@@ -53,6 +54,32 @@ public class Booth extends Thread {
 //		
 //		window.updateCandidateList(clist);
 	}
+	
+	
+	public void clearVoter(){
+		this.voter = null;
+	}
+	
+	public Candidate[] getCandidates(){
+		try {
+			this.clientServer.sendMessageParent("candidates");
+		} catch (IOException | InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+		
+		Candidate[] res;
+		try {
+			res = (Candidate[]) this.clientServer.getMessageBlocking();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+		
+		return res;
+	}
 
 	public ElectionResults getElectionStatus(){
 		try {
@@ -94,6 +121,29 @@ public class Booth extends Thread {
 		}
 		
 		this.voter = p;
+		
+		return (s == "true");
+	}
+	
+	public boolean verify(String pin){
+		Credential c = new Credential(voter.getName(), pin);
+		
+		try {
+			this.clientServer.sendMessageParent(c);
+		} catch (IOException | InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
+		
+		String s;
+		try {
+			s = (String) this.clientServer.getMessageBlocking();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return false;
+		}
 		
 		return (s == "true");
 	}

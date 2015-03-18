@@ -6,6 +6,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 
 import FinalProject.masterserver.ElectionResults;
 import FinalProject.persons.Candidate;
@@ -33,15 +35,15 @@ class BoothUI extends JPanel implements ActionListener{
 	private JPanel pnlRegister;
 	private JPanel pnlVerify;
 	private JPanel pnlVote;
-	
 	private JPanel voteOptions;
+	private JPanel pnlStatus;
+	private JPanel pnlAction;
+
+	private JTable tblResults;
 	
 	public BoothUI(Booth model){
 		super();
 		this.model = model;
-		
-		CardLayout c = new CardLayout();
-		this.setLayout(c);
 //		c.addLayoutComponent(this, "layoutComponent");
 	}
 	
@@ -60,8 +62,6 @@ class BoothUI extends JPanel implements ActionListener{
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		
-		CardLayout layout = (CardLayout)(this.getLayout());
-		
 		/*
 		 * Welcome panel
 		 *	
@@ -70,6 +70,8 @@ class BoothUI extends JPanel implements ActionListener{
 		pnlRegister = new JPanel();
 		pnlVerify = new JPanel();
 		pnlVote = new JPanel();
+		pnlStatus = new JPanel();
+		pnlAction = new JPanel();
 		
 		voteOptions = new JPanel(new GridLayout(0, 1));
 		
@@ -84,6 +86,13 @@ class BoothUI extends JPanel implements ActionListener{
 		lblRegisterStatus = new JLabel();
 		lblVerifyStatus = new JLabel();
 		lblVoteStatus = new JLabel();
+		
+		tblResults = new JTable(); tblResults.addColumn(new TableColumn()); tblResults.addColumn(new TableColumn());
+		TableColumnModel headers = tblResults.getTableHeader().getColumnModel(); 
+		headers.getColumn(0).setHeaderValue("Candidate"); headers.getColumn(1).setHeaderValue("Votes");
+		tblResults.repaint();
+		
+		pnlStatus.add(tblResults);
 	
 		pnlRegister.add(lblRegisterStatus);
 		pnlRegister.add(txtFirstName);
@@ -99,141 +108,16 @@ class BoothUI extends JPanel implements ActionListener{
 		pnlVote.add(voteOptions);
 		pnlVote.add(btnVote);
 		
-		this.add(pnlRegister, "register");
-		this.add(pnlVerify, "verify");
-		this.add(pnlVote, "vote");
+		CardLayout c = new CardLayout();
+		pnlAction.setLayout(c);
 		
+		pnlAction.add(pnlRegister, "register");
+		pnlAction.add(pnlVerify, "verify");
+		pnlAction.add(pnlVote, "vote");
 		
-//		
-//		txtFirstName = new JTextField();
-//		txtFirstName.setColumns(10);
-//		
-//		txtLastName = new JTextField();
-//		txtLastName.setColumns(10);
-//		
-//		JButton btnRegister = new JButton("Register");
-//		btnRegister.addActionListener(this);
-//		
-//		JLabel lblFirstName = new JLabel("First Name");
-//		
-//		JTextPane textPane = new JTextPane();
-//		textPane.setEditable(false);
-//		textPane.setText("hello world");
-//		
-//		JLabel lblLastName = new JLabel("Last Name");
-//		GroupLayout gl_panel = new GroupLayout(panel);
-//		gl_panel.setHorizontalGroup(
-//			gl_panel.createSequentialGroup()
-//				.addComponent(textPane)
-//				.addGap(10)
-//				.addGroup(
-//					gl_panel.createParallelGroup(Alignment.TRAILING)
-//						.addGroup(gl_panel.createSequentialGroup()
-//							.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-//								.addGroup(gl_panel.createSequentialGroup()
-//									.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-//										.addComponent(lblLastName)
-//										.addComponent(lblFirstName)
-//										.addGroup(gl_panel.createParallelGroup(Alignment.TRAILING, false)
-//											.addComponent(txtLastName, Alignment.LEADING)
-//											.addComponent(txtFirstName, Alignment.LEADING, GroupLayout.PREFERRED_SIZE, 220, GroupLayout.PREFERRED_SIZE)))
-//									.addGap(20))
-//								.addGroup(Alignment.TRAILING, gl_panel.createSequentialGroup()
-//									.addComponent(btnRegister)
-//									.addContainerGap()))))
-//				.addContainerGap()
-//		);
-//		gl_panel.setVerticalGroup(
-//			gl_panel.createParallelGroup(Alignment.LEADING)
-//				.addGroup(gl_panel.createParallelGroup(Alignment.LEADING)
-//					.addGroup(gl_panel.createSequentialGroup()
-//						.addGap(18)
-//						.addComponent(lblFirstName)
-//						.addGap(3)
-//						.addComponent(txtFirstName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-//						.addGap(4)
-//						.addComponent(lblLastName)
-//						.addPreferredGap(ComponentPlacement.RELATED)
-//						.addComponent(txtLastName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-//						.addPreferredGap(ComponentPlacement.RELATED, 29, Short.MAX_VALUE)
-//						.addComponent(btnRegister)
-//						.addContainerGap())
-//					.addGroup(gl_panel.createSequentialGroup()
-//							.addGap(18)
-//							.addComponent(textPane, GroupLayout.PREFERRED_SIZE, 116, GroupLayout.PREFERRED_SIZE)
-//							.addContainerGap()))
-//		);
-//		
-//		panel.setLayout(gl_panel);
+		this.add(pnlAction);
+//		this.add(tblResults);
 		
-//		GroupLayout groupLayout = new GroupLayout(this);
-//		groupLayout.setHorizontalGroup(
-//			groupLayout.createParallelGroup(Alignment.LEADING)
-//				.addGroup(groupLayout.createSequentialGroup()
-//					.addGap(268)
-//					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 265, GroupLayout.PREFERRED_SIZE)
-//					.addContainerGap(267, Short.MAX_VALUE))
-//		);
-//		groupLayout.setVerticalGroup(
-//			groupLayout.createParallelGroup(Alignment.LEADING)
-//				.addGroup(groupLayout.createSequentialGroup()
-//					.addGap(97)
-//					.addComponent(panel, GroupLayout.PREFERRED_SIZE, 183, GroupLayout.PREFERRED_SIZE)
-//					.addContainerGap(120, Short.MAX_VALUE))
-//		);
-//		panel.setLayout(groupLayout);
-		
-		
-//		panel.setVisible(true);
-		
-		
-		/*
-		 * Voting panel
-		 * 
-		 */
-		
-//		GroupLayout groupLayout2 = new GroupLayout(this);
-//		groupLayout2.setHorizontalGroup(
-//			groupLayout2.createParallelGroup(Alignment.LEADING)
-//				.addComponent(panel2, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
-//		);
-//		groupLayout2.setVerticalGroup(
-//			groupLayout2.createParallelGroup(Alignment.LEADING)
-//				.addComponent(panel2, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
-//		);
-//		
-//		candidatePanel = new JPanel();
-//		panel2.add(candidatePanel);
-//		JButton btnVote = new JButton("Vote");
-//		btnVote.addActionListener(this);
-//		
-//		GroupLayout gl_panel2 = new GroupLayout(panel2);
-//		gl_panel2.setHorizontalGroup(
-//			gl_panel2.createParallelGroup(Alignment.LEADING)
-//				.addGroup(Alignment.TRAILING, gl_panel2.createSequentialGroup()
-//					.addContainerGap(15, Short.MAX_VALUE)
-//					.addGroup(gl_panel2.createParallelGroup(Alignment.TRAILING)
-//						.addComponent(btnVote)
-//						.addComponent(candidatePanel, GroupLayout.PREFERRED_SIZE, 195, GroupLayout.PREFERRED_SIZE))
-//					.addGap(118))
-//		);
-//		gl_panel2.setVerticalGroup(
-//			gl_panel2.createParallelGroup(Alignment.LEADING)
-//				.addGroup(Alignment.TRAILING, gl_panel2.createSequentialGroup()
-//					.addContainerGap(66, Short.MAX_VALUE)
-//					.addGroup(gl_panel2.createParallelGroup(Alignment.TRAILING)
-//						.addGroup(gl_panel2.createSequentialGroup()
-//							.addComponent(candidatePanel, GroupLayout.PREFERRED_SIZE, 177, GroupLayout.PREFERRED_SIZE)
-//							.addPreferredGap(ComponentPlacement.RELATED)
-//							.addComponent(btnVote)))
-//					.addGap(22))
-//		);
-//		
-//		candidateGroup = new ButtonGroup();
-//		candidatePanel.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-//		
-//		panel2.setLayout(gl_panel2);
-//		panel2.setLayout(groupLayout2);
 		
 	}
 	
@@ -262,18 +146,35 @@ class BoothUI extends JPanel implements ActionListener{
 	}
 	
 	public void showVerify(){
-		CardLayout layout = (CardLayout)(this.getLayout());
-		layout.show(this, "verify");
+		lblVerifyStatus.setText("");
+		CardLayout layout = (CardLayout)(pnlAction.getLayout());
+		layout.show(pnlAction, "verify");
 	}
 	
-	public void showWelcome(){
-		CardLayout layout = (CardLayout)(this.getLayout());
-		layout.show(this, "welcome");
+	public void showRegister(){
+		lblRegisterStatus.setText("");
+		CardLayout layout = (CardLayout)(pnlAction.getLayout());
+		layout.show(pnlAction, "register");
 	}
 	
-	public void showVoting(){
-		CardLayout layout = (CardLayout)(this.getLayout());
-		layout.show(this, "vote");
+	public boolean showVoting(){
+		
+		if(this.candidates == null){
+			(new Thread() {
+			    public void run() {
+			    	candidates = model.getCandidates();
+			    	showVoting();
+			    }
+			}).start();
+			
+			return false;
+		}
+		
+		lblVoteStatus.setText("");
+		CardLayout layout = (CardLayout)(pnlAction.getLayout());
+		layout.show(pnlAction, "vote");
+		
+		return true;
 	}
 
 	@Override
@@ -282,29 +183,33 @@ class BoothUI extends JPanel implements ActionListener{
 		
 		switch(e.getActionCommand()){
 		case "Vote":
-			if(candidates.length == 0){
-				System.out.println("Load candidates");
-				return;
-			}
-			
-			Enumeration<AbstractButton> lst = this.candidateGroup.getElements();
-			AbstractButton b;
-			
-			int i = 0;
-			while(lst.hasMoreElements()){
-				b = lst.nextElement();
-				if(b.isSelected()){
-					if(this.model.vote(candidates[i])){
-						this.showWelcome();
-					}else{
-						// model error
-					}
-					return;
-				}
-				i++;
-			}
-			
-			System.out.println("No one selected");
+			showRegister();
+//			if(candidates.length == 0){
+//				System.out.println("Load candidates");
+//				return;
+//			}
+//			
+//			Enumeration<AbstractButton> lst = this.candidateGroup.getElements();
+//			AbstractButton b;
+//			
+//			int i = 0;
+//			while(lst.hasMoreElements()){
+//				b = lst.nextElement();
+//				
+//				if(b.isSelected()){
+//					if(this.model.vote(candidates[i])){
+//						showWelcome();
+//						model.clearVoter();
+//					}else{
+//						// model error
+//					}
+//					return;
+//				}
+//				
+//				i++;
+//			}
+//			
+//			System.out.println("No one selected");
 			
 			break;
 		case "Register":
@@ -314,12 +219,35 @@ class BoothUI extends JPanel implements ActionListener{
 			
 			(new Thread() {
 			    public void run() {
-			    	if(model.register(v)){
-						showVerify();
-					}else{
-						// model error
-						lblRegisterStatus.setText("Invalid!");
-					}
+			    	showVerify();
+			    	return;
+//			    	if(model.register(v)){
+//						showVerify();
+//					}else{
+//						// model error
+//						lblRegisterStatus.setText("Invalid!");
+//					}
+			    }
+			}).start();
+			
+			break;
+		case "Verify":
+			lblVerifyStatus.setText("Verifying...");
+			
+			(new Thread() {
+			    public void run() {
+			    	
+			    	if(!showVoting()){
+			    		lblVerifyStatus.setText("Loading Candidates...");
+			    	}
+			    	
+//			    	if(model.verify(v)){
+//						showVoting();
+//					}else{
+//						// model error
+//						lblVerifyStatus.setText("Incorrect!");
+//					}
+			    	
 			    }
 			}).start();
 			
