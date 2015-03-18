@@ -30,6 +30,19 @@ public class Person implements Serializable {
 	String user;
 	String pin;
 
+	public Person(String name, String address, String postal, String city,
+			String province, String districtId, String user, String pin) {
+		super();
+		this.name = name;
+		this.address = address;
+		this.postal = postal;
+		this.city = city;
+		this.province = province;
+		this.districtId = districtId;
+		this.user = user;
+		this.pin = pin;
+	}
+
 	/**
 	 * Empty constructor.
 	 */

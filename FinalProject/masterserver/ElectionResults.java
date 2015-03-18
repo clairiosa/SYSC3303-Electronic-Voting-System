@@ -30,7 +30,7 @@ public class ElectionResults extends Thread implements Serializable {
 	private Comm comm; 
 	private boolean electionDone;
 	
-	ElectionResults(ConcurrentHashMap<String, Candidate> candidates, int refreshRate, Comm comm){
+	public ElectionResults(ConcurrentHashMap<String, Candidate> candidates, int refreshRate, Comm comm){
 		this.candidates=candidates;
 		this.refreshRate=refreshRate;
 		electionDone=false;
