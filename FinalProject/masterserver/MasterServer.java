@@ -21,37 +21,66 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.SocketException;
+import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class MasterServer {
-
+	public static boolean electionDone=false;
 	public MasterServer() {
 
 	}
 
 	public static void main(String args[]) {
+		
 		System.out.println("MasterServer Started\n");
 		ConcurrentHashMap<String, Candidate> candidates;
-		int port=4323;
 		Comm comm=null;
+
+
+		if (args.length < 4) {
+			System.out.println("java MasterServer <port> <voterFilename> <CandidatesFilename> <refreshrate> ");
+			System.out.println("java MasterServer voters.txt candidates.txt 10000");
+			System.exit(1);
+		}
+		
 		try{
+			int port=Integer.valueOf(args[0]);
 			comm = new Comm(port);
 		}catch(SocketException e){
 			e.printStackTrace();
 		}
+		try{
+			
+			new Thread()
+	        {
+	            public void run() {
+	                System.out.println("Console Input Thread");
+	    			String s; 
+		    		try{
+	    				Scanner scanner = new Scanner(System.in);
+		    			s=scanner.nextLine();
+		    			if(s.equalsIgnoreCase("done")){
+		    				electionDone=true;
+		    				System.exit(1);
+		    			}
+		    		}catch(Exception e){
+		    			e.printStackTrace();
+		    		}
+	            }
+	        };
 
-		if (args.length < 4) {
-			System.out.println("java MasterServer <voterFilename> <CandidatesFilename> <refreshrate> <Number of Districts>");
-			System.out.println("java MasterServer voters.txt candidates.txt 10000");
-			System.exit(1);
+			
+			
+			
+		}catch(Exception e){
+			e.printStackTrace();
 		}
 
 		try {
-			int refreshRate = Integer.valueOf(args[2]);
-			int numDistricts = Integer.valueOf(args[3]);
+			int refreshRate = Integer.valueOf(args[3]);
 			MasterServerInformation  lists = new MasterServerInformation();
-			File votersFile = new File ("./"+args[0]);
-			File candidatesFile = new File ("./"+args[1]);
+			File votersFile = new File ("./"+args[1]);
+			File candidatesFile = new File ("./"+args[2]);
 			try{
 				FileInputStream fis1 = new FileInputStream(votersFile);
 			 
@@ -111,7 +140,7 @@ public class MasterServer {
 			ElectionResults electionUpdateThread = new ElectionResults(candidates, refreshRate, comm);
 			electionUpdateThread.start();
 
-			while (numDistricts!=receiveThread.getDistrictCount()) {
+			while (electionDone==false) {
 				Thread.sleep(1000);
 			}
 			electionUpdateThread.outputResults();
