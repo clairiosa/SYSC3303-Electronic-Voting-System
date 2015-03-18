@@ -53,11 +53,11 @@ class BoothUI extends JPanel implements ActionListener{
 		pnlStatus = new JPanel();
 		
 		pnlStatus.setBackground(new Color(100, 100, 100));
-		pnlStatus.setPreferredSize(new Dimension(200, 400));
+		pnlStatus.setPreferredSize(new Dimension(300, 400));
 		
-		setPreferredSize(new Dimension(600, 400));
+		setPreferredSize(new Dimension(500, 400));
 		setBackground(new Color(255, 255, 255));
-		setLocation(200,0);
+		setLocation(300,0);
 		
 		JFrame frame = new JFrame("Voter Booth");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -67,7 +67,7 @@ class BoothUI extends JPanel implements ActionListener{
         
         layout.setHorizontalGroup(
         		layout.createSequentialGroup()
-        			.addComponent(pnlStatus, 200, 200, 200)
+        			.addComponent(pnlStatus, 300, 300, 300)
         			.addComponent(this, 400, 400, layout.DEFAULT_SIZE)
         		);
         
@@ -115,7 +115,7 @@ class BoothUI extends JPanel implements ActionListener{
 		tblResults = new JTable(0,2);
 		tblResults.getColumnModel().getColumn(0).setHeaderValue("Candidate");
 		tblResults.getColumnModel().getColumn(1).setHeaderValue("Votes");
-		
+		tblResults.getColumnModel().getColumn(0).setPreferredWidth(10);
 		
 		GroupLayout tblLayout = new GroupLayout(pnlStatus);
 		

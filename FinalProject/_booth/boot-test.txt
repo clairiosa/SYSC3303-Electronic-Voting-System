@@ -1,3 +1,0 @@
-register Damian
-verify 0
-vote bob liberal

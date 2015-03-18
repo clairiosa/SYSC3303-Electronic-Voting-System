@@ -37,9 +37,15 @@ public class AutomatedTest {
                 DistrictServer.main(new String[]{"2010", "127.0.0.1", "2000", "0", "test"});
             }
         };
+//        Thread boothServer1 = new Thread(){
+//            public void run() {
+//                Booth.main(new String[]{"127.0.0.1", "2010", "2101"});
+//            }
+//        };
+        
         Thread boothServer1 = new Thread(){
             public void run() {
-                Booth.main(new String[]{"127.0.0.1", "2010", "2101"});
+                Booth.main(new String[]{"127.0.0.1", "2010", "2101", "boot-test.txt"});
             }
         };
 
@@ -49,6 +55,7 @@ public class AutomatedTest {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        
         boothServer1.start();
         /*
         Thread boothServer2 = new Thread(){

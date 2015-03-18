@@ -310,6 +310,12 @@ public class Booth extends Thread {
 		}
 		
 		if(args.length == 4){
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			booth.parse(args[0]);
 		}else{
 			booth.run();
