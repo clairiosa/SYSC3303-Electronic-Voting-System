@@ -11,6 +11,7 @@ import FinalProject.Credential;
 import FinalProject.communication.Comm;
 import FinalProject.masterserver.ElectionResults;
 import FinalProject.masterserver.MasterServerInformation;
+import FinalProject.persons.Candidate;
 import FinalProject.persons.Person;
 import FinalProject.persons.Voter;
 
@@ -67,6 +68,23 @@ public class DistrictServer implements Runnable {
 		this.uniqueDistrictId = uniqueDistrictId;
 	}
 
+	boolean fake = false;
+
+	public void fakeData() {
+
+		masterServerInfo = new MasterServerInformation();
+		masterServerInfo.addCandidate(new Candidate("Nate", "Liberal"));
+		masterServerInfo.addCandidate(new Candidate("David", "NDP"));
+		masterServerInfo.addVoter(new Voter("Damian", "", "", "", "", "0",
+				"Damian", "0", "", null, false, false));
+
+		masterServerInfo.addVoter(new Voter("Jon", "", "", "", "", "1", "Jon",
+				"0", "", null, false, false));
+
+		results = new ElectionResults(null, 1000, null);
+		fake = true;
+	}
+
 	/**
 	 * Starts the server
 	 */
@@ -104,7 +122,8 @@ public class DistrictServer implements Runnable {
 			// Ballot -> "true" or "false" vote valid (must be registered)
 
 			if (recievedMessage instanceof MasterServerInformation) {
-				this.masterServerInfo = (MasterServerInformation) recievedMessage;
+				if (!fake)
+					this.masterServerInfo = (MasterServerInformation) recievedMessage;
 
 			} else if (recievedMessage instanceof ElectionResults) {
 				this.results = (ElectionResults) recievedMessage;
@@ -128,8 +147,8 @@ public class DistrictServer implements Runnable {
 				// district must be matching to vote AND must be registered
 				if (voteBallot.getDistrict().equals(uniqueDistrictId)
 						&& voteBallot.getVoter().getRegistered()
-						&& voteBallot.getVoter().getDistrictId().equals(
-								uniqueDistrictId)) {
+						&& voteBallot.getVoter().getDistrictId()
+								.equals(uniqueDistrictId)) {
 
 					Voter localVoter = this.masterServerInfo
 							.getVoter(voteBallot.getVoter().getName());
@@ -140,7 +159,8 @@ public class DistrictServer implements Runnable {
 					districtComm.sendMessageReply("true");
 
 					// TEMPORARY - until structure rework with Jon.
-					districtComm.sendMessageParent(masterServerInfo);
+					if (!fake)
+						districtComm.sendMessageParent(masterServerInfo);
 
 				} else
 					districtComm.sendMessageReply("false");

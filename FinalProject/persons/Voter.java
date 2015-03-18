@@ -16,6 +16,15 @@ public class Voter extends Person {
 	private boolean voted;
 	private boolean registered;
 
+	public Voter(String name, String address, String postal, String city,
+			String province, String districtId, String user, String pin,
+			String party, Candidate votedFor, boolean voted, boolean registered) {
+		super(name, address, postal, city, province, districtId, user, pin);
+		this.party = party;
+		this.votedFor = votedFor;
+		this.voted = voted;
+		this.registered = registered;
+	}
 
 	public Voter(String name, String party) {
 		super(name);
