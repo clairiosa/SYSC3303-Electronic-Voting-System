@@ -1,6 +1,8 @@
 
 package FinalProject._booth;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.SocketException;
@@ -129,8 +131,51 @@ public class Booth extends Thread {
 		}
 	}
 	
+	public void testCommand(String cmd, String[] args){
+		switch(cmd){
+		case "register":
+			Voter v = new Voter(args[1], null);
+			if(register(v)){
+				System.out.println("Register voter " + args[1] + " SUCCESS");
+			}else{
+				System.out.println("Register voter " + args[1] + " FAIL");
+			}
+			break;
+		case "":
+			break;
+		}
+	}
+	
 	public void parse(String textFile){
-		
+		try{
+			BufferedReader br = new BufferedReader(new FileReader(textFile));
+			
+			try {
+			    StringBuilder sb = new StringBuilder();
+			    String line = br.readLine();
+			
+			    while (line != null) {
+			        sb.append(line);
+			        sb.append(System.lineSeparator());
+			        line = br.readLine();
+			    }
+			    String everything = sb.toString();
+			    
+			    String lst[] = everything.split("/\n/");
+			    String cmd[];
+			    for(int i=0; i < lst.length;i++){
+			    	cmd = lst[i].split(" ");
+			    	
+			    	testCommand(cmd[0], cmd);
+			    }
+			    
+			} finally {
+			    br.close();
+			}
+		}catch(IOException e){
+			e.printStackTrace();
+			return;
+		}
 	}
 
 	public boolean register(Voter p){
@@ -157,7 +202,7 @@ public class Booth extends Thread {
 			this.voter = p;
 		}
 		
-		return (s == "true");
+		return s.equals("true");
 	}
 	
 	public boolean verify(String pin){
@@ -181,7 +226,7 @@ public class Booth extends Thread {
 				return false;
 			}
 		}
-		return (s == "true");
+		return s.equals("true");
 	}
 
 	public boolean vote(Candidate c){
@@ -212,7 +257,7 @@ public class Booth extends Thread {
 		}
 		
 		this.voter = null;
-		return (s == "true");
+		return s.equals("true");
 	}
 
 	public static void main(String args[]) {
