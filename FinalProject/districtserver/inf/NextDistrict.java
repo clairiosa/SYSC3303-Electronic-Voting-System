@@ -12,36 +12,44 @@ import java.io.Serializable;
 import java.util.concurrent.ConcurrentHashMap;
 
 import FinalProject.persons.Person;
-import FinalProject.persons.Voter;
 
 /**
- * 
+ * To be used in next milestone
  * @author damianpolan
  * 
  */
 public class NextDistrict implements Serializable {
 
-	protected String nextDistrictName;
+	/**
+	 * Default version ID
+	 */
+	private static final long serialVersionUID = 1L;
+
+	
+	/**
+	 * The id given by the master server to this district
+	 */
+	protected String uniqueDistrictId;
 
 	/**
-	 * Key: name of the Person
-	 * Value: Person that belongs to the district of the given name
+	 * Key: name of the Person Value: Person that belongs to the district of the
+	 * given name
 	 */
 	protected ConcurrentHashMap<String, Person> people;
 
-	public DistrictPeople(String newDistrictName,
+	public NextDistrict(String uniqueDistrictId,
 			ConcurrentHashMap<String, Person> people) {
 		super();
-		this.newDistrictName = newDistrictName;
+		this.uniqueDistrictId = uniqueDistrictId;
 		this.people = new ConcurrentHashMap<String, Person>();
 	}
 
-	public String getNewDistrictName() {
-		return newDistrictName;
+	public String getUniqueDistrictId() {
+		return uniqueDistrictId;
 	}
 
-	public void setNewDistrictName(String newDistrictName) {
-		this.newDistrictName = newDistrictName;
+	public void setUniqueDistrictId(String newDistrictName) {
+		this.uniqueDistrictId = newDistrictName;
 	}
 
 	public ConcurrentHashMap<String, Person> getPeople() {
