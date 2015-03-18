@@ -10,14 +10,6 @@ package FinalProject.masterserver;
 
 
 
-import java.util.Enumeration;
-import java.util.concurrent.ConcurrentHashMap;
-
-import FinalProject.communication.Comm;
-import FinalProject.persons.Candidate;
-import FinalProject.persons.Voter;
-
-
 public class ReceiveMasterServerInfo extends Thread {
 
 		private ConcurrentHashMap<String, Candidate> candidates = new ConcurrentHashMap<String, Candidate>();
@@ -35,28 +27,26 @@ public class ReceiveMasterServerInfo extends Thread {
 	    
 	    public void run() {
 	    	while(true){
-	    	   Object info;
-			try {
-				info = comm.getMessageBlocking();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				return;
-			}
-	    	   if(info instanceof MasterServerInformation){
-	    		   MasterServerInformation mInfo = (MasterServerInformation)info;
-	    		   System.out.printf("District %d Information Received.\n",mInfo.getDistrictID());
-	    		   ConcurrentHashMap<String, Candidate> tempCandidates = mInfo.getCandidates();
-	    		   addInformation(tempCandidates);
-	    		   districtCount++;
-	    	   }
-               //voters = mInfo.getVoters();
-               //tallyVotes();
-               
-               if(electionDone==true){
-            	   System.out.println("Election is completed");
-            	   System.exit(1);
-               }
+	    		try{
+	    			Object info = comm.getMessageBlocking();
+		    	   if(info instanceof MasterServerInformation){
+		    		   MasterServerInformation mInfo = (MasterServerInformation)info;
+		    		   System.out.printf("District %d Information Received.\n",mInfo.getDistrictID());
+		    		   ConcurrentHashMap<String, Candidate> tempCandidates = mInfo.getCandidates();
+		    		   addInformation(tempCandidates);
+		    		   districtCount++;
+		    	   }
+	               //voters = mInfo.getVoters();
+	               //tallyVotes();
+	               
+	               if(electionDone==true){
+	            	   System.out.println("Election is completed");
+	            	   System.exit(1);
+	               }
+	    		}catch(InterruptedException e){
+	    			e.printStackTrace();
+	    		}
+	           
                
   	
 	    	}
