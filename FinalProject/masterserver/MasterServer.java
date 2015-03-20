@@ -136,7 +136,7 @@ public class MasterServer {
 			/*************************************/
 			ReceiveMasterServerInfo receiveThread = new ReceiveMasterServerInfo(comm);
 			receiveThread.start();
-			Thread.sleep(10000); // make sure at least some results are in
+			//Thread.sleep(10000); // make sure at least some results are in
 			candidates = receiveThread.getCandidates();
 
 			// periodically update displayed results and send preliminary

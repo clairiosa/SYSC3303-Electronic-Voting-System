@@ -110,14 +110,14 @@ public class Comm implements CommInterface {
     public int sendMessageClient(Object obj) throws IOException, InterruptedException {
         DatagramPacket outgoingPacket;
         for (Connection connection : listener.connectionHashMap.values()) {
-            if (!connection.equals(parentConnection)) {
+            if (!connection.equals(parentConnection) && connection != null ) {
                 outgoingPacket = Packets.craftPacket(obj, connection.getAddress(), connection.getPort());
                 connection.putOutgoingBlocking(outgoingPacket);
             }
         }
 
         for (Connection connection : listener.connectionHashMap.values()) {
-            if (!connection.equals(parentConnection)) {
+            if (!connection.equals(parentConnection) && !connection.equals(null)) {
                 synchronized (connection.waitAckSync) {
                     if (!connection.isAckResultReady()) connection.waitAckSync.wait();
                     if (!connection.isAckResult()) return CommError.ERROR_TIMEOUT;
