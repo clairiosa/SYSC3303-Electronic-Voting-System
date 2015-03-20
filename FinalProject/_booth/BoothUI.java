@@ -4,22 +4,22 @@ package FinalProject._booth;
 import java.awt.event.*;
 
 import javax.swing.*;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
 
 import FinalProject.BoothElectionResults;
 import FinalProject.persons.Candidate;
 import FinalProject.persons.Voter;
 
 import java.awt.*;
-import java.sql.Date;
 import java.util.Enumeration;
 
 class BoothUI extends JPanel implements ActionListener{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private final Booth model;
 	
 	private ButtonGroup candidateGroup;
@@ -68,7 +68,7 @@ class BoothUI extends JPanel implements ActionListener{
         layout.setHorizontalGroup(
         		layout.createSequentialGroup()
         			.addComponent(pnlStatus, 300, 300, 300)
-        			.addComponent(this, 400, 400, layout.DEFAULT_SIZE)
+        			.addComponent(this, 400, 400, GroupLayout.DEFAULT_SIZE)
         		);
         
         layout.setVerticalGroup(
@@ -177,7 +177,7 @@ class BoothUI extends JPanel implements ActionListener{
 		model.addRow(new Object[]{ "", ""});
 		
 		int t = r.totalVotes;
-		String dt = r.generated.toGMTString();
+		String dt = r.generated.toString();
 		
 		model.addRow(new Object[]{ "Total", t });
 		model.addRow(new Object[]{ "Updated", dt });

@@ -247,14 +247,14 @@ public class DistrictServer implements Runnable {
 						localVoter.setVoted(true);
 
 						for (int i = 0; i < electionResults.results.length; i++)
-							if (electionResults.results[i].candidate.getName()
-									.equals(voteBallot.getCandidate().getName())) {
+							if (electionResults.results[i].candidate
+									.equals(voteBallot.getCandidate())) {
 								electionResults.results[i].count++;
 							}
 
 						electionResults.totalVotes++;
 						electionResults.generated = new Date();
-						System.out.println("District Server " + uniqueDistrictId + ": \n" + electionResults.toString());
+						System.out.println("" + electionResults.toString());
 
 						districtComm.sendMessageReply("true");
 						System.out.println("District Server " + uniqueDistrictId + ": " + "Vote Successful");

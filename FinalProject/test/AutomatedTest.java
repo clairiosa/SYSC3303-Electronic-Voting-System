@@ -39,7 +39,7 @@ public class AutomatedTest {
         };
         Thread boothServer1 = new Thread(){
             public void run() {
-                Booth.main(new String[]{"127.0.0.1", "2010", "2101"});
+                DistrictServer.main(new String[]{"2010", "127.0.0.1", "2000", "0", "candidates.txt", "voters.txt"});
             }
         };
         
