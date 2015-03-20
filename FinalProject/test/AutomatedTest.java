@@ -33,7 +33,7 @@ public class AutomatedTest {
         };
         Thread districtServer = new Thread(){
             public void run() {
-                DistrictServer.main(new String[]{"2010", "127.0.0.1", "2000", "0"});
+                DistrictServer.main(new String[]{"2010", "127.0.0.1", "2000", "0", "fake-data", "aa"});
             }
         };
 //        Thread boothServer1 = new Thread(){

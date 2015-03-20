@@ -3,6 +3,7 @@ package FinalProject._booth;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -166,8 +167,8 @@ public class Booth extends Thread {
 		File votersFile = new File (userFile);
 		
 		try{
-			BufferedReader br = new BufferedReader(new FileReader(votersFile));
-			
+			FileReader fr = new FileReader(votersFile);
+			BufferedReader br = new BufferedReader(fr);
 			try {
 			    StringBuilder sb = new StringBuilder();
 			    String line = br.readLine();
@@ -188,6 +189,10 @@ public class Booth extends Thread {
 			} finally {
 			    br.close();
 			}
+		}catch(FileNotFoundException e){
+			System.out.println("file doesn't exist");
+			System.exit(-1);
+			return;
 		}catch(IOException e){
 			e.printStackTrace();
 			return;

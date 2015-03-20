@@ -7,6 +7,7 @@ package FinalProject.districtserver;
 import java.net.InetAddress;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.concurrent.ConcurrentHashMap;
 
 import FinalProject.Ballot;
 import FinalProject.BoothElectionResult;
@@ -224,7 +225,7 @@ public class DistrictServer implements Runnable {
                         districtComm.sendMessageReply(electionResults);
                     }
                     else if(recievedMessage.equals("candidates")){
-
+                    	
                         Candidate[] c = new Candidate[masterServerInfo.getCandidates().size()];
 
                         int i = 0;
