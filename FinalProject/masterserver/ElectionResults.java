@@ -9,6 +9,8 @@
 
 package FinalProject.masterserver;
 
+import FinalProject.BoothElectionResult;
+import FinalProject.BoothElectionResults;
 import FinalProject.persons.*;
 import FinalProject.communication.Comm;
 
@@ -17,6 +19,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -60,6 +63,25 @@ public class ElectionResults extends Thread implements Serializable {
 			}
 			
 		}
+		
+	}
+	
+	
+	public BoothElectionResults toBoothResults(){
+		BoothElectionResult[] ber = new BoothElectionResult[candidates.size()];
+		Date d = new Date();
+		int vCount = 0;
+		
+		int i = 0;
+		Enumeration<Candidate> it = candidates.elements();
+     	while(it.hasMoreElements()) {
+     		Candidate c = (Candidate) it.nextElement();
+     		vCount += c.getVoteCount();
+     		ber[i] = new BoothElectionResult(c, c.getVoteCount());
+     		i++;
+     	}
+		
+		return new BoothElectionResults(ber, vCount);
 		
 	}
 	

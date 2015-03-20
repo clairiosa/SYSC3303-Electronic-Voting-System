@@ -13,11 +13,11 @@
  */
 
 
-package FinalProject;
+package FinalProject.test;
 
 import FinalProject._booth.Booth;
-//import FinalProject.masterserver.MasterServer;
 import FinalProject.districtserver.DistrictServer;
+import FinalProject.masterserver.MasterServer;
 
 
 public class AutomatedTest {
@@ -25,16 +25,15 @@ public class AutomatedTest {
     public static void main(String args[]) {
         System.out.println("\nAutomated test of the SYSC3303 Electronic Voting System");
 
-        /*
+
         Thread masterServer = new Thread(){
             public void run() {
-                MasterServer.main(new String[]{"2000", "voterFile.txt", "candidateFile.txt", "5000"});
+                MasterServer.main(new String[]{"2000", "FinalProject/test/voters.txt", "FinalProject/test/candidates.txt", "5000"});
             }
         };
-        */
         Thread districtServer = new Thread(){
             public void run() {
-                DistrictServer.main(new String[]{"2010", "127.0.0.1", "2000", "0", "test"});
+                DistrictServer.main(new String[]{"2010", "127.0.0.1", "2000", "0"});
             }
         };
 //        Thread boothServer1 = new Thread(){
@@ -49,6 +48,7 @@ public class AutomatedTest {
             }
         };
 
+        masterServer.start();
         districtServer.start();
         try {
             Thread.sleep(1000);
