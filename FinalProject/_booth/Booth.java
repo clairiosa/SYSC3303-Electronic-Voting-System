@@ -155,8 +155,7 @@ public class Booth extends Thread {
 				System.exit(-1);
 			}
 		}else{
-			System.out.println("REGISTER ERROR");
-			System.exit(-1);
+			System.out.println("Couldn't register");
 		}
 		
 		System.out.print("\n");
@@ -164,7 +163,7 @@ public class Booth extends Thread {
 	
 	public void parse(String userFile){
 		Candidate[] c = getCandidates();
-		File votersFile = new File ("./src/"+userFile);
+		File votersFile = new File (userFile);
 		
 		try{
 			BufferedReader br = new BufferedReader(new FileReader(votersFile));
