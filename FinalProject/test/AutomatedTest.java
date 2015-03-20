@@ -13,7 +13,7 @@
  */
 
 
-package FinalProject;
+package FinalProject.test;
 
 import FinalProject._booth.Booth;
 import FinalProject.districtserver.DistrictServer;
@@ -50,7 +50,7 @@ public class AutomatedTest {
         
         
 
-        masterServer.start();
+//        masterServer.start();
         districtServer.start();
         try {
             Thread.sleep(1000);

@@ -4,6 +4,7 @@ package FinalProject._booth;
 import java.awt.event.*;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 
 import FinalProject.BoothElectionResults;
 import FinalProject.persons.Candidate;

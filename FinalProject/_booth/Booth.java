@@ -177,7 +177,7 @@ public class Booth extends Thread {
 			    }
 			    String everything = sb.toString();
 			    
-			    String lst[] = everything.split("/\n/");
+			    String lst[] = everything.split("\n");
 			    
 			    for(int i=0; i < lst.length-1;i++){
 			    	testCommand(c, lst[i], lst[i+1]);
@@ -318,7 +318,7 @@ public class Booth extends Thread {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			booth.parse(args[0]);
+			booth.parse(args[3]);
 		}else{
 			booth.run();
 		}
