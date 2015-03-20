@@ -61,6 +61,7 @@ public class DistrictServer implements Runnable {
 
 	// Election results. pulled from master server
 	ElectionResults results;
+	private BoothElectionResults electionResults;
 
 	/**
 	 * Constructor
@@ -79,9 +80,6 @@ public class DistrictServer implements Runnable {
 	}
 
 	boolean fake = false;
-
-	private BoothElectionResults electionResults;
-
 	public void fakeData(String candidatePath, String voterPath) {
 
 		// from MasterServer.java
@@ -125,7 +123,7 @@ public class DistrictServer implements Runnable {
 			System.out.println("Error reading Candidates file.");
 			System.exit(-1);
 		}
-		
+
 		masterServerInfo = lists;
 
 		// masterServerInfo = new MasterServerInformation();
@@ -144,24 +142,23 @@ public class DistrictServer implements Runnable {
 		// "Jon",
 		// "0", "", null, false, false));
 		//
-		// Enumeration<Candidate> c =
-		// masterServerInfo.getCandidates().elements();
-		// int i = 0;
-		// while(c.hasMoreElements()){
-		// c.nextElement();
-		// i++;
-		// }
+		Enumeration<Candidate> c = masterServerInfo.getCandidates().elements();
+		int i = 0;
+		while (c.hasMoreElements()) {
+			c.nextElement();
+			i++;
+		}
 		//
-		// BoothElectionResult[] r = new BoothElectionResult[i];
-		// BoothElectionResult r1;
-		// c = masterServerInfo.getCandidates().elements();
-		// i = 0;
-		// while(c.hasMoreElements()){
-		// r[i++] = new BoothElectionResult(c.nextElement(), 0);
+		BoothElectionResult[] r = new BoothElectionResult[i];
+		
+		c = masterServerInfo.getCandidates().elements();
+		i = 0;
+		while (c.hasMoreElements()) {
+			r[i++] = new BoothElectionResult(c.nextElement(), 0);
+
+		}
 		//
-		// }
-		//
-		// electionResults = new BoothElectionResults(r, 0);
+		 electionResults = new BoothElectionResults(r, 0);
 
 		fake = true;
 	}
