@@ -13,7 +13,7 @@
  */
 
 
-package FinalProject;
+package FinalProject.test;
 
 import FinalProject._booth.Booth;
 import FinalProject.districtserver.DistrictServer;
@@ -26,31 +26,32 @@ public class AutomatedTest {
         System.out.println("\nAutomated test of the SYSC3303 Electronic Voting System");
 
 
-        Thread masterServer = new Thread(){
-            public void run() {
-                MasterServer.main(new String[]{"2000", "./src/FinalProject/test/voters.txt", "./src/FinalProject/test/candidates.txt", "5000"});
-            }
-        };
-        Thread districtServer = new Thread(){
-            public void run() {
-                DistrictServer.main(new String[]{"2010", "127.0.0.1", "2000", "0"});
-            }
-        };
-//        Thread boothServer1 = new Thread(){
+//        Thread masterServer = new Thread(){
 //            public void run() {
-//                Booth.main(new String[]{"127.0.0.1", "2010", "2101"});
+//                MasterServer.main(new String[]{"2000", "voters.txt", "candidates.txt", "5000"});
 //            }
 //        };
         
+        Thread districtServer = new Thread(){
+            public void run() {
+                DistrictServer.main(new String[]{"2010", "127.0.0.1", "2000", "1", "candidates.txt", "voters.txt"});
+            }
+        };
         Thread boothServer1 = new Thread(){
             public void run() {
-                Booth.main(new String[]{"127.0.0.1", "2010", "2101", "./src/FinalProject/test/voters.txt"});
+                Booth.main(new String[]{"127.0.0.1", "2010", "2101"});
             }
         };
         
+//        Thread boothServer1 = new Thread(){
+//            public void run() {
+//                Booth.main(new String[]{"127.0.0.1", "2010", "2101", "./src/FinalProject/test/voters.txt"});
+//            }
+//        };
+        
         
 
-        masterServer.start();
+//        masterServer.start();
         districtServer.start();
         try {
             Thread.sleep(1000);
