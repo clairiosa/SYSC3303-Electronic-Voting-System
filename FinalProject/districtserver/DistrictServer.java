@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.util.Date;
 import java.util.Enumeration;
@@ -223,7 +224,9 @@ public class DistrictServer implements Runnable {
 							&& localVoter.getRegistered() == false) {
 						localVoter.setRegistered(true);
 						districtComm.sendMessageReply("true");
-						System.out.println("District Server " + uniqueDistrictId + ": " + "Registered Successful");
+						System.out.println("District Server "
+								+ uniqueDistrictId + ": "
+								+ "Registered Successful");
 					} else {
 						districtComm.sendMessageReply("false");
 						System.out.println("Not Registered");
@@ -231,7 +234,8 @@ public class DistrictServer implements Runnable {
 
 				} else if (recievedMessage instanceof Ballot) { // vote with
 																// this
-					System.out.println("District Server " + uniqueDistrictId + ": " + "Attempting to vote");
+					System.out.println("District Server " + uniqueDistrictId
+							+ ": " + "Attempting to vote");
 					// person
 					Ballot voteBallot = (Ballot) recievedMessage;
 
@@ -246,9 +250,11 @@ public class DistrictServer implements Runnable {
 						localVoter.setCandidate(voteBallot.getCandidate());
 						localVoter.setVoted(true);
 
+
 						for (int i = 0; i < electionResults.results.length; i++)
 							if (electionResults.results[i].candidate
-									.equals(voteBallot.getCandidate())) {
+									.getName()
+									.equals(voteBallot.getCandidate().getName())) {
 								electionResults.results[i].count++;
 							}
 
@@ -257,22 +263,31 @@ public class DistrictServer implements Runnable {
 						System.out.println("" + electionResults.toString());
 
 						districtComm.sendMessageReply("true");
-						System.out.println("District Server " + uniqueDistrictId + ": " + "Vote Successful");
+						System.out.println("District Server "
+								+ uniqueDistrictId + ": " + "Vote Successful");
 
+
+						// save results to file
+						PrintWriter writer = new PrintWriter(
+								"election-results.txt", "UTF-8");
+						writer.println(electionResults.toString());
+						writer.close();
+						
+						
 						// TEMPORARY - until structure rework with Jon.
 						if (!fake)
 							districtComm.sendMessageParent(masterServerInfo);
 
 					} else {
 						districtComm.sendMessageReply("false");
-						System.out.println("District Server " + uniqueDistrictId + ": " + "Voting failed");
+						System.out.println("District Server "
+								+ uniqueDistrictId + ": " + "Voting failed");
 					}
-					
-					
 
 				} else if (recievedMessage instanceof Credential) {
 					Credential creds = (Credential) recievedMessage;
-					System.out.println("District Server " + uniqueDistrictId + ": " + "Checking Credentials");
+					System.out.println("District Server " + uniqueDistrictId
+							+ ": " + "Checking Credentials");
 					// check user match
 					if (masterServerInfo.getVoter(creds.getUser()).getUser()
 							.equals(creds.getUser())
@@ -280,21 +295,28 @@ public class DistrictServer implements Runnable {
 									.getPin().equals(creds.getPin())) {
 
 						districtComm.sendMessageReply("true");
-						System.out.println("District Server " + uniqueDistrictId + ": " + "Credentials valid");
+						System.out
+								.println("District Server " + uniqueDistrictId
+										+ ": " + "Credentials valid");
 					} else {
 						districtComm.sendMessageReply("false");
-						System.out.println("District Server " + uniqueDistrictId + ": " + "Credentials failed");
+						System.out.println("District Server "
+								+ uniqueDistrictId + ": "
+								+ "Credentials failed");
 					}
 
 				} else if (recievedMessage instanceof String) {
 					if (recievedMessage.equals("status")) {
 						// send back the ElectionResults to booth
 
-						System.out.println("District Server " + uniqueDistrictId + ": " + "Sending Status");
+						System.out.println("District Server "
+								+ uniqueDistrictId + ": " + "Sending Status");
 						districtComm.sendMessageReply(electionResults);
 					} else if (recievedMessage.equals("candidates")) {
 
-						System.out.println("District Server " + uniqueDistrictId + ": " + "Sending Candidates");
+						System.out.println("District Server "
+								+ uniqueDistrictId + ": "
+								+ "Sending Candidates");
 						Candidate[] c = new Candidate[masterServerInfo
 								.getCandidates().size()];
 
