@@ -13,7 +13,7 @@
  */
 
 
-package FinalProject.test;
+package FinalProject;
 
 import FinalProject._booth.Booth;
 import FinalProject.districtserver.DistrictServer;
@@ -44,9 +44,11 @@ public class AutomatedTest {
         
         Thread boothServer1 = new Thread(){
             public void run() {
-                Booth.main(new String[]{"127.0.0.1", "2010", "2101", "boot-test.txt"});
+                Booth.main(new String[]{"127.0.0.1", "2010", "2101", "FinalProject/test/voters.txt"});
             }
         };
+        
+        
 
         masterServer.start();
         districtServer.start();

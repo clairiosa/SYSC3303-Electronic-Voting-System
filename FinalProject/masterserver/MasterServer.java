@@ -83,8 +83,9 @@ public class MasterServer {
 		try {
 			int refreshRate = Integer.valueOf(args[3]);
 			MasterServerInformation  lists = new MasterServerInformation();
-			File votersFile = new File ("./"+args[1]);
-			File candidatesFile = new File ("./"+args[2]);
+			File votersFile = new File ("./src/"+args[1]);
+			File candidatesFile = new File ("./src/"+args[2]);
+			System.out.println(System.getProperty("user.dir"));
 			try{
 				FileInputStream fis1 = new FileInputStream(votersFile);
 			 

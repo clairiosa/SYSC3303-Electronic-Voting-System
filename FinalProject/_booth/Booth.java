@@ -2,6 +2,7 @@
 package FinalProject._booth;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -133,38 +134,40 @@ public class Booth extends Thread {
 		}
 	}
 	
-	public void testCommand(String cmd, String[] args){
-		Voter v;
-		switch(cmd){
-		case "register":
-			v = new Voter(args[1], null);
-			if(register(v)){
-				System.out.println("Register voter " + args[1] + " SUCCESS");
+	public void testCommand(Candidate[] c, String pin, String user){
+		int index = (int)(Math.random() * c.length % 1);
+		
+		Voter v = new Voter(user, null);
+		
+		if(register(v)){
+			System.out.print("Registered ");
+			if(verify(pin)){
+				System.out.print("Verified ");
+				
+				if(vote(c[index])){
+					System.out.print("Voted for " + c[index].getName());
+				}else{
+					System.out.println("VOTE ERROR");
+					System.exit(-1);
+				}
 			}else{
-				System.out.println("Register voter " + args[1] + " FAIL");
+				System.out.println("VERIFY ERROR");
+				System.exit(-1);
 			}
-			break;
-		case "verify":
-			if(verify(args[1])){
-				System.out.println("Verify voter " + this.voter.getName() + " with pwd " +args[2] +" SUCCESS");
-		    }else{
-		    	System.out.println("Verify voter " + this.voter.getName() + " with pwd " +args[2] +" FAIL");
-		    }
-			break;
-		case "vote":
-			Candidate c = new Candidate(args[1], args[2]);
-			if(vote(c)){
-				System.out.println("Vote: voter " + this.voter.getName() + " with vote " + c.getName() +" SUCCESS");
-		    }else{
-		    	System.out.println("Vote: voter " + this.voter.getName() + " with vote " + c.getName() +" FAIL");
-		    }
-			break;
+		}else{
+			System.out.println("REGISTER ERROR");
+			System.exit(-1);
 		}
+		
+		System.out.print("\n");
 	}
 	
-	public void parse(String textFile){
+	public void parse(String userFile){
+		Candidate[] c = getCandidates();
+		File votersFile = new File ("./src/"+userFile);
+		
 		try{
-			BufferedReader br = new BufferedReader(new FileReader(textFile));
+			BufferedReader br = new BufferedReader(new FileReader(votersFile));
 			
 			try {
 			    StringBuilder sb = new StringBuilder();
@@ -178,11 +181,9 @@ public class Booth extends Thread {
 			    String everything = sb.toString();
 			    
 			    String lst[] = everything.split("/\n/");
-			    String cmd[];
-			    for(int i=0; i < lst.length;i++){
-			    	cmd = lst[i].split(" ");
-			    	
-			    	testCommand(cmd[0], cmd);
+			    
+			    for(int i=0; i < lst.length-1;i++){
+			    	testCommand(c, lst[i], lst[i+1]);
 			    }
 			    
 			} finally {
