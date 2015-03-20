@@ -102,6 +102,7 @@ public class MasterServer {
 				br1.close();
 			}catch(Exception e){
 				System.out.println("Error reading voters file.");
+				e.printStackTrace();
 				System.exit(-1);
 			}
 			
@@ -120,6 +121,7 @@ public class MasterServer {
 				br2.close();
 			}catch(Exception e){
 				System.out.println("Error reading Candidates file.");
+				e.printStackTrace();
 				System.exit(-1);
 			}
 			try{
