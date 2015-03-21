@@ -15,9 +15,9 @@
 
 package FinalProject.test;
 
-import FinalProject._booth.Booth;
+import FinalProject.booth.Booth;
+//import FinalProject.masterserver.MasterServer;
 import FinalProject.districtserver.DistrictServer;
-import FinalProject.masterserver.MasterServer;
 
 
 public class AutomatedTest {
@@ -25,40 +25,37 @@ public class AutomatedTest {
     public static void main(String args[]) {
         System.out.println("\nAutomated test of the SYSC3303 Electronic Voting System");
 
-
-//        Thread masterServer = new Thread(){
-//            public void run() {
-//                MasterServer.main(new String[]{"2000", "voters.txt", "candidates.txt", "5000"});
-//            }
-//        };
-        
+        /*
+        Thread masterServer = new Thread(){
+            public void run() {
+                MasterServer.main(new String[]{"2000", "voterFile.txt", "candidateFile.txt", "5000"});
+            }
+        };
+        */
         Thread districtServer = new Thread(){
             public void run() {
-                DistrictServer.main(new String[]{"2010", "127.0.0.1", "2000", "1", "candidates.txt", "voters.txt"});
+                DistrictServer.main(new String[]{"2010", "127.0.0.1", "2000", "1", "FinalProject/test/candidates.txt", "FinalProject/test/voters.txt"});
             }
         };
-        Thread boothServer1 = new Thread(){
-            public void run() {
-                DistrictServer.main(new String[]{"2010", "127.0.0.1", "2000", "0", "candidates.txt", "voters.txt"});
-            }
-        };
-        
 //        Thread boothServer1 = new Thread(){
 //            public void run() {
-//                Booth.main(new String[]{"127.0.0.1", "2010", "2101", "./src/FinalProject/test/voters.txt"});
+//                Booth.main(new String[]{"127.0.0.1", "2010", "2101"});
 //            }
 //        };
-        
-        
 
-//        masterServer.start();
+        Thread boothServer1 = new Thread(){
+            public void run() {
+                Booth.main(new String[]{"127.0.0.1", "2010", "2101", "FinalProject/test/voters.txt"});
+            }
+        };
+
         districtServer.start();
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        
+
         boothServer1.start();
         /*
         Thread boothServer2 = new Thread(){
