@@ -56,7 +56,7 @@ public class Person implements Serializable {
 		address = postal = city = province = "";
 
 		this.user = name;
-		this.pin = "0000";
+		this.pin = "1";
 	}
 
 	public String getUser() {
