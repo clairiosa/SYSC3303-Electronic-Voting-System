@@ -175,8 +175,7 @@ public class DistrictServer implements Runnable {
 		try {
 			districtComm = new Comm(port);
 			districtComm.connectToParent(InetAddress.getByName(masterAddress),
-					masterPort);
-			Thread.sleep(1000);
+                    masterPort);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -221,7 +220,7 @@ public class DistrictServer implements Runnable {
 					if (localVoter != null
 							&& localVoter.getDistrictId().equals(
 									uniqueDistrictId)
-							&& localVoter.getRegistered() == false) {
+							&& !localVoter.getRegistered()) {
 						localVoter.setRegistered(true);
 						districtComm.sendMessageReply("true");
 						System.out.println("District Server "
@@ -262,6 +261,8 @@ public class DistrictServer implements Runnable {
 						electionResults.generated = new Date();
 						System.out.println("" + electionResults.toString());
 
+
+
 						districtComm.sendMessageReply("true");
 						System.out.println("District Server "
 								+ uniqueDistrictId + ": " + "Vote Successful");
@@ -283,6 +284,15 @@ public class DistrictServer implements Runnable {
 						System.out.println("District Server "
 								+ uniqueDistrictId + ": " + "Voting failed");
 					}
+
+                    if (v.getName().equals("Ellena Jeanbaptiste")) {
+                        try {
+                            districtComm.shutdown();
+                        } catch (InterruptedException e) {
+                            System.exit(0);
+                        }
+                        System.exit(0);
+                    }
 
 				} else if (recievedMessage instanceof Credential) {
 					Credential creds = (Credential) recievedMessage;
