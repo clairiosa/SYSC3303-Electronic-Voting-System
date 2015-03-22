@@ -2,7 +2,9 @@
  *		SYSC 3303 - Electronic Voting System
  *	David Bews, Jonathan Oommen, Nate Bosscher, Damian Polan
  *
- *	Connection.java
+ *  @Author David Bews
+ *
+ *	communication.Connection.java
  *
  * Object that handles the open connections for the worker threads of the Comm instance.
  *
@@ -16,7 +18,7 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-//import java.util.concurrent.TimeUnit; // Functions associated with this are unused.
+import java.util.concurrent.TimeUnit; // Functions associated with this are unused.
 
 class Connection implements Serializable{
     private int port;

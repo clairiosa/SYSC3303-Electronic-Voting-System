@@ -2,7 +2,9 @@
  *		SYSC 3303 - Electronic Voting System
  *	David Bews, Jonathan Oommen, Nate Bosscher, Damian Polan
  *
- *	Packets.java
+ *  @Author David Bews
+ *
+ *	communication.Packets.java
  *
  * Static functions for dealing with packets, checksums and byte arrays.
  *

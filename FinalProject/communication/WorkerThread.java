@@ -2,7 +2,9 @@
  *		SYSC 3303 - Electronic Voting System
  *	David Bews, Jonathan Oommen, Nate Bosscher, Damian Polan
  *
- *	WorkerThread.java
+ *  @Author David Bews
+ *
+ *	communication.WorkerThread.java
  *
  *  Does all the 'work' for each connection.  Decodes packets, sends them to the received queue, and encodes packets
  *  and sends them to the connected server.
@@ -17,7 +19,6 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Semaphore;
 
 class WorkerThread implements Runnable{
     long threadId;
@@ -27,7 +28,6 @@ class WorkerThread implements Runnable{
     DatagramPacket lastPacketSent;
     DatagramPacket lastPacketReceived;
     DatagramSocket socket;
-    Semaphore queueSemaphore;
     int maxTimeouts;
 
     BlockingQueue<CommTuple> receivedObjectQueue;
@@ -38,17 +38,14 @@ class WorkerThread implements Runnable{
      * @param connection            Connection object associated with the worker thread.
      * @param socket                Socket to send messages out on.
      * @param receivedObjectQueue   Queue to put received messages on.
-     * @param queueSemaphore        Semaphore governing access to the queue.
      * @throws SocketException
      */
-    public WorkerThread(Connection connection, DatagramSocket socket, BlockingQueue<CommTuple> receivedObjectQueue, Semaphore queueSemaphore) throws SocketException {
+    public WorkerThread(Connection connection, DatagramSocket socket, BlockingQueue<CommTuple> receivedObjectQueue) throws SocketException {
         threadId = Thread.currentThread().getId();
         this.connection = connection;
 
         this.socket = socket;
         this.receivedObjectQueue = receivedObjectQueue;
-
-        this.queueSemaphore = queueSemaphore;
 
         maxTimeouts = 5;
 
@@ -122,9 +119,7 @@ class WorkerThread implements Runnable{
                                 cleanDisconnect = true;
                                 break;
                             } else {
-                                queueSemaphore.acquire();
                                 receivedObjectQueue.put(new CommTuple(obj, connection));
-                                queueSemaphore.release();
                                 sendAck(false);
                             }
 

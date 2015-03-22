@@ -2,9 +2,11 @@
  *		SYSC 3303 - Electronic Voting System
  *	David Bews, Jonathan Oommen, Nate Bosscher, Damian Polan
  *
- *	CommTuple.java
+ *  @Author David Bews
  *
- * Holds an object and it's associated connection object.
+ *	communication.CommTuple.java
+ *
+ * Holds an object and it's associated connection object.  Used to facilitate the sendMessageReply command.
  *
  */
 

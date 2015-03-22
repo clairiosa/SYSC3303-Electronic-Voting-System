@@ -2,7 +2,9 @@
  *		SYSC 3303 - Electronic Voting System
  *	David Bews, Jonathan Oommen, Nate Bosscher, Damian Polan
  *
- *	CommTest.java
+ *  @Author David Bews
+ *
+ *	FinalProject.communication.CommTest.java
  *
  * Example class showing how to use Comm.java
  *
