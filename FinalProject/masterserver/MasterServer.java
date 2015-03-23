@@ -15,6 +15,7 @@ package FinalProject.masterserver;
 //get the file chunk by chunk
 //read file and and add results to master table 
 
+import java.awt.EventQueue;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -37,6 +38,7 @@ public class MasterServer {
 	public static void main(String args[]) {
 		
 		System.out.println("MasterServer Started\n");
+		final MasterServerInformation  lists = new MasterServerInformation();
 		ConcurrentHashMap<String, Candidate> candidates;
 		Comm comm=null;
 
@@ -65,7 +67,17 @@ public class MasterServer {
 		    			s=scanner.nextLine();
 		    			if(s.trim().equalsIgnoreCase("done")){
 		    				electionDone=true;
-		    				System.exit(1);
+		    				EventQueue.invokeLater(new Runnable() {
+		    					public void run() {
+		    						try {
+		    							framer1 frame = new framer1(lists.candidates);
+		    							frame.setVisible(true);
+		    						} catch (Exception e) {
+		    							e.printStackTrace();
+		    						}
+		    					}
+		    				});
+		    				//System.exit(1);
 		    			}
 		    		}catch(Exception e){
 		    			e.printStackTrace();
@@ -82,7 +94,6 @@ public class MasterServer {
 
 		try {
 			int refreshRate = Integer.valueOf(args[3]);
-			MasterServerInformation  lists = new MasterServerInformation();
 			File votersFile = new File (args[1]);
 			File candidatesFile = new File (args[2]);
 			

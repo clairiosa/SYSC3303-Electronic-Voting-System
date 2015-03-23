@@ -14,7 +14,7 @@
 
 package FinalProject.test;
 
-import FinalProject._booth.Booth;
+import FinalProject.booth.Booth;
 import FinalProject.districtserver.DistrictServer;
 import FinalProject.masterserver.MasterServer;
 

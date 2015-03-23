@@ -51,7 +51,7 @@ public class ElectionResults extends Thread implements Serializable {
 															// results
 				Thread.sleep(refreshRate);
 				if (electionDone == true) {
-					comm.sendMessageClient(this); // send final results
+					comm.sendMessageClient(toBoothResults()); // send final results
 					System.exit(1);
 				}
 			} catch (InterruptedException e) {

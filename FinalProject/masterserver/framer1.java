@@ -1,10 +1,17 @@
-import java.awt.*;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JTabbedPane;
+
+package FinalProject.masterserver;
+
+import java.awt.BorderLayout;
+import java.awt.EventQueue;
 //import java.io.File;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.border.EmptyBorder;
+
+import FinalProject.persons.Candidate;
 
 
 

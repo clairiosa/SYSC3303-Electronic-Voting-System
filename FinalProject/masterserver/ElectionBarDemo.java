@@ -1,3 +1,6 @@
+
+package FinalProject.masterserver;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.util.Enumeration;
@@ -17,6 +20,8 @@ import org.jfree.chart.title.TextTitle;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.ui.RefineryUtilities;
+
+import FinalProject.persons.Candidate;
 
 
 

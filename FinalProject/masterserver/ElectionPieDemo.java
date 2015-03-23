@@ -1,4 +1,6 @@
 
+package FinalProject.masterserver;
+
 import java.awt.Font;
 import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
@@ -13,6 +15,8 @@ import org.jfree.chart.plot.PiePlot;
 import org.jfree.data.general.DefaultPieDataset;
 import org.jfree.data.general.PieDataset;
 import org.jfree.ui.RefineryUtilities;
+
+import FinalProject.persons.Candidate;
 
 /**
  * A simple demonstration application showing how to create a pie chart using 

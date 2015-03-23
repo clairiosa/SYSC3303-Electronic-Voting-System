@@ -1,5 +1,7 @@
+
+package FinalProject.masterserver;
+
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -15,10 +17,10 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
-
 
 import org.jfree.ui.RefineryUtilities;
+
+import FinalProject.persons.Candidate;
 
 
 //The view used for the setup process. the only view available at this point. Review the JFrame class for more details.
