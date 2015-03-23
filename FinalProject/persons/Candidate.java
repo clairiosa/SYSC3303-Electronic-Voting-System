@@ -49,5 +49,24 @@ public class Candidate extends Voter {
 	public int getTotalVotes(){
 		return totalVotes;
 	}
+		public void setVoteCount(int vCount){
+		voteCount=vCount;
+	}
+	
+	
+	public void setTotalVotes(int tVotes){
+		totalVotes=tVotes;
+	}
+	
+	public int getFinalTotalVotes(ConcurrentHashMap<String, Candidate> candidates){
+     	Enumeration<Candidate> it = candidates.elements(); 
+     	int tVotes=0;
+     	while(it.hasMoreElements()) {
+     		Candidate c = (Candidate) it.nextElement();
+     		tVotes+=c.getVoteCount();
+     	}
+     	totalVotes=tVotes;
+     	return totalVotes;
+	}
 	
    }
