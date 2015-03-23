@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.concurrent.TimeUnit;
 
 import FinalProject.Ballot;
 import FinalProject.BoothElectionResult;
@@ -18,7 +19,7 @@ import FinalProject.persons.Candidate;
 import FinalProject.persons.Voter;
 
 public class Booth extends Thread {
-    private Comm clientServer;
+    final private Comm clientServer;
     private Voter voter;
 
     private InetAddress parentIP;
@@ -26,30 +27,44 @@ public class Booth extends Thread {
     private Object cmdInProgress;
     private boolean dummyData;
 
-    public Booth(String parentServer, int port) throws UnknownHostException{
+    public Booth(String parentServer, int port, int listenPort) throws UnknownHostException, IOException, InterruptedException{
         parentIP = InetAddress.getByName(parentServer);
         parentPort = port;
         dummyData = false;
         cmdInProgress = new Object();
-    }
-
-    public void connect(int listenPort) throws IOException, InterruptedException{
-        clientServer = new Comm(listenPort);
-        clientServer.connectToParent(parentIP, parentPort);
-
-        Thread.sleep(1000);
+		
+		this.clientServer = new Comm(listenPort);
+		clientServer.connectToParent(parentIP, parentPort);
+		Thread.sleep(1000);
     }
 
     public void run(){
         final BoothUI window = new BoothUI(this);
         window.start();
-//		return;
 
         (new Thread() {
             public void run() {
+            	String msg = null;
+            	
                 while(true){
                     synchronized(cmdInProgress){
                         window.updateStats(getElectionStatus());
+                    }
+                    
+                    synchronized(cmdInProgress){
+                        try {
+							msg = (String)clientServer.getMessageBlocking(10, TimeUnit.MILLISECONDS);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+                    }
+                    
+                    if(msg != null){
+                    	if(msg.equals("done")){
+                    		System.out.println("Exiting...");
+                    		System.exit(0);
+                    	}
                     }
 
                     try {
@@ -297,7 +312,7 @@ public class Booth extends Thread {
 
         Booth booth;
         try {
-            booth = new Booth(args[0], Integer.parseInt(args[1]));
+            booth = new Booth(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]));
         }catch(NumberFormatException e){
             System.out.println("Invalid port number");
             return;
@@ -306,10 +321,6 @@ public class Booth extends Thread {
             e1.printStackTrace();
             System.out.println("Unknown host error");
             return;
-        }
-
-        try{
-            booth.connect(Integer.parseInt(args[2]));
         }catch(IOException e){
             e.printStackTrace();
             System.out.println("IO exception");
