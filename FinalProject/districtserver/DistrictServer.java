@@ -18,7 +18,6 @@ import FinalProject.BoothElectionResult;
 import FinalProject.BoothElectionResults;
 import FinalProject.Credential;
 import FinalProject.communication.Comm;
-import FinalProject.masterserver.ElectionResults;
 import FinalProject.masterserver.MasterServerInformation;
 import FinalProject.persons.Candidate;
 import FinalProject.persons.Person;
@@ -130,22 +129,6 @@ public class DistrictServer implements Runnable {
 
 		masterServerInfo = lists;
 
-		// masterServerInfo = new MasterServerInformation();
-		// masterServerInfo.addCandidate(new Candidate("Nate", "Liberal"));
-		// masterServerInfo.addCandidate(new Candidate("David", "NDP"));
-		//
-		// masterServerInfo.addVoter(new Voter("Damian", "", "", "", "", "0",
-		// "Damian", "0", "", null, false, false));
-		// masterServerInfo.addVoter(new Voter("Nate", "", "", "", "", "0",
-		// "Nate", "9", "", null, false, false));
-		// masterServerInfo.addVoter(new Voter("Nate Bosscher", "", "", "", "",
-		// "0",
-		// "Nate Bosscher", "9", "", null, false, false));
-		//
-		// masterServerInfo.addVoter(new Voter("Jon", "", "", "", "", "1",
-		// "Jon",
-		// "0", "", null, false, false));
-		//
 		Enumeration<Candidate> c = masterServerInfo.getCandidates().elements();
 		int i = 0;
 		while (c.hasMoreElements()) {
@@ -176,7 +159,6 @@ public class DistrictServer implements Runnable {
 			districtComm = new Comm(port);
 			districtComm.connectToParent(InetAddress.getByName(masterAddress),
 					masterPort);
-			Thread.sleep(1000);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -206,17 +188,31 @@ public class DistrictServer implements Runnable {
 				// Ballot -> "true" or "false" vote valid (must be registered)
 
 				if (recievedMessage instanceof MasterServerInformation) {
-					if (!fake)
+					if (!fake) {
+						System.out.println("Received voter information.");
 						this.masterServerInfo = (MasterServerInformation) recievedMessage;
 
-				} else if (recievedMessage instanceof ElectionResults) {
-					// this.results = (BoothElectionResults) recievedMessage;
+						Enumeration<Voter> it = ((MasterServerInformation) recievedMessage)
+								.getVoters().elements();
+						while (it.hasMoreElements()) {
+							Voter v = it.nextElement();
 
+							if (!v.getDistrictId().equals(uniqueDistrictId)) {
+								masterServerInfo.getVoters()
+										.remove(v.getName());
+							}
+
+						}
+
+					}
+				} else if (recievedMessage instanceof BoothElectionResults) {
+
+					this.electionResults = (BoothElectionResults) recievedMessage;
 				} else if (recievedMessage instanceof Person) { // register the
 					// person
 					System.out.println("Registering Person");
-					Voter localVoter = this.masterServerInfo
-							.getVoter(((Person) recievedMessage).getName());
+					String nm = ((Person) recievedMessage).getName();
+					Voter localVoter = this.masterServerInfo.getVoter(nm);
 
 					if (localVoter != null
 							&& localVoter.getDistrictId().equals(
@@ -250,7 +246,6 @@ public class DistrictServer implements Runnable {
 						localVoter.setCandidate(voteBallot.getCandidate());
 						localVoter.setVoted(true);
 
-
 						for (int i = 0; i < electionResults.results.length; i++)
 							if (electionResults.results[i].candidate
 									.getName()
@@ -266,17 +261,15 @@ public class DistrictServer implements Runnable {
 						System.out.println("District Server "
 								+ uniqueDistrictId + ": " + "Vote Successful");
 
-
 						// save results to file
 						PrintWriter writer = new PrintWriter(
 								"election-results.txt", "UTF-8");
 						writer.println(electionResults.toString());
 						writer.close();
-						
-						
+
 						// TEMPORARY - until structure rework with Jon.
 						if (!fake)
-							districtComm.sendMessageParent(masterServerInfo);
+							districtComm.sendMessageParent(localVoter);
 
 					} else {
 						districtComm.sendMessageReply("false");

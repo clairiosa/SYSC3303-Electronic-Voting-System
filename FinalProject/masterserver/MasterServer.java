@@ -125,7 +125,9 @@ public class MasterServer {
 				System.exit(-1);
 			}
 			try{
-				comm.sendMessageClient((Object) lists);
+				Thread.sleep(1000);
+				
+				comm.sendMessageClient(lists);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -137,7 +139,7 @@ public class MasterServer {
 			/*************************************/
 			/* Receiving District Server info */
 			/*************************************/
-			ReceiveMasterServerInfo receiveThread = new ReceiveMasterServerInfo(comm);
+			ReceiveMasterServerInfo receiveThread = new ReceiveMasterServerInfo(comm, lists.candidates);
 			receiveThread.start();
 			//Thread.sleep(10000); // make sure at least some results are in
 			candidates = receiveThread.getCandidates();
