@@ -169,7 +169,8 @@ public class DistrictServer implements Runnable {
 
 	@Override
 	public void run() {
-		while (true) {
+		boolean continues = true;
+		while (continues) {
 			try {
 				// listen for incoming messages. messages can come from booths
 				// or
@@ -333,6 +334,12 @@ public class DistrictServer implements Runnable {
 							i++;
 						}
 						districtComm.sendMessageReply(c);
+					}
+					else if(recievedMessage.equals("end")){
+						System.out.println("District Server "
+								+ uniqueDistrictId + ": " + "closed");
+						districtComm.sendMessageClient("end");
+						continues = false;
 					}
 				}
 

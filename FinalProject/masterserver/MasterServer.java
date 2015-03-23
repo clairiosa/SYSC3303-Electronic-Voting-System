@@ -6,10 +6,7 @@
  *
  */
 
-
 package FinalProject.masterserver;
-
-
 
 //get data from each district saved in a file 
 //get the file chunk by chunk
@@ -30,137 +27,143 @@ import FinalProject.persons.Candidate;
 import FinalProject.persons.Voter;
 
 public class MasterServer {
-	public static boolean electionDone=false;
+	public static boolean electionDone = false;
+
 	public MasterServer() {
 
 	}
 
-	public static void main(String args[]) {
-		
-		System.out.println("MasterServer Started\n");
-		final MasterServerInformation  lists = new MasterServerInformation();
-		ConcurrentHashMap<String, Candidate> candidates;
-		Comm comm=null;
+	static Comm comm;
 
+	public static void main(String args[]) {
+
+		System.out.println("MasterServer Started\n");
+		final MasterServerInformation lists = new MasterServerInformation();
+		ConcurrentHashMap<String, Candidate> candidates;
+		
 
 		if (args.length < 4) {
-			System.out.println("java MasterServer <port> <voterFilename> <CandidatesFilename> <refreshrate> ");
-			System.out.println("java MasterServer voters.txt candidates.txt 10000");
+			System.out
+					.println("java MasterServer <port> <voterFilename> <CandidatesFilename> <refreshrate> ");
+			System.out
+					.println("java MasterServer voters.txt candidates.txt 10000");
 			System.exit(1);
 		}
-		
-		try{
-			int port=Integer.valueOf(args[0]);
-			comm = new Comm(port);
-		}catch(SocketException e){
-			e.printStackTrace();
-		}
-		try{
-			
-			new Thread()
-	        {
-	            public void run() {
-	                System.out.println("Console Input Thread");
-	    			String s; 
-		    		try{
-	    				Scanner scanner = new Scanner(System.in);
-		    			s=scanner.nextLine();
-		    			if(s.trim().equalsIgnoreCase("done")){
-		    				electionDone=true;
-		    				EventQueue.invokeLater(new Runnable() {
-		    					public void run() {
-		    						try {
-		    							framer1 frame = new framer1(lists.candidates);
-		    							frame.setVisible(true);
-		    						} catch (Exception e) {
-		    							e.printStackTrace();
-		    						}
-		    					}
-		    				});
-		    				//System.exit(1);
-		    			}
-		    		}catch(Exception e){
-		    			e.printStackTrace();
-		    		}
-	            }
-	        }.start();
 
-			
-			
-			
-		}catch(Exception e){
+		int port = Integer.valueOf(args[0]);
+		try {
+			comm = new Comm(port);
+		} catch (SocketException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		
+		try {
+
+			new Thread() {
+				public void run() {
+					System.out.println("Console Input Thread");
+					String s;
+					try {
+						Scanner scanner = new Scanner(System.in);
+						s = scanner.nextLine();
+						if (s.trim().equalsIgnoreCase("done")) {
+							electionDone = true;
+
+							comm.sendMessageClient("end");
+							EventQueue.invokeLater(new Runnable() {
+								public void run() {
+									try {
+										framer1 frame = new framer1(
+												lists.candidates);
+										frame.setVisible(true);
+									} catch (Exception e) {
+										e.printStackTrace();
+									}
+								}
+							});
+							// System.exit(1);
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}.start();
+
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		try {
 			int refreshRate = Integer.valueOf(args[3]);
-			File votersFile = new File (args[1]);
-			File candidatesFile = new File (args[2]);
-			
-			try{
+			File votersFile = new File(args[1]);
+			File candidatesFile = new File(args[2]);
+
+			try {
 				FileInputStream fis1 = new FileInputStream(votersFile);
-			 
-				//Construct BufferedReader from InputStreamReader
-				BufferedReader br1 = new BufferedReader(new InputStreamReader(fis1));
-				String line=null;
+
+				// Construct BufferedReader from InputStreamReader
+				BufferedReader br1 = new BufferedReader(new InputStreamReader(
+						fis1));
+				String line = null;
 				String voter = null;
-				int district; 
+				int district;
 				while ((line = br1.readLine()) != null) {
-					district=Integer.valueOf(line);
-					voter=br1.readLine();
-					lists.addVoter(new Voter(voter,"",district+""));
+					district = Integer.valueOf(line);
+					voter = br1.readLine();
+					lists.addVoter(new Voter(voter, "", district + ""));
 				}
 				br1.close();
-			}catch(Exception e){
+			} catch (Exception e) {
 				System.out.println("Error reading voters file.");
 				e.printStackTrace();
 				System.exit(-1);
 			}
-			
-			
+
 			String candidate = null;
-			String party = null; 
-			try{
+			String party = null;
+			try {
 				FileInputStream fis2 = new FileInputStream(candidatesFile);
-				//Construct BufferedReader from InputStreamReader
-				BufferedReader br2 = new BufferedReader(new InputStreamReader(fis2));
+				// Construct BufferedReader from InputStreamReader
+				BufferedReader br2 = new BufferedReader(new InputStreamReader(
+						fis2));
 				while ((party = br2.readLine()) != null) {
-					candidate=br2.readLine();
-					lists.addCandidate(new Candidate(candidate,party));	
+					candidate = br2.readLine();
+					lists.addCandidate(new Candidate(candidate, party));
 				}
-		 
+
 				br2.close();
-			}catch(Exception e){
+			} catch (Exception e) {
 				System.out.println("Error reading Candidates file.");
 				e.printStackTrace();
 				System.exit(-1);
 			}
-			try{
+			try {
 				Thread.sleep(1000);
-				
+
 				comm.sendMessageClient(lists);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			
-			
 
 			/*************************************/
 			/* Receiving District Server info */
 			/*************************************/
-			ReceiveMasterServerInfo receiveThread = new ReceiveMasterServerInfo(comm, lists.candidates);
+			ReceiveMasterServerInfo receiveThread = new ReceiveMasterServerInfo(
+					comm, lists.candidates);
 			receiveThread.start();
-			//Thread.sleep(10000); // make sure at least some results are in
+			// Thread.sleep(10000); // make sure at least some results are in
 			candidates = receiveThread.getCandidates();
 
 			// periodically update displayed results and send preliminary
 			// election results
-			ElectionResults electionUpdateThread = new ElectionResults(candidates, refreshRate, comm);
+			ElectionResults electionUpdateThread = new ElectionResults(
+					candidates, refreshRate, comm);
 			electionUpdateThread.start();
 
-			while (electionDone==false) {
+			while (electionDone == false) {
 				Thread.sleep(1000);
 			}
 			electionUpdateThread.outputResults();
@@ -181,4 +184,3 @@ public class MasterServer {
 	}
 
 }
-
