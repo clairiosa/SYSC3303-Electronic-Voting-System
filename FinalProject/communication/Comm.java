@@ -2,7 +2,9 @@
  *		SYSC 3303 - Electronic Voting System
  *	David Bews, Jonathan Oommen, Nate Bosscher, Damian Polan
  *
- *	Comm.java
+ *  @Author David Bews
+ *
+ *	communication.Comm.java
  *
  * Implementation of CommInterface.
  *
@@ -24,7 +26,6 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 public class Comm implements CommInterface {
@@ -43,8 +44,7 @@ public class Comm implements CommInterface {
      * @throws SocketException
      */
     public Comm(int port) throws SocketException {
-        Semaphore queueSemaphore = new Semaphore(1);
-        listener = new ListenThread(port, receivedObjectQueue, queueSemaphore);
+        listener = new ListenThread(port, receivedObjectQueue);
         listenThread = new Thread(listener);
         listenThread.start();
     }
@@ -63,17 +63,6 @@ public class Comm implements CommInterface {
         parentConnection = listener.createConnection(parentServer, port);
         DatagramPacket outgoingPacket = Packets.craftPacket(new Connect(), parentConnection.getAddress(), parentConnection.getPort());
         parentConnection.putOutgoingBlocking(outgoingPacket);
-
-        /*
-        Object obj = getMessageBlocking(6000, TimeUnit.MILLISECONDS);
-        if (obj == null) throw new CommException("Unable to Connect: Timeout");
-        if (obj instanceof Ack) {
-            Ack ack = (Ack) obj;
-            if (!ack.isParentAck()) throw new CommException("Unable to Connect: Invalid ACK Message");
-        } else {
-            parentConnection = null;
-            throw new CommException("Unable to Connect: Unexpected Message.");
-        }*/
 
         synchronized (parentConnection.waitAckSync) {
             if (!parentConnection.isAckResultReady()) parentConnection.waitAckSync.wait();
@@ -109,15 +98,18 @@ public class Comm implements CommInterface {
     @Override
     public int sendMessageClient(Object obj) throws IOException, InterruptedException {
         DatagramPacket outgoingPacket;
+
+        if (listener.connectionHashMap.size() == 0) return CommError.ERROR_NO_CLIENTS;
+
         for (Connection connection : listener.connectionHashMap.values()) {
-            if (!connection.equals(parentConnection) && connection != null ) {
+            if (!connection.equals(parentConnection)) {
                 outgoingPacket = Packets.craftPacket(obj, connection.getAddress(), connection.getPort());
                 connection.putOutgoingBlocking(outgoingPacket);
             }
         }
 
         for (Connection connection : listener.connectionHashMap.values()) {
-            if (!connection.equals(parentConnection) && !connection.equals(null)) {
+            if (!connection.equals(parentConnection)) {
                 synchronized (connection.waitAckSync) {
                     if (!connection.isAckResultReady()) connection.waitAckSync.wait();
                     if (!connection.isAckResult()) return CommError.ERROR_TIMEOUT;
@@ -125,7 +117,7 @@ public class Comm implements CommInterface {
                 }
             }
             if (connection.equals(parentConnection) && listener.connectionHashMap.size() == 1){
-                return CommError.NO_CLIENTS;
+                return CommError.ERROR_NO_CLIENTS;
             }
         }
         return 0;
@@ -169,22 +161,6 @@ public class Comm implements CommInterface {
         status = sendMessageParent(obj);
         if (status == 0) status = sendMessageClient(obj);
         return status;
-        /*
-
-        for (Connection connection : listener.connectionHashMap.values()) {
-            DatagramPacket outgoingPacket = Packets.craftPacket(obj, connection.getAddress(), connection.getPort());
-            connection.putOutgoingBlocking(outgoingPacket);
-        }
-
-        for (Connection connection : listener.connectionHashMap.values()) {
-            synchronized (connection.waitAckSync) {
-                if (!connection.isAckResultReady()) connection.waitAckSync.wait();
-                if (!connection.isAckResult()) return CommError.ERROR_TIMEOUT;
-                connection.setAckResultReady(false);
-            }
-        }
-        return 0;
-        */
     }
 
 

@@ -2,7 +2,9 @@
  *		SYSC 3303 - Electronic Voting System
  *	David Bews, Jonathan Oommen, Nate Bosscher, Damian Polan
  *
- *	ListenThread.java
+ *  @Author David Bews
+ *
+ *	communication.ListenThread.java
  *
  *  Thread for listening for packets, and handing them off to a worker thread specific to each connection.
  *
@@ -19,7 +21,6 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.Semaphore;
 
 class ListenThread implements Runnable {
 
@@ -29,7 +30,6 @@ class ListenThread implements Runnable {
     HashMap<String, Connection> connectionHashMap = new HashMap<>();
     private DatagramSocket listenSocket;
     private BlockingQueue<CommTuple> receivedObjectQueue;
-    private Semaphore queueSemaphore;
 
 
     /**
@@ -37,14 +37,12 @@ class ListenThread implements Runnable {
      *
      * @param listenPort          Port to open the listen socket on.
      * @param receivedObjectQueue The queue to place received objects into for access from the class using Comm.
-     * @param queueSemaphore      A semaphore preventing multiple workers from writing to the queue at once.
      *                            Potentially unnecessary, added as a precaution while bug testing.
      * @throws SocketException
      */
-    public ListenThread(int listenPort, BlockingQueue<CommTuple> receivedObjectQueue, Semaphore queueSemaphore) throws SocketException {
+    public ListenThread(int listenPort, BlockingQueue<CommTuple> receivedObjectQueue) throws SocketException {
         listenSocket = new DatagramSocket(listenPort);
         this.receivedObjectQueue = receivedObjectQueue;
-        this.queueSemaphore = queueSemaphore;
     }
 
 
@@ -109,7 +107,7 @@ class ListenThread implements Runnable {
      */
     Connection createConnection(InetAddress address, int port) throws SocketException {
         Connection newConnection = new Connection(address, port);
-        WorkerThread worker = new WorkerThread(newConnection, listenSocket, receivedObjectQueue, queueSemaphore);
+        WorkerThread worker = new WorkerThread(newConnection, listenSocket, receivedObjectQueue);
         Thread workerThread = new Thread(worker);
         newConnection.setWorkerThread(workerThread);
 

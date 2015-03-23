@@ -4,7 +4,7 @@
  *
  *  @Author David Bews
  *
- *	CommInterface.java
+ *	communication.CommInterface.java
  *
  *
  *  Public functions used for sending and receiving objects.

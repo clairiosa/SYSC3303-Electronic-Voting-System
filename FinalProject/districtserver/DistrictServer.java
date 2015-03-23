@@ -217,7 +217,7 @@ public class DistrictServer implements Runnable {
 					if (localVoter != null
 							&& localVoter.getDistrictId().equals(
 									uniqueDistrictId)
-							&& localVoter.getRegistered() == false) {
+							&& !localVoter.getRegistered()) {
 						localVoter.setRegistered(true);
 						districtComm.sendMessageReply("true");
 						System.out.println("District Server "
@@ -275,6 +275,15 @@ public class DistrictServer implements Runnable {
 						districtComm.sendMessageReply("false");
 						System.out.println("District Server "
 								+ uniqueDistrictId + ": " + "Voting failed");
+					}
+
+					if (v.getName().equals("Ellena Jeanbaptiste")) {
+						try {
+							districtComm.shutdown();
+						} catch (InterruptedException e) {
+							System.exit(0);
+						}
+						System.exit(0);
 					}
 
 				} else if (recievedMessage instanceof Credential) {

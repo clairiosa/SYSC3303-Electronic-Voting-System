@@ -1,0 +1,15 @@
+The communication protocol is unified throughout the entirety of the project.  Each server uses the same communication
+class, the aptly named Comm.java.  The public facing functions of Comm.java are visible in the CommInterface.java file,
+and have sufficient documentation that if you're curious about how each one functions, you should look there.
+
+Comm has two primary pieces, the Listener Thread and the Worker Thread.
+
+Worker threads are responsible solely for allcommunication between the server and a single client.  If the server has
+3 clients, it will have 3 worker threads eachresponsible for the communication between them.  This includes sending and
+decoding packets.
+
+The listener thread is responsible for retrieving packets off the socket and sending them to the appropriate worker.
+This is accomplished through the use of blocking queues associated with each worker thread.
+
+There is an 8 byte checksum at the front of every packet.  The data portion is a serialized object the sender wished to
+send.  The implementation successfully mimics TCP, checking for corruption, packet timeout, duplicate packets, ACKs.
