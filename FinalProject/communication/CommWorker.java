@@ -21,7 +21,7 @@ import java.net.SocketException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Semaphore;
 
-class WorkerThread implements Runnable{
+class CommWorker implements Runnable{
     long threadId;
     Connection connection;
     boolean waitingOnReply;
@@ -43,7 +43,7 @@ class WorkerThread implements Runnable{
      * @param maximumConnections
      * @throws SocketException
      */
-    public WorkerThread(Connection connection, DatagramSocket socket, BlockingQueue<CommTuple> receivedObjectQueue, Semaphore maximumConnections) throws SocketException {
+    public CommWorker(Connection connection, DatagramSocket socket, BlockingQueue<CommTuple> receivedObjectQueue, Semaphore maximumConnections) throws SocketException {
         threadId = Thread.currentThread().getId();
         this.connection = connection;
 

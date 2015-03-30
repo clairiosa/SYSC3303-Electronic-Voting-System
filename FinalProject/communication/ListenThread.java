@@ -133,7 +133,7 @@ class ListenThread implements Runnable {
      */
     Connection createConnection(InetAddress address, int port) throws SocketException {
         Connection newConnection = new Connection(address, port);
-        WorkerThread worker = new WorkerThread(newConnection, listenSocket, receivedObjectQueue, maximumConnections);
+        CommWorker worker = new CommWorker(newConnection, listenSocket, receivedObjectQueue, maximumConnections);
         Thread workerThread = new Thread(worker);
         newConnection.setWorkerThread(workerThread);
 
