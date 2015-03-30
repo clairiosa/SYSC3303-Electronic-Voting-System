@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Semaphore;
 
-class ListenThread implements Runnable {
+class CommListener implements Runnable {
 
     private static final int MAX_PACKET_SIZE = 8192;
 
@@ -37,7 +37,7 @@ class ListenThread implements Runnable {
 
 
     /**
-     * Sole constructor for the ListenThread object.  Only one is expected to exist for each implementation of Comm.
+     * Sole constructor for the CommListener object.  Only one is expected to exist for each implementation of Comm.
      *
      * @param listenPort          Port to open the listen socket on.
      * @param receivedObjectQueue The queue to place received objects into for access from the class using Comm.
@@ -45,7 +45,7 @@ class ListenThread implements Runnable {
      * @param maximumConnections  A semaphore governing the maximum number of client connections a server can have.
      * @throws SocketException
      */
-    public ListenThread(int listenPort, BlockingQueue<CommTuple> receivedObjectQueue, Semaphore maximumConnections) throws SocketException {
+    public CommListener(int listenPort, BlockingQueue<CommTuple> receivedObjectQueue, Semaphore maximumConnections) throws SocketException {
         listenSocket = new DatagramSocket(listenPort);
         this.receivedObjectQueue = receivedObjectQueue;
         this.maximumConnections = maximumConnections;

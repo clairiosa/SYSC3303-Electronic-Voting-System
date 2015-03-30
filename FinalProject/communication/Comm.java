@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Comm implements CommInterface {
 
-    private ListenThread listener;
+    private CommListener listener;
     private Thread listenThread;
     private Connection parentConnection = null;
     private Connection replyConnection = null;
@@ -47,7 +47,7 @@ public class Comm implements CommInterface {
      */
     public Comm(int port) throws SocketException {
         maximumConnections = new Semaphore(20);
-        listener = new ListenThread(port, receivedObjectQueue, maximumConnections);
+        listener = new CommListener(port, receivedObjectQueue, maximumConnections);
         listenThread = new Thread(listener);
         listenThread.start();
     }
@@ -61,7 +61,7 @@ public class Comm implements CommInterface {
      */
     public Comm(int port, int maxConnections) throws SocketException {
         maximumConnections = new Semaphore(maxConnections);
-        listener = new ListenThread(port, receivedObjectQueue, maximumConnections);
+        listener = new CommListener(port, receivedObjectQueue, maximumConnections);
         listenThread = new Thread(listener);
         listenThread.start();
     }
