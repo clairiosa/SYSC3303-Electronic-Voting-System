@@ -19,6 +19,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Semaphore;
 
 class WorkerThread implements Runnable{
     long threadId;
@@ -29,6 +30,7 @@ class WorkerThread implements Runnable{
     DatagramPacket lastPacketReceived;
     DatagramSocket socket;
     int maxTimeouts;
+    private Semaphore maximumConnections;
 
     BlockingQueue<CommTuple> receivedObjectQueue;
 
@@ -38,14 +40,17 @@ class WorkerThread implements Runnable{
      * @param connection            Connection object associated with the worker thread.
      * @param socket                Socket to send messages out on.
      * @param receivedObjectQueue   Queue to put received messages on.
+     * @param maximumConnections
      * @throws SocketException
      */
-    public WorkerThread(Connection connection, DatagramSocket socket, BlockingQueue<CommTuple> receivedObjectQueue) throws SocketException {
+    public WorkerThread(Connection connection, DatagramSocket socket, BlockingQueue<CommTuple> receivedObjectQueue, Semaphore maximumConnections) throws SocketException {
         threadId = Thread.currentThread().getId();
         this.connection = connection;
 
         this.socket = socket;
         this.receivedObjectQueue = receivedObjectQueue;
+
+        this.maximumConnections = maximumConnections;
 
         maxTimeouts = 5;
 
@@ -83,7 +88,7 @@ class WorkerThread implements Runnable{
                             lastSentPacketTime = 0;
                             synchronized(connection.waitAckSync) {
                                 connection.setAckResultReady(true);
-                                connection.setAckResult(false);
+                                connection.setAckResult(CommError.ERROR_TIMEOUT);
                                 connection.waitAckSync.notify();
                             }
                         } else {
@@ -103,12 +108,18 @@ class WorkerThread implements Runnable{
                                 if (waitingOnReply) {
                                     waitingOnReply = false;
                                     Ack receivedAck = (Ack) obj;
-                                    if (receivedAck.isCorrupted()) {
+                                    if (receivedAck.isRejectConnection()) {
+                                        synchronized(connection.waitAckSync) {
+                                            connection.setAckResultReady(true);
+                                            connection.setAckResult(CommError.ERROR_REJECT_CONNECTION);
+                                            connection.waitAckSync.notify();
+                                        }
+                                    } else if (receivedAck.isCorrupted()) {
                                         lastSentPacketTime = sendPacket(lastPacketSent, !lastPacketSentAck);
                                     } else {
                                         synchronized(connection.waitAckSync) {
                                             connection.setAckResultReady(true);
-                                            connection.setAckResult(true);
+                                            connection.setAckResult(0);
                                             connection.waitAckSync.notify();
                                         }
                                     }
@@ -166,7 +177,7 @@ class WorkerThread implements Runnable{
 
         }
 
-
+        maximumConnections.release();
         if (!cleanDisconnect) {
             try {
                 socket.send(Packets.craftPacket(new Disconnect(), connection.getAddress(), connection.getPort()));

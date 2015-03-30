@@ -26,6 +26,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 public class Comm implements CommInterface {
@@ -34,17 +35,33 @@ public class Comm implements CommInterface {
     private Thread listenThread;
     private Connection parentConnection = null;
     private Connection replyConnection = null;
+    private Semaphore maximumConnections;
 
     private BlockingQueue<CommTuple> receivedObjectQueue = new LinkedBlockingQueue<>();
 
     /**
-     * Sole constructor for the Comm objects, initializes the listener threads.
+     * Constructor for the Comm objects, initializes the listener threads.
      *
      * @param port Port to listen on for packets.
      * @throws SocketException
      */
     public Comm(int port) throws SocketException {
-        listener = new ListenThread(port, receivedObjectQueue);
+        maximumConnections = new Semaphore(20);
+        listener = new ListenThread(port, receivedObjectQueue, maximumConnections);
+        listenThread = new Thread(listener);
+        listenThread.start();
+    }
+
+
+    /**
+     * Constructor for the Comm objects, initializes the listener threads.
+     *
+     * @param port Port to listen on for packets.
+     * @throws SocketException
+     */
+    public Comm(int port, int maxConnections) throws SocketException {
+        maximumConnections = new Semaphore(maxConnections);
+        listener = new ListenThread(port, receivedObjectQueue, maximumConnections);
         listenThread = new Thread(listener);
         listenThread.start();
     }
@@ -66,9 +83,10 @@ public class Comm implements CommInterface {
 
         synchronized (parentConnection.waitAckSync) {
             if (!parentConnection.isAckResultReady()) parentConnection.waitAckSync.wait();
-            if (!parentConnection.isAckResult()) {
+            int result = parentConnection.getAckResult();
+            if (result != 0) {
                 parentConnection = null;
-                return CommError.ERROR_TIMEOUT;
+                return result;
             }
             parentConnection.setAckResultReady(false);
         }
@@ -112,7 +130,8 @@ public class Comm implements CommInterface {
             if (!connection.equals(parentConnection)) {
                 synchronized (connection.waitAckSync) {
                     if (!connection.isAckResultReady()) connection.waitAckSync.wait();
-                    if (!connection.isAckResult()) return CommError.ERROR_TIMEOUT;
+                    int result = connection.getAckResult();
+                    if (result != 0) return result;
                     connection.setAckResultReady(false);
                 }
             }
@@ -139,7 +158,10 @@ public class Comm implements CommInterface {
 
             synchronized (parentConnection.waitAckSync) {
                 if (!parentConnection.isAckResultReady()) parentConnection.waitAckSync.wait();
-                if (!parentConnection.isAckResult()) return CommError.ERROR_TIMEOUT;
+                int result = parentConnection.getAckResult();
+                if (result != 0) {
+                    return result;
+                }
                 parentConnection.setAckResultReady(false);
             }
             return 0;
@@ -178,7 +200,10 @@ public class Comm implements CommInterface {
 
         synchronized (replyConnection.waitAckSync) {
             if (!replyConnection.isAckResultReady()) replyConnection.waitAckSync.wait();
-            if (!replyConnection.isAckResult()) return CommError.ERROR_TIMEOUT;
+            int result = replyConnection.getAckResult();
+            if (result != 0) {
+                return result;
+            }
             replyConnection.setAckResultReady(false);
         }
         return 0;

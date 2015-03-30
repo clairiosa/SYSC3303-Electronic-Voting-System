@@ -14,6 +14,8 @@
 package FinalProject.communication;
 
 
+import FinalProject.communication.communicationobjects.Ack;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -21,6 +23,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Semaphore;
 
 class ListenThread implements Runnable {
 
@@ -30,6 +33,7 @@ class ListenThread implements Runnable {
     HashMap<String, Connection> connectionHashMap = new HashMap<>();
     private DatagramSocket listenSocket;
     private BlockingQueue<CommTuple> receivedObjectQueue;
+    private Semaphore maximumConnections;
 
 
     /**
@@ -38,11 +42,13 @@ class ListenThread implements Runnable {
      * @param listenPort          Port to open the listen socket on.
      * @param receivedObjectQueue The queue to place received objects into for access from the class using Comm.
      *                            Potentially unnecessary, added as a precaution while bug testing.
+     * @param maximumConnections  A semaphore governing the maximum number of client connections a server can have.
      * @throws SocketException
      */
-    public ListenThread(int listenPort, BlockingQueue<CommTuple> receivedObjectQueue) throws SocketException {
+    public ListenThread(int listenPort, BlockingQueue<CommTuple> receivedObjectQueue, Semaphore maximumConnections) throws SocketException {
         listenSocket = new DatagramSocket(listenPort);
         this.receivedObjectQueue = receivedObjectQueue;
+        this.maximumConnections = maximumConnections;
     }
 
 
@@ -62,22 +68,42 @@ class ListenThread implements Runnable {
                 break;
             }
 
+
             // Grab the associated open connection.
             String connectionKey = incomingPacket.getAddress().toString() + ":" + incomingPacket.getPort();
             Connection connection = connectionHashMap.get(connectionKey);
 
             // If we do not have a connection open.
-            if (connection == null) try {
-                connection = createConnection(incomingPacket.getAddress(), incomingPacket.getPort());
-            } catch (SocketException e) {
-                break;
-            }
+            if (connection == null) {
+                boolean connect = maximumConnections.tryAcquire();
 
-            // Pass the packet to the connections worker thread.
-            try {
-                connection.putIncomingBlocking(incomingPacket);
-            } catch (InterruptedException e) {
-                break;
+                if (!connect) {
+                    try {
+                        sendRejectAck(incomingPacket.getAddress(), incomingPacket.getPort());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    try {
+                        connection = createConnection(incomingPacket.getAddress(), incomingPacket.getPort());
+                    } catch (SocketException e) {
+                        break;
+                    }
+
+                    // Pass the packet to the connections worker thread.
+                    try {
+                        connection.putIncomingBlocking(incomingPacket);
+                    } catch (InterruptedException e) {
+                        break;
+                    }
+                }
+            } else {
+                // Pass the packet to the connections worker thread.
+                try {
+                    connection.putIncomingBlocking(incomingPacket);
+                } catch (InterruptedException e) {
+                    break;
+                }
             }
 
         }
@@ -107,7 +133,7 @@ class ListenThread implements Runnable {
      */
     Connection createConnection(InetAddress address, int port) throws SocketException {
         Connection newConnection = new Connection(address, port);
-        WorkerThread worker = new WorkerThread(newConnection, listenSocket, receivedObjectQueue);
+        WorkerThread worker = new WorkerThread(newConnection, listenSocket, receivedObjectQueue, maximumConnections);
         Thread workerThread = new Thread(worker);
         newConnection.setWorkerThread(workerThread);
 
@@ -128,6 +154,19 @@ class ListenThread implements Runnable {
             connection.getWorkerThread().join();
         }
         listenSocket.close();
+    }
+
+
+    /**
+     * Sends a rejection packet to reject the incoming connection.
+     *
+     * @param address       IP Address where the connection attempt originated.
+     * @param port          Port of the above.
+     * @throws IOException
+     */
+    void sendRejectAck(InetAddress address, int port) throws IOException {
+        DatagramPacket ackPacket = Packets.craftPacket(new Ack(false, true), address, port);
+        listenSocket.send(ackPacket);
     }
 
 

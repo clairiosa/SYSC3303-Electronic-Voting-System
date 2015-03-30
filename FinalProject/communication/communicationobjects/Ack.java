@@ -18,13 +18,30 @@ import java.io.Serializable;
 
 public class Ack implements Serializable {
     private boolean corrupted;
+    private boolean rejectConnection;
 
     /**
      *
      * @param corrupted    True if this ack is being sent in response to a corrupted packet.
      */
     public Ack(boolean corrupted) {
+
         this.corrupted = corrupted;
+        this.rejectConnection = false;
+    }
+
+    /**
+     *
+     * @param corrupted         True if this ack is being sent in response to a corrupted packet.
+     * @param rejectConnection  True if this ack is being sent to reject an attempted connection.
+     */
+    public Ack(boolean corrupted, boolean rejectConnection) {
+
+        this.corrupted = corrupted; this.rejectConnection = rejectConnection;
+    }
+
+    public boolean isRejectConnection() {
+        return rejectConnection;
     }
 
     public boolean isCorrupted() {

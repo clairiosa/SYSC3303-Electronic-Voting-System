@@ -18,7 +18,7 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit; // Functions associated with this are unused.
+//import java.util.concurrent.TimeUnit; // Functions associated with this are unused.
 
 class Connection implements Serializable{
     private int port;
@@ -29,7 +29,7 @@ class Connection implements Serializable{
     private BlockingQueue<DatagramPacket> outgoingPacketQueue;
 
     private boolean ackResultReady;
-    private boolean ackResult;
+    private int ackResult;
     final Object waitAckSync;
 
 
@@ -47,6 +47,7 @@ class Connection implements Serializable{
         outgoingPacketQueue = new LinkedBlockingQueue<>();
         waitAckSync = new Object();
         ackResultReady = false;
+        ackResult = 0;
     }
 
 
@@ -202,11 +203,11 @@ class Connection implements Serializable{
         this.ackResultReady = ackResultReady;
     }
 
-    public boolean isAckResult() {
+    public int getAckResult() {
         return ackResult;
     }
 
-    public void setAckResult(boolean ackResult) {
+    public void setAckResult(int ackResult) {
         this.ackResult = ackResult;
     }
 }

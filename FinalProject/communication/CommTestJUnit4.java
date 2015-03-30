@@ -14,6 +14,7 @@ public class CommTestJUnit4 {
     private Comm comm1;
     private Comm comm2;
     private Comm comm3;
+    private Comm comm4;
 
     @BeforeClass
     public static void oneTimeSetUp() {
@@ -28,6 +29,7 @@ public class CommTestJUnit4 {
         comm1 = new Comm(2000);
         comm2 = new Comm(2011);
         comm3 = new Comm(2111);
+        comm4 = new Comm(2222, 1);
     }
 
     @After
@@ -35,6 +37,7 @@ public class CommTestJUnit4 {
         comm1.shutdown();
         comm2.shutdown();
         comm3.shutdown();
+        comm4.shutdown();
     }
 
     @Test
@@ -42,10 +45,12 @@ public class CommTestJUnit4 {
         int test;
         test = comm2.connectToParent(InetAddress.getByName("127.0.0.1"), 2000);
         assertEquals(0, test);
-        test = comm3.connectToParent(InetAddress.getByName("127.0.0.1"), 2011);
-        assertEquals(0, test);
         test = comm1.connectToParent(InetAddress.getByName("127.0.0.1"), 1000);
         assertEquals(1000, test);
+        test = comm3.connectToParent(InetAddress.getByName("127.0.0.1"), 2222);
+        assertEquals(0, test);
+        test = comm1.connectToParent(InetAddress.getByName("127.0.0.1"), 2222);
+        assertEquals(1003, test);
     }
 
     @Test
