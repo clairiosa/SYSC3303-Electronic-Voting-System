@@ -4,11 +4,7 @@
  *
  *	AutomatedTest.java
  *
- * Implementation of CommInterface.
- *
- * Responsible for all network traffic within the Electronic Voting System.  Simulates TCP/IP through UDP (Uses
- * ACKs, Checksums and requests retransmission of corrupted packets).  Each server/client implements an instance
- * of this class.
+ * Runs a fully automated test.
  *
  */
 

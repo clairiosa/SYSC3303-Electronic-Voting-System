@@ -220,7 +220,7 @@ public class Comm implements CommInterface {
     @Override
     public Object getMessageNonBlocking() {
         CommTuple receivedCommTuple = receivedObjectQueue.poll();
-        if (replyConnection == null) return null;
+        if (receivedCommTuple == null) return null;
         replyConnection = receivedCommTuple.getConnection();
         return receivedCommTuple.getObj();
     }
@@ -255,7 +255,7 @@ public class Comm implements CommInterface {
     @Override
     public Object getMessageBlocking(long timeDuration, TimeUnit timeUnit) throws InterruptedException {
         CommTuple receivedCommTuple = receivedObjectQueue.poll(timeDuration, timeUnit);
-        if (replyConnection == null) return null;
+        if (receivedCommTuple == null) return null;
         replyConnection = receivedCommTuple.getConnection();
         return receivedCommTuple.getObj();
     }
