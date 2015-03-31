@@ -22,11 +22,12 @@ import FinalProject.BoothElectionResults;
 import FinalProject.communication.Comm;
 import FinalProject.persons.Candidate;
 
+/**
+ * This class is responsible to send peridic election updates    
+ **/
+
 public class ElectionResults extends Thread implements Serializable {
-	/**
-	 * 
-	 */
-	// private static final long serialVersionUID = 1L;
+
 	private ConcurrentHashMap<String, Candidate> candidates = new ConcurrentHashMap<String, Candidate>();
 	private StringBuffer OfficialRecord = new StringBuffer();
 	private int refreshRate;
@@ -63,7 +64,8 @@ public class ElectionResults extends Thread implements Serializable {
 		}
 
 	}
-
+	
+	//convert an ElectionResults object to a BoothelectionResults object 
 	public BoothElectionResults toBoothResults() {
 		BoothElectionResult[] ber = new BoothElectionResult[candidates.size()];
 		Date d = new Date();
@@ -82,10 +84,13 @@ public class ElectionResults extends Thread implements Serializable {
 
 	}
 
+	//set the election as done 
 	public void setElectionDone(boolean a) {
 		electionDone = a;
 	}
 
+	
+	//write the election results to a file 
 	public void outputResults() {
 		BufferedWriter writer = null;
 
@@ -115,6 +120,7 @@ public class ElectionResults extends Thread implements Serializable {
 
 	}
 
+	//display the results on the console 
 	public void displayResults() {
 		/** Report the vote count for each candidate **/
 		log("Tally");
@@ -132,6 +138,7 @@ public class ElectionResults extends Thread implements Serializable {
 
 	}
 
+	//log data 
 	public void log(String s) {
 		OfficialRecord.append(s + '\n');
 		System.out.println(s);
