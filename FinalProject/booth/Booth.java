@@ -61,7 +61,7 @@ public class Booth extends Thread {
                     }
                     
                     if(msg != null){
-                    	if(msg.equals("done")){
+                    	if(msg.equals("end")){
                     		System.out.println("Exiting...");
                     		System.exit(0);
                     	}
