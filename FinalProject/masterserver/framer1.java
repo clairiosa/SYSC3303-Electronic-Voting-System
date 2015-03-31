@@ -1,3 +1,11 @@
+/*
+ *		SYSC 3303 - Electronic Voting System
+ *	David Bews, Jonathan Oommen, Nate Bosscher, Damian Polan
+ *
+ *	framer1.java
+ *
+ */
+
 
 package FinalProject.masterserver;
 
@@ -15,7 +23,9 @@ import FinalProject.persons.Candidate;
 
 
 
-//***setImage() in ModelSuper only lets you set the image once.***//
+/**
+ * This class represents the frame of the Graphical User Interface   
+ **/
 
 public class framer1 extends JFrame {
 	
@@ -23,10 +33,46 @@ public class framer1 extends JFrame {
 	private JPanel contentPane;
 	private static ConcurrentHashMap<String, Candidate> candidates;
 
+	
+
 	/**
-	 * Launch the application.
+	 * Create the frame.
+	 * 
+	 * @param cand - candidates information hashmap 
+	 */
+	public framer1(ConcurrentHashMap<String, Candidate> cand) {
+		//create the Graphical User Interface window  
+		candidates=cand;
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 1250, 850);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setLayout(new BorderLayout(0, 0));
+		setContentPane(contentPane);
+		
+		//create the TabbedMainWidow 
+		JTabbedPane TabbedMainWindow = new JTabbedPane(JTabbedPane.TOP);
+		TabbedMainWindow.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+		contentPane.add(TabbedMainWindow, BorderLayout.CENTER);
+
+		//add main tab to the GUI 
+		FancyDisplayWindow1 displayWindow = new FancyDisplayWindow1(candidates);
+		TabbedMainWindow.addTab("Election Results", null, displayWindow, null);
+
+	}
+	
+	//get the candidates information 
+	public ConcurrentHashMap<String, Candidate> getCandidates(){
+		return candidates;
+	}
+	
+	
+	
+	/**
+	 * Main test method 
 	 */
 	public static void main(String[] args) {
+		//create fake data 
 		candidates=new ConcurrentHashMap<String,Candidate>();
     	Candidate c1=new Candidate("Jonathan Oommen", "Conservative");
     	Candidate c2=new Candidate("David Bews", "Liberal");
@@ -37,6 +83,7 @@ public class framer1 extends JFrame {
     	candidates.put(c1.getName(), c1);
     	candidates.put(c2.getName(), c2);
 		
+    	//thread for the Graphical User Interface 
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -47,35 +94,6 @@ public class framer1 extends JFrame {
 				}
 			}
 		});
-	}
-
-	/**
-	 * Create the frame.
-	 */
-	public framer1(ConcurrentHashMap<String, Candidate> cand) {
-		candidates=cand;
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 1250, 850);
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		contentPane.setLayout(new BorderLayout(0, 0));
-		setContentPane(contentPane);
-		
-		JTabbedPane TabbedMainWindow = new JTabbedPane(JTabbedPane.TOP);
-		TabbedMainWindow.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-		contentPane.add(TabbedMainWindow, BorderLayout.CENTER);
-
-		FancyDisplayWindow1 displayWindow = new FancyDisplayWindow1(candidates);
-		TabbedMainWindow.addTab("Election Results", null, displayWindow, null);
-
-
-
-
-	}
-	
-
-	public ConcurrentHashMap<String, Candidate> getCandidates(){
-		return candidates;
 	}
 
 
