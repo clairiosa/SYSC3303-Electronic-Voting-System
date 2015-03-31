@@ -71,6 +71,7 @@ public class MasterServer {
 							electionDone = true;
 
 							comm.sendMessageClient("end");
+							comm.shutdown();
 							EventQueue.invokeLater(new Runnable() {
 								public void run() {
 									try {
