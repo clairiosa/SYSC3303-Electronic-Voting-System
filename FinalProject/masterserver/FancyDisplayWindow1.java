@@ -50,7 +50,7 @@ public class FancyDisplayWindow1 extends JPanel {
 					  "Dathonian Core Technologies is the independent, non-partisan agency responsible for conducting\n" +
 					  "federal elections and referendums in Canada.\n\n\n");
 		field.setBackground(null);
-		String path = "./election-year-2015.png";
+		String path = "FinalProject/election-year-2015.png";
         File file = new File(path);
         BufferedImage image=null;
         try {
