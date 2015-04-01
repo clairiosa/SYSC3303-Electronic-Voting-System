@@ -70,6 +70,7 @@ public class Booth extends Thread {
 	    			window.exit();
 	    			return;
 	    		}
+	    		
 				_msgs.put((String)msg);
 	    	}else{
 	    		System.out.println("unknown type");
