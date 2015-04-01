@@ -44,7 +44,7 @@ public class AutomatedTest {
 		//
 		Thread boothServer1 = new Thread() {
 			public void run() {
-				Booth.main(new String[] { "127.0.0.1", "2010", "2101" });
+				Booth.main(new String[] { "127.0.0.1", "d1", "2010", "2101" });
 				// Booth.main(new String[]{"127.0.0.1", "2010", "2101",
 				// "./src/FinalProject/test/voters.txt"});
 			}

@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import FinalProject.Ballot;
@@ -23,49 +24,69 @@ public class Booth extends Thread {
     private Voter voter;
 
     private InetAddress parentIP;
+    private String districtId;
     private int parentPort;
     private Object cmdInProgress;
     private boolean dummyData;
+    
+    private BlockingQueue<Candidate[]> _candidates;
+    private BlockingQueue<BoothElectionResults> _results;
+    private BlockingQueue<String> _msgs;
+    
+    private final BoothUI window; 
+    private boolean exit;
+    
 
-    public Booth(String parentServer, int port, int listenPort) throws UnknownHostException, IOException, InterruptedException{
+    public Booth(String parentServer, String districtId, int port, int listenPort) throws UnknownHostException, IOException, InterruptedException{
         parentIP = InetAddress.getByName(parentServer);
         parentPort = port;
         dummyData = false;
         cmdInProgress = new Object();
+        this.districtId = districtId;
+        exit = false;
 		
 		this.clientServer = new Comm(listenPort);
 		clientServer.connectToParent(parentIP, parentPort);
+		window = new BoothUI(this, districtId);
 		Thread.sleep(1000);
+    }
+    
+    public void recv(){
+    	Object msg = null;
+    	try {
+			msg = clientServer.getMessageBlocking(10, TimeUnit.MILLISECONDS);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+    	
+    	try {
+	    	if(msg instanceof Candidate[]){
+	    		_candidates.put((Candidate[])msg);
+	    	}else if(msg instanceof BoothElectionResults){
+	    		_results.put((BoothElectionResults)msg);
+	    	}else if(msg instanceof String){
+	    		if(((String)msg).equals("done")){
+	    			exit = true;
+	    			window.exit();
+	    			return;
+	    		}
+				_msgs.put((String)msg);
+	    	}else{
+	    		System.out.println("unknown type");
+	    	}
+    	} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
     }
 
     public void run(){
-        final BoothUI window = new BoothUI(this);
         window.start();
 
         (new Thread() {
             public void run() {
-            	String msg = null;
             	
                 while(true){
-                    synchronized(cmdInProgress){
-                        window.updateStats(getElectionStatus());
-                    }
-                    
-                    synchronized(cmdInProgress){
-                        try {
-							msg = (String)clientServer.getMessageBlocking(10, TimeUnit.MILLISECONDS);
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-                    }
-                    
-                    if(msg != null){
-                    	if(msg.equals("done")){
-                    		System.out.println("Exiting...");
-                    		System.exit(0);
-                    	}
-                    }
+                    window.updateStats(getElectionStatus());
 
                     try {
                         Thread.sleep(5000);
@@ -73,6 +94,9 @@ public class Booth extends Thread {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
+                    
+                    if(exit)
+                    	return;
                 }
             }}).start();
     }
@@ -97,15 +121,16 @@ public class Booth extends Thread {
                 e.printStackTrace();
                 return null;
             }
+            
+            recv();
 
-            Candidate[] res;
-            try {
-                res = (Candidate[]) this.clientServer.getMessageBlocking();
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                return null;
-            }
+            Candidate[] res = null;
+			try {
+				res = _candidates.take();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 
             return res;
         }
@@ -126,6 +151,7 @@ public class Booth extends Thread {
 
             return r;
         }else{
+        	BoothElectionResults res = null;
             try {
                 this.clientServer.sendMessageParent("status");
             } catch (IOException | InterruptedException e) {
@@ -133,16 +159,17 @@ public class Booth extends Thread {
                 e.printStackTrace();
                 return null;
             }
-
-            BoothElectionResults res;
+            
+            recv();
+            
             try {
-                res = (BoothElectionResults) this.clientServer.getMessageBlocking();
+                res = _results.take();
             } catch (InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
                 return null;
             }
-
+        	
             return res;
         }
     }
@@ -223,50 +250,49 @@ public class Booth extends Thread {
     public boolean register(Voter p){
         String s;
 
-        synchronized(cmdInProgress){
-            try {
-                this.clientServer.sendMessageParent(p);
-            } catch (IOException | InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                return false;
-            }
-
-
-            try {
-                s = (String) this.clientServer.getMessageBlocking();
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                return false;
-            }
-
-            this.voter = p;
+        try {
+            this.clientServer.sendMessageParent(p);
+        } catch (IOException | InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return false;
         }
 
+        recv();
+        
+        try {
+            s = _msgs.take();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return false;
+        }
+
+        this.voter = p;
+        
         return s.equals("true");
     }
 
     public boolean verify(String pin){
         Credential c = new Credential(voter.getName(), pin);
         String s;
+        
+        try {
+            this.clientServer.sendMessageParent(c);
+        } catch (IOException | InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return false;
+        }
+        
+        recv();
 
-        synchronized(cmdInProgress){
-            try {
-                this.clientServer.sendMessageParent(c);
-            } catch (IOException | InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                return false;
-            }
-
-            try {
-                s = (String) this.clientServer.getMessageBlocking();
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                return false;
-            }
+        try {
+            s = _msgs.take();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return false;
         }
         return s.equals("true");
     }
@@ -289,9 +315,10 @@ public class Booth extends Thread {
                 return false;
             }
 
+            recv();
 
             try {
-                s = (String) this.clientServer.getMessageBlocking();
+                s = _msgs.take();
             } catch (InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -305,14 +332,14 @@ public class Booth extends Thread {
 
     public static void main(String args[]) {
 
-        if(args.length != 3 && args.length != 4){
-            System.out.print("Booth serverIp serverPort listenPort [test file.txt]");
+        if(args.length != 4 && args.length != 5){
+            System.out.print("Booth serverIp districtId serverPort listenPort [test file.txt]");
             return;
         }
 
         Booth booth;
         try {
-            booth = new Booth(args[0], Integer.parseInt(args[1]), Integer.parseInt(args[2]));
+            booth = new Booth(args[0], args[1], Integer.parseInt(args[2]), Integer.parseInt(args[3]));
         }catch(NumberFormatException e){
             System.out.println("Invalid port number");
             return;
@@ -331,14 +358,14 @@ public class Booth extends Thread {
             return;
         }
 
-        if(args.length == 4){
+        if(args.length == 5){
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            booth.parse(args[3]);
+            booth.parse(args[4]);
         }else{
             booth.run();
         }
