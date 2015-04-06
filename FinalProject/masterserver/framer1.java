@@ -32,6 +32,7 @@ public class framer1 extends JFrame {
 	private static final long serialVersionUID = -3468702018359690051L;
 	private JPanel contentPane;
 	private static ConcurrentHashMap<String, Candidate> candidates;
+	private FancyDisplayWindow1 displayWindow;
 
 	
 
@@ -56,7 +57,7 @@ public class framer1 extends JFrame {
 		contentPane.add(TabbedMainWindow, BorderLayout.CENTER);
 
 		//add main tab to the GUI 
-		FancyDisplayWindow1 displayWindow = new FancyDisplayWindow1(candidates);
+		displayWindow = new FancyDisplayWindow1(candidates);
 		TabbedMainWindow.addTab("Election Results", null, displayWindow, null);
 
 	}
@@ -65,6 +66,11 @@ public class framer1 extends JFrame {
 	public ConcurrentHashMap<String, Candidate> getCandidates(){
 		return candidates;
 	}
+	
+	//get the candidates information 
+		public void setCandidates(ConcurrentHashMap<String, Candidate> cands){
+			displayWindow.setCandidates(cands);
+		}
 	
 	
 	

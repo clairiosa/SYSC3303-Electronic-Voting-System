@@ -44,8 +44,6 @@ public class ElectionResults extends Thread implements Serializable {
 
 	public void run() {
 		while (true) {
-			displayResults();
-
 			try {
 
 				comm.sendMessageClient(toBoothResults()); // send periodic

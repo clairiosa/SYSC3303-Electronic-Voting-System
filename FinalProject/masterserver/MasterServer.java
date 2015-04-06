@@ -16,9 +16,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 
+import FinalProject.CandidateReader;
+import FinalProject.VoterReader;
 import FinalProject.communication.Comm;
 import FinalProject.persons.Candidate;
 import FinalProject.persons.Voter;
@@ -29,7 +32,7 @@ import FinalProject.persons.Voter;
 
 public class MasterServer {
 	public static boolean electionDone = false;
-
+	public static int refreshRate;
 	public MasterServer() {
 
 	}
@@ -77,16 +80,16 @@ public class MasterServer {
 							comm.sendMessageClient("end");
 							comm.shutdown(); 
 							//launch the Graphical User Interface with the election results 
-							EventQueue.invokeLater(new Runnable() {
-								public void run() {
-									try {
-										framer1 frame = new framer1(lists.candidates);
-										frame.setVisible(true);
-									} catch (Exception e) {
-										e.printStackTrace();
-									}
-								}
-							});
+//							EventQueue.invokeLater(new Runnable() {
+//								public void run() {
+//									try {
+//										framer1 frame = new framer1(lists.candidates);
+//										frame.setVisible(true);
+//									} catch (Exception e) {
+//										e.printStackTrace();
+//									}
+//								}
+//							});
 							// System.exit(1);
 						}
 					} catch (Exception e) {
@@ -103,41 +106,33 @@ public class MasterServer {
 		//initialize all the election information in a MasterServerInformation object and send to all districts 
 		try {
 			//get Command Line information 
-			int refreshRate = Integer.valueOf(args[3]);
-			File votersFile = new File(args[1]);
-			File candidatesFile = new File(args[2]);
+			refreshRate = Integer.valueOf(args[3]);
+			String votersFile = new String(args[1]);
+			String candidatesFile = new String(args[2]);
 			
 			//get the voter information into a hashmap by reading a file containing the information of all the voters  
 			try {
-				FileInputStream fis1 = new FileInputStream(votersFile);
-				BufferedReader br1 = new BufferedReader(new InputStreamReader(fis1));
-				String line = null;
-				String voter = null;
-				int district;
-				while ((line = br1.readLine()) != null) {  //read the entire file 
-					district = Integer.valueOf(line);
-					voter = br1.readLine();
-					lists.addVoter(new Voter(voter, "", district + ""));
+				VoterReader vReader = new VoterReader(votersFile);
+				vReader.parse();
+				ArrayList<Voter> vList = vReader.voters;
+				for(Voter v:vList){
+					lists.addVoter(v);	
 				}
-				br1.close();
 			} catch (Exception e) {  //notify user there was an error reading the voter file 
 				System.out.println("Error reading voters file.");
 				e.printStackTrace();
 				System.exit(-1);
 			}
 
-			String candidate = null;
-			String party = null;
+
 			//get the candidate information into a hashmap by reading a file containing the information of all the candidates  
 			try {
-				FileInputStream fis2 = new FileInputStream(candidatesFile);
-				BufferedReader br2 = new BufferedReader(new InputStreamReader(fis2));
-				while ((party = br2.readLine()) != null) { //read the entire file 
-					candidate = br2.readLine();
-					lists.addCandidate(new Candidate(candidate, party));
+				CandidateReader cReader = new CandidateReader(candidatesFile);
+				cReader.parse();
+				ArrayList<Candidate> cList = cReader.candidates;
+				for(Candidate c:cList){
+					lists.addCandidate(c);	
 				}
-
-				br2.close();
 			} catch (Exception e) {  //notify user there was an error reading the candidate file 
 				System.out.println("Error reading Candidates file.");
 				e.printStackTrace();
@@ -163,6 +158,21 @@ public class MasterServer {
 			// periodically update displayed results and send preliminary
 			ElectionResults electionUpdateThread = new ElectionResults(candidates, refreshRate, comm);
 			electionUpdateThread.start();
+			
+			EventQueue.invokeLater(new Runnable() {
+				public void run() {
+					try {
+						framer1 frame = new framer1(lists.candidates);
+						frame.setVisible(true);
+						while(true){
+							Thread.sleep(refreshRate);
+							frame.setCandidates(lists.candidates);
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});
 
 			while (electionDone == false) { //sleep until the election is done 
 				Thread.sleep(1000);

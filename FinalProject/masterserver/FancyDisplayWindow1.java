@@ -109,6 +109,16 @@ public class FancyDisplayWindow1 extends JPanel {
 		add(barGraphButton, BorderLayout.WEST);
 		this.setVisible(true);
 	}
+	
+	//get the candidates information 
+	public ConcurrentHashMap<String, Candidate> getCandidates(){
+		return candidates;
+	}
+	
+	//get the candidates information 
+		public void setCandidates(ConcurrentHashMap<String, Candidate> cands){
+			candidates=cands;
+		}
 
 
 

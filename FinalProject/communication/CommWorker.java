@@ -22,6 +22,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Semaphore;
 
 class CommWorker implements Runnable{
+    //Constants
     long threadId;
     Connection connection;
     boolean waitingOnReply;
@@ -31,6 +32,7 @@ class CommWorker implements Runnable{
     DatagramSocket socket;
     int maxTimeouts;
     private Semaphore maximumConnections;
+    long lastSentPacketTime;
 
     BlockingQueue<CommTuple> receivedObjectQueue;
 
@@ -40,7 +42,7 @@ class CommWorker implements Runnable{
      * @param connection            Connection object associated with the worker thread.
      * @param socket                Socket to send messages out on.
      * @param receivedObjectQueue   Queue to put received messages on.
-     * @param maximumConnections
+     * @param maximumConnections    The maximum number of child connections possible.
      * @throws SocketException
      */
     public CommWorker(Connection connection, DatagramSocket socket, BlockingQueue<CommTuple> receivedObjectQueue, Semaphore maximumConnections) throws SocketException {
@@ -57,31 +59,33 @@ class CommWorker implements Runnable{
     }
 
 
-
-
+    /**
+     * Main loop for the worker thread.  Two main functions, process the received packets for this connection and
+     * send the packets intended for the other half of the connection.
+     */
     @Override
     public void run() {
 
         DatagramPacket outgoingPacket;
-        boolean cleanDisconnect = false;
         Object obj;
         long lastPacketReceivedChecksum = 0;
-
-        long lastSentPacketTime = 0;
+        boolean cleanDisconnect = false;
         waitingOnReply = false;
-
         lastPacketSentAck = false;
-
-
+        lastSentPacketTime = 0;
         int currentTimeouts = 0;
 
         while (true) {
 
-            // Receiving.
+            //                          //
+            // Handle received packets. //
+            //                          //
             DatagramPacket incomingPacket;
             try {
                 incomingPacket = connection.getIncomingNonBlocking();
                 if (incomingPacket == null) {
+
+                    //Timeout handling
                     if (timeoutOnLastPacket(lastSentPacketTime) && waitingOnReply) {
                         currentTimeouts++;
                         if (currentTimeouts == maxTimeouts) {
@@ -99,39 +103,19 @@ class CommWorker implements Runnable{
 
                 } else {
                     currentTimeouts = 0;
+
+                    // Checksum validating
                     if (Packets.validateChecksum(incomingPacket.getData(), incomingPacket.getLength())) {
                         obj = Packets.decodePacket(incomingPacket);
+
+                        // Duplicate packet checking.
                         if ((lastPacketReceivedChecksum == Packets.calculateChecksum(incomingPacket.getData(), incomingPacket.getLength())) && !(obj instanceof Ack)) { //Duplicate
                             sendAck(false);
                         } else { // Not duplicate.
-                            if (obj instanceof Ack) {
-                                if (waitingOnReply) {
-                                    waitingOnReply = false;
-                                    Ack receivedAck = (Ack) obj;
-                                    if (receivedAck.isRejectConnection()) {
-                                        synchronized(connection.waitAckSync) {
-                                            connection.setAckResultReady(true);
-                                            connection.setAckResult(CommError.ERROR_REJECT_CONNECTION);
-                                            connection.waitAckSync.notify();
-                                        }
-                                    } else if (receivedAck.isCorrupted()) {
-                                        lastSentPacketTime = sendPacket(lastPacketSent, !lastPacketSentAck);
-                                    } else {
-                                        synchronized(connection.waitAckSync) {
-                                            connection.setAckResultReady(true);
-                                            connection.setAckResult(0);
-                                            connection.waitAckSync.notify();
-                                        }
-                                    }
-                                }
-                            } else if (obj instanceof Connect) {
-                                sendAck(false);
-                            } else if (obj instanceof Disconnect) {
+
+                            if (!handleObject(obj)) {
                                 cleanDisconnect = true;
                                 break;
-                            } else {
-                                receivedObjectQueue.put(new CommTuple(obj, connection));
-                                sendAck(false);
                             }
 
                             lastPacketReceived = incomingPacket;
@@ -150,7 +134,9 @@ class CommWorker implements Runnable{
             }
 
 
-            // Sending
+            //                          //
+            // Handle sending packets.  //
+            //                          //
             try {
                 outgoingPacket = connection.getOutgoingNonBlocking();
                 if (outgoingPacket != null) {
@@ -159,6 +145,7 @@ class CommWorker implements Runnable{
                     lastPacketSent = outgoingPacket;
                 }
 
+                // To prevent using all available CPU cycles.
                 if (outgoingPacket == null && incomingPacket == null) {
                     Thread.sleep(5);
                 }
@@ -168,15 +155,13 @@ class CommWorker implements Runnable{
                 }
 
             } catch (IOException e) {
-                //
                 break;
             } catch (InterruptedException e) {
-                //
                 break;
             }
-
         }
 
+        // Exiting.
         maximumConnections.release();
         if (!cleanDisconnect) {
             try {
@@ -185,6 +170,48 @@ class CommWorker implements Runnable{
                 e.printStackTrace();
             }
         }
+    }
+
+
+    /**
+     * Does different actions depending on the object received.  Basically a function to hide away the ugly
+     * instanceof if tree.
+     *
+     * @param obj           The object to inspect.
+     * @return              False if disconnecting.
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    private boolean handleObject(Object obj) throws IOException, InterruptedException {
+        if (obj instanceof Ack) {
+            if (waitingOnReply) {
+                waitingOnReply = false;
+                Ack receivedAck = (Ack) obj;
+                if (receivedAck.isRejectConnection()) {
+                    synchronized(connection.waitAckSync) {
+                        connection.setAckResultReady(true);
+                        connection.setAckResult(CommError.ERROR_REJECT_CONNECTION);
+                        connection.waitAckSync.notify();
+                    }
+                } else if (receivedAck.isCorrupted()) {
+                    lastSentPacketTime = sendPacket(lastPacketSent, !lastPacketSentAck);
+                } else {
+                    synchronized(connection.waitAckSync) {
+                        connection.setAckResultReady(true);
+                        connection.setAckResult(0);
+                        connection.waitAckSync.notify();
+                    }
+                }
+            }
+        } else if (obj instanceof Connect) {
+            sendAck(false);
+        } else if (obj instanceof Disconnect) {
+            return false;
+        } else {
+            receivedObjectQueue.put(new CommTuple(obj, connection));
+            sendAck(false);
+        }
+        return true;
     }
 
 
