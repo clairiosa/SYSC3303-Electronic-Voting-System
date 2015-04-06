@@ -212,6 +212,9 @@ class BoothUI extends JPanel implements ActionListener{
 
     public void showRegister(){
         lblRegisterStatus.setText("");
+        txtFirstName.setText("");
+        txtLastName.setText("");
+
         CardLayout layout = (CardLayout)(this.getLayout());
         layout.show(this, "register");
     }

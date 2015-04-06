@@ -91,7 +91,6 @@ public class Booth extends Thread {
 
         (new Thread() {
             public void run() {
-            	
                 while(true){
                     window.updateStats(getElectionStatus());
 
