@@ -1,6 +1,6 @@
 package FinalProject.test;
 
-import FinalProject.CandidateReader;
+import FinalProject.filereaders.CandidateReader;
 import FinalProject.test.BoothTestBench;
 import FinalProject.persons.Voter;
 

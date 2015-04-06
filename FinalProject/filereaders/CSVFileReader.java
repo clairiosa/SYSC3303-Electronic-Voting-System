@@ -1,7 +1,8 @@
-package FinalProject;
+package FinalProject.filereaders;
 
 /**
  * Created by natebosscher on 15-04-06.
+ *
  */
 public class CSVFileReader {
     protected String filename;

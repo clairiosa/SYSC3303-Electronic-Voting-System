@@ -17,8 +17,8 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
 
-import FinalProject.BoothElectionResult;
-import FinalProject.BoothElectionResults;
+import FinalProject.resultdata.ResultItem;
+import FinalProject.resultdata.BoothElectionResults;
 import FinalProject.communication.Comm;
 import FinalProject.persons.Candidate;
 
@@ -65,7 +65,7 @@ public class ElectionResults extends Thread implements Serializable {
 	
 	//convert an ElectionResults object to a BoothelectionResults object 
 	public BoothElectionResults toBoothResults() {
-		BoothElectionResult[] ber = new BoothElectionResult[candidates.size()];
+		ResultItem[] ber = new ResultItem[candidates.size()];
 		Date d = new Date();
 		int vCount = 0;
 
@@ -74,7 +74,7 @@ public class ElectionResults extends Thread implements Serializable {
 		while (it.hasMoreElements()) {
 			Candidate c = (Candidate) it.nextElement();
 			vCount += c.getVoteCount();
-			ber[i] = new BoothElectionResult(c, c.getVoteCount());
+			ber[i] = new ResultItem(c, c.getVoteCount());
 			i++;
 		}
 

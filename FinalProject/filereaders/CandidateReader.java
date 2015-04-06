@@ -1,6 +1,7 @@
-package FinalProject;
+package FinalProject.filereaders;
 
-import FinalProject.persons.Voter;
+import FinalProject.filereaders.CSVFileReader;
+import FinalProject.persons.Candidate;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -10,12 +11,13 @@ import java.util.ArrayList;
 /**
  * Created by natebosscher on 15-04-06.
  */
-public class VoterReader extends CSVFileReader {
-    public ArrayList<Voter> voters;
+public class CandidateReader extends CSVFileReader {
 
-    public VoterReader(String filename) {
+    public ArrayList<Candidate> candidates;
+
+    public CandidateReader(String filename){
         super(filename);
-        voters = new ArrayList<>();
+        candidates = new ArrayList<>();
     }
 
     public void parse(){
@@ -24,33 +26,24 @@ public class VoterReader extends CSVFileReader {
 
             // Construct BufferedReader from InputStreamReader
             BufferedReader br1 = new BufferedReader(new InputStreamReader(fis1));
-            Voter v = null;
+            Candidate c = null;
             String[] cols;
-            String name, address, postal, city, province, district, pin;
-            String line;
+            String line, name, party;
             int i = 0;
 
             while ((line = br1.readLine()) != null) {
                 if(!line.substring(0,1).equals("#")) {
                     cols = line.split(",");
-
-                    if(cols.length == 7) {
+                    if(cols.length == 2){
                         name = clean(cols[0]);
-                        address = clean(cols[1]);
-                        postal = clean(cols[2]);
-                        city = clean(cols[3]);
-                        province = clean(cols[4]);
-                        district = clean(cols[5]);
-                        pin = clean(cols[6]);
+                        party = clean(cols[1]);
 
-                        v = new Voter(name, address, postal, city, province, district, null, pin, null, null, false, false);
-
-                        voters.add(v);
+                        c = new Candidate(name, party);
+                        candidates.add(c);
                     }else{
                         System.out.println("Format error on line " + i);
                     }
                 }
-
                 i++;
             }
 

@@ -60,7 +60,7 @@ public class FancyDisplayWindow1 extends JPanel {
 					  "federal elections and referendums in Canada.\n\n\n");
 		field.setBackground(null);
 		//get GUI backgroup photo 
-		String path = "FinalProject/election-year-2015.png";
+		String path = "FinalProject/images/election-year-2015.png";
         File file = new File(path);
         BufferedImage image=null;
         try {

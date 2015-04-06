@@ -13,10 +13,10 @@ import java.net.InetAddress;
 import java.util.Date;
 import java.util.Enumeration;
 
-import FinalProject.Ballot;
-import FinalProject.BoothElectionResult;
-import FinalProject.BoothElectionResults;
-import FinalProject.Credential;
+import FinalProject.electionobjects.Ballot;
+import FinalProject.resultdata.ResultItem;
+import FinalProject.resultdata.BoothElectionResults;
+import FinalProject.electionobjects.Credential;
 import FinalProject.communication.Comm;
 import FinalProject.masterserver.MasterServerInformation;
 import FinalProject.persons.Candidate;
@@ -136,12 +136,12 @@ public class DistrictServer implements Runnable {
 			i++;
 		}
 		//
-		BoothElectionResult[] r = new BoothElectionResult[i];
+		ResultItem[] r = new ResultItem[i];
 
 		c = masterServerInfo.getCandidates().elements();
 		i = 0;
 		while (c.hasMoreElements()) {
-			r[i++] = new BoothElectionResult(c.nextElement(), 0);
+			r[i++] = new ResultItem(c.nextElement(), 0);
 
 		}
 		//

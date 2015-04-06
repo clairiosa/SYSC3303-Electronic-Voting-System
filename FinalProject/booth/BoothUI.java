@@ -6,7 +6,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
-import FinalProject.BoothElectionResults;
+import FinalProject.resultdata.BoothElectionResults;
 import FinalProject.persons.Candidate;
 import FinalProject.persons.Voter;
 

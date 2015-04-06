@@ -12,10 +12,10 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import FinalProject.Ballot;
-import FinalProject.BoothElectionResult;
-import FinalProject.BoothElectionResults;
-import FinalProject.Credential;
+import FinalProject.electionobjects.Ballot;
+import FinalProject.resultdata.ResultItem;
+import FinalProject.resultdata.BoothElectionResults;
+import FinalProject.electionobjects.Credential;
 import FinalProject.communication.Comm;
 import FinalProject.persons.Candidate;
 import FinalProject.persons.Voter;
@@ -155,13 +155,13 @@ public class Booth extends Thread {
     public BoothElectionResults getElectionStatus(){
 
         if(dummyData){
-            BoothElectionResult[] rs = new BoothElectionResult[2];
+            ResultItem[] rs = new ResultItem[2];
 
             Candidate c1 = new Candidate("Bob", "Liberal");
             Candidate c2 = new Candidate("Fred", "Conservative");
 
-            rs[0] = new BoothElectionResult(c1, 2);
-            rs[1] = new BoothElectionResult(c2, 1);
+            rs[0] = new ResultItem(c1, 2);
+            rs[1] = new ResultItem(c2, 1);
 
             BoothElectionResults r = new BoothElectionResults(rs,3);
 

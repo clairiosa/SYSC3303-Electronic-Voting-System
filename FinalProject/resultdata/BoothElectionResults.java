@@ -1,4 +1,4 @@
-package FinalProject;
+package FinalProject.resultdata;
 
 import java.util.Date;
 
@@ -8,11 +8,11 @@ public class BoothElectionResults implements java.io.Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public BoothElectionResult[] results;
+	public ResultItem[] results;
 	public int totalVotes;
 	public Date generated;
 
-	public BoothElectionResults(BoothElectionResult[] results, int totalVotes) {
+	public BoothElectionResults(ResultItem[] results, int totalVotes) {
 		this.results = results;
 		this.totalVotes = totalVotes;
 		this.generated = new Date();
