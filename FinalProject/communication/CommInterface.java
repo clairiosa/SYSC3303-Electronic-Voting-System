@@ -33,7 +33,7 @@ interface CommInterface {
      * @throws IOException
      * @throws InterruptedException
      */
-    public int connectToParent(InetAddress parentServer, int port) throws IOException, InterruptedException;
+    int connectToParent(InetAddress parentServer, int port) throws IOException, InterruptedException;
 
 
     /**
@@ -41,7 +41,7 @@ interface CommInterface {
      *
      * @throws InterruptedException
      */
-    public void shutdown() throws InterruptedException;
+    void shutdown() throws InterruptedException;
 
 
     /**
@@ -51,7 +51,7 @@ interface CommInterface {
      * @throws IOException
      * @throws InterruptedException
      */
-    public int sendMessageClient(Object obj) throws IOException, InterruptedException;
+    int sendMessageClient(Object obj) throws IOException, InterruptedException;
 
 
     /**
@@ -61,7 +61,7 @@ interface CommInterface {
      * @throws IOException
      * @throws InterruptedException
      */
-    public int sendMessageParent(Object obj) throws IOException, InterruptedException;
+    int sendMessageParent(Object obj) throws IOException, InterruptedException;
 
 
     /**
@@ -71,7 +71,7 @@ interface CommInterface {
      * @throws IOException
      * @throws InterruptedException
      */
-    public int sendMessageBroadcast(Object obj) throws IOException, InterruptedException;
+    int sendMessageBroadcast(Object obj) throws IOException, InterruptedException;
 
 
     /**
@@ -81,7 +81,7 @@ interface CommInterface {
      * @throws IOException
      * @throws InterruptedException
      */
-    public int sendMessageReply(Object obj) throws IOException, InterruptedException;
+    int sendMessageReply(Object obj) throws IOException, InterruptedException;
 
 
     /**
@@ -91,7 +91,7 @@ interface CommInterface {
      *
      * @return      The first object in the queue.
      */
-    public Object getMessageNonBlocking();
+    Object getMessageNonBlocking();
 
 
     /**
@@ -102,7 +102,7 @@ interface CommInterface {
      * @return      The first object in the queue.
      * @throws InterruptedException
      */
-    public Object getMessageBlocking() throws InterruptedException;
+    Object getMessageBlocking() throws InterruptedException;
 
 
     /**
@@ -115,6 +115,6 @@ interface CommInterface {
      * @return                  The first object in the queue.
      * @throws InterruptedException
      */
-    public Object getMessageBlocking(long timeDuration, TimeUnit timeUnit) throws InterruptedException;
+    Object getMessageBlocking(long timeDuration, TimeUnit timeUnit) throws InterruptedException;
 }
 
