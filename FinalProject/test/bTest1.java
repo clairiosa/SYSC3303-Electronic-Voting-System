@@ -2,7 +2,7 @@ package FinalProject.test;
 
 import FinalProject.CandidateReader;
 import FinalProject.VoterReader;
-import FinalProject.booth.BoothTestBench;
+import FinalProject.test.BoothTestBench;
 import FinalProject.persons.Voter;
 
 import java.util.LinkedList;
@@ -47,5 +47,12 @@ public class bTest1 extends BoothTestBench {
         assert !b3.register(v);
 
         return true;
+    }
+
+    public void destroy(){
+        b1.shutdown();
+        b2.shutdown();
+        b3.shutdown();
+        b4.shutdown();
     }
 }

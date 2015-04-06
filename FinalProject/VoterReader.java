@@ -31,7 +31,7 @@ public class VoterReader extends CSVFileReader {
             int i = 0;
 
             while ((line = br1.readLine()) != null) {
-                if(line.substring(0,1) != "#") {
+                if(!line.substring(0,1).equals("#")) {
                     cols = line.split(",");
 
                     if(cols.length == 7) {
