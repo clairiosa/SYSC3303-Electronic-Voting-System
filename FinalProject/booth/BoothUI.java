@@ -313,6 +313,7 @@ class BoothUI extends JPanel implements ActionListener{
     }
 
 	public void exit() {
-		frame.dispose();
+        if(frame != null)
+		    frame.dispose();
 	}
 }

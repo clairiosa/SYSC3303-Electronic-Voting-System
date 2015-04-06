@@ -19,12 +19,6 @@ public class bTest1 extends BoothTestBench {
         loadVoters();
         CandidateReader dr = new CandidateReader("FinalProject/test/candidates.txt");
 
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
         Voter v;
 
         v = vd1.pop();
@@ -56,10 +50,9 @@ public class bTest1 extends BoothTestBench {
     }
 
     public void destroy(){
-//
-//        b1.shutdown();
-//        b2.shutdown();
-//        b3.shutdown();
-//        b4.shutdown();
+        b1.shutdown();
+        b2.shutdown();
+        b3.shutdown();
+        b4.shutdown();
     }
 }
