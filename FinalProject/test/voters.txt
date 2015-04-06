@@ -1,66 +1,34 @@
-1
-Malcolm Helton
-1
-Cami Villanueva
-1
-Ngan Kafka
-1
-Desirae Levingston
-1
-Josette Loney
-1
-Stephenie Lauderdale
-1
-Alphonse Alberico
-1
-Eugenio Sarkis
-1
-Malisa Lineberger
-1
-Tamiko Steuck
-2
-Sofia Peach
-1
-Toi Duarte
-1
-Tanner Mcgrane
-1
-Keisha Lorraine
-1
-Remona Balmer
-1
-Latoria Masiello
-1
-Cathey Mirza
-1
-Charlesetta Fenlon
-1
-Kimiko Gaston
-1
-Jenniffer Harper
-1
-Charlette Boehmer
-1
-Natividad Kreutzer
-1
-Stanley Morgado
-1
-Odette Ribera
-1
-Margert Santore
-1
-Jackson Ducote
-1
-Hershel Striegel
-1
-Julia Neuhaus
-1
-Jamika Roser
-1
-Nakisha Hamner
-1
-Werner Niel
-1
-Jalisa Passman
-1
-Ellena Jeanbaptiste
+# name, address, postal, city, province, district, pin
+"Malcolm Helton", "", "", "", "", 1, 2570
+"Cami Villanueva", "", "", "", "", 1, 8668
+"Ngan Kafka", "", "", "", "", 1, 3522
+"Desirae Levingston", "", "", "", "", 1, 2458
+"Josette Loney", "", "", "", "", 1, 2390
+"Stephenie Lauderdale", "", "", "", "", 1, 3302
+"Alphonse Alberico", "", "", "", "", 1, 5053
+"Eugenio Sarkis", "", "", "", "", 1, 9337
+"Malisa Lineberger", "", "", "", "", 1, 9598
+"Tamiko Steuck", "", "", "", "", 1, 7020
+"Sofia Peach", "", "", "", "", 2, 3309
+"Toi Duarte", "", "", "", "", 1, 9724
+"Tanner Mcgrane", "", "", "", "", 1, 5953
+"Keisha Lorraine", "", "", "", "", 1, 3957
+"Remona Balmer", "", "", "", "", 1, 4894
+"Latoria Masiello", "", "", "", "", 1, 6088
+"Cathey Mirza", "", "", "", "", 1, 3229
+"Charlesetta Fenlon", "", "", "", "", 1, 5018
+"Kimiko Gaston", "", "", "", "", 1, 5679
+"Jenniffer Harper", "", "", "", "", 1, 2302
+"Charlette Boehmer", "", "", "", "", 1, 1163
+"Natividad Kreutzer", "", "", "", "", 1, 8069
+"Stanley Morgado", "", "", "", "", 1, 5604
+"Odette Ribera", "", "", "", "", 1, 1676
+"Margert Santore", "", "", "", "", 1, 3123
+"Jackson Ducote", "", "", "", "", 1, 1294
+"Hershel Striegel", "", "", "", "", 1, 7626
+"Julia Neuhaus", "", "", "", "", 1, 3292
+"Jamika Roser", "", "", "", "", 1, 5008
+"Nakisha Hamner", "", "", "", "", 1, 3898
+"Werner Niel", "", "", "", "", 1, 4333
+"Jalisa Passman", "", "", "", "", 1, 1052
+"Ellena Jeanbaptiste", "", "", "", "", 1, 3420
