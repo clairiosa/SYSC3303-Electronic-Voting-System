@@ -29,6 +29,7 @@ public class VoterReader extends CSVFileReader {
             String name, address, postal, city, province, district, pin;
             String line;
             int i = 0;
+
             while ((line = br1.readLine()) != null) {
                 if(line.substring(0,1) != "#") {
                     cols = line.split(",");
