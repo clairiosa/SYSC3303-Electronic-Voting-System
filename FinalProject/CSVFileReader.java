@@ -12,7 +12,7 @@ public class CSVFileReader {
 
     public String clean(String str){
         String s = str.trim();
-        return s.replaceAll("/(^\"|\"$)/", "");
+        return s.replaceAll("^\"", "").replaceAll("\"$", "");
     }
 
     public void parse(){}

@@ -158,16 +158,17 @@ public class MasterServer {
 			// periodically update displayed results and send preliminary
 			ElectionResults electionUpdateThread = new ElectionResults(candidates, refreshRate, comm);
 			electionUpdateThread.start();
-			
+
+
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
 					try {
 						framer1 frame = new framer1(lists.candidates);
 						frame.setVisible(true);
-						while(true){
+//						while(true){
 							Thread.sleep(refreshRate);
 							frame.setCandidates(lists.candidates);
-						}
+//						}
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
@@ -177,6 +178,7 @@ public class MasterServer {
 			while (electionDone == false) { //sleep until the election is done 
 				Thread.sleep(1000);
 			}
+
 			electionUpdateThread.outputResults();  //write election results to a file 
 			electionUpdateThread.setElectionDone(true);  //notify thread the election is done 
 			receiveThread.setElectionDone(true); //notify thread the election is done 

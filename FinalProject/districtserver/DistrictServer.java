@@ -176,7 +176,7 @@ public class DistrictServer implements Runnable {
 				// or
 				// master server
 				Object recievedMessage = districtComm.getMessageBlocking();
-				System.out.println(recievedMessage);
+//				System.out.println(recievedMessage);
 				// from master server:
 				// Receive MasterServerInformation containing all candidate and
 				// voters
@@ -256,7 +256,7 @@ public class DistrictServer implements Runnable {
 
 						electionResults.totalVotes++;
 						electionResults.generated = new Date();
-						System.out.println("" + electionResults.toString());
+//						System.out.println("" + electionResults.toString());
 
 						districtComm.sendMessageReply("true");
 						System.out.println("District Server "

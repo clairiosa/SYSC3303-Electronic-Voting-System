@@ -1,6 +1,7 @@
-package FinalProject.booth;
+package FinalProject.test;
 
 import FinalProject.VoterReader;
+import FinalProject.booth.Booth;
 import FinalProject.districtserver.DistrictServer;
 import FinalProject.masterserver.MasterServer;
 import FinalProject.persons.Voter;
@@ -46,32 +47,44 @@ public class BoothTestBench {
 
         m.start();
 
-        System.out.println("Master started");
-
-        d0.start();
-        d1.start();
-        d2.start();
-
-        System.out.println("Districts started");
-
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            b1 = new Booth("127.0.0.1", "d1", Integer.parseInt("2011"), Integer.parseInt("2101"));
-            b2 = new Booth("127.0.0.1", "d2", Integer.parseInt("2012"), Integer.parseInt("2102"));
-            b3 = new Booth("127.0.0.1", "d3", Integer.parseInt("2013"), Integer.parseInt("2203"));
-            b4 = new Booth("127.0.0.1", "d3", Integer.parseInt("2013"), Integer.parseInt("2204"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        System.out.println("Booths started");
+//        System.out.println("Master started");
+//
+//        try {
+//            Thread.sleep(1000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//
+//        d0.start();
+//        d1.start();
+//        d2.start();
+//
+//        System.out.println("Districts started");
+//
+//        try {
+//            Thread.sleep(2000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//
+//        try {
+//            b1 = new Booth("127.0.0.1", "d1", Integer.parseInt("2011"), Integer.parseInt("2101"));
+//            b2 = new Booth("127.0.0.1", "d2", Integer.parseInt("2012"), Integer.parseInt("2102"));
+//            b3 = new Booth("127.0.0.1", "d3", Integer.parseInt("2013"), Integer.parseInt("2203"));
+//            b4 = new Booth("127.0.0.1", "d3", Integer.parseInt("2013"), Integer.parseInt("2204"));
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//
+//        try {
+//            Thread.sleep(3000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//
+//        System.out.println("Booths started");
     }
 
     protected void loadVoters(){

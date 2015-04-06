@@ -53,7 +53,17 @@ public class Booth extends Thread {
 		this.clientServer = new Comm(listenPort);
 		clientServer.connectToParent(parentIP, parentPort);
 		window = new BoothUI(this, districtId);
-		Thread.sleep(1000);
+		Thread.sleep(5000);
+    }
+
+    public void shutdown(){
+        try {
+            clientServer.shutdown();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        window.exit();
     }
     
     public void recv(){
@@ -73,8 +83,8 @@ public class Booth extends Thread {
 	    		_results.put((BoothElectionResults)msg);
 	    	}else if(msg instanceof String){
 	    		if(((String)msg).equals("done")){
-	    			exit = true;
-	    			window.exit();
+                    exit = true;
+                    shutdown();
 	    			return;
 	    		}
 				_msgs.put((String)msg);
