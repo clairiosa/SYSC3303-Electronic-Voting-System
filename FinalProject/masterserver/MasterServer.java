@@ -39,6 +39,17 @@ public class MasterServer {
 
 	static Comm comm;
 
+	public static void shutdown() throws IOException, InterruptedException {
+		//send message to districts notifying them the election is done
+		MasterServer.comm.sendMessageClient("end");
+		MasterServer.comm.shutdown();
+	}
+
+	public static void reset(){
+		electionDone = false;
+		comm = null;
+	}
+
 	public static void main(String args[]) {
 
 		System.out.println("MasterServer Started\n");
@@ -76,9 +87,7 @@ public class MasterServer {
 						s = scanner.nextLine();
 						if (s.trim().equalsIgnoreCase("done")) {
 							electionDone = true;
-							//send message to districts notifying them the election is done 
-							comm.sendMessageClient("end");
-							comm.shutdown(); 
+							shutdown();
 							//launch the Graphical User Interface with the election results 
 //							EventQueue.invokeLater(new Runnable() {
 //								public void run() {

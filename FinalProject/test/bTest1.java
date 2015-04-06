@@ -2,9 +2,12 @@ package FinalProject.test;
 
 import FinalProject.CandidateReader;
 import FinalProject.VoterReader;
+import FinalProject.masterserver.MasterServer;
 import FinalProject.test.BoothTestBench;
 import FinalProject.persons.Voter;
 
+import java.io.ByteArrayInputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.LinkedList;
 
 /**
@@ -15,7 +18,23 @@ public class bTest1 extends BoothTestBench {
         Test voter registration
      */
 
-    public boolean test(){
+    public static void main(String[] args){
+        bTest1 b1 = new bTest1();
+        System.out.println("Test 1 Instantiated");
+        assert b1.test();
+
+        try {
+            System.setIn(new ByteArrayInputStream("done".getBytes("UTF-8")));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        b1.destroy();
+
+        System.out.println("TEST 1 COMPLETE");
+    }
+
+    public boolean test() {
         loadVoters();
         CandidateReader dr = new CandidateReader("FinalProject/test/candidates.txt");
 
@@ -47,12 +66,5 @@ public class bTest1 extends BoothTestBench {
         assert !b3.register(v);
 
         return true;
-    }
-
-    public void destroy(){
-        b1.shutdown();
-        b2.shutdown();
-        b3.shutdown();
-        b4.shutdown();
     }
 }

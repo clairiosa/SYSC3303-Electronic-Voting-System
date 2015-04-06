@@ -172,6 +172,9 @@ public class DistrictServer implements Runnable {
 		boolean continues = true;
 		while (continues) {
 			try {
+				if(Thread.interrupted() || districtComm == null)
+					return;
+
 				// listen for incoming messages. messages can come from booths
 				// or
 				// master server

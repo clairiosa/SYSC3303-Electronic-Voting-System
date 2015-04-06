@@ -1,35 +1,58 @@
 package FinalProject.test;
 
+import FinalProject.masterserver.MasterServer;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+
 /**
  * Created by natebosscher on 15-04-06.
  */
 public class BoothTest {
+    public static void reset(){
+        try {
+            MasterServer.shutdown();
+            MasterServer.reset();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void main(String args[]) {
-        System.out.println("Booth Test Starting...");
 
-        bTest1 b1 = new bTest1();
-        System.out.println("Test 1 Instantiated");
-        assert b1.test();
-        b1.destroy();
+        Thread t = (new Thread() {
+            public void run() {
+                bTest1.main(null);
+            }
+        });
 
-        System.out.println("TEST 1 COMPLETE");
+        t.start();
 
         try {
-            Thread.sleep(2000);
+            Thread.sleep(10000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
-        bTest2 b2 = new bTest2();
-        assert b2.test();
-        b2.destroy();
+        t.interrupt();
 
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        t = (new Thread() {
+            public void run() {
+                bTest2.main(null);
+            }
+        });
 
-        System.out.println("TEST 2 COMPLETE");
+        t.start();
+        t.interrupt();
+
     }
 }

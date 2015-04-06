@@ -11,6 +11,12 @@ public class bTest2 extends BoothTestBench {
     /*
         Test voter verification
      */
+    public static void main(String[] args){
+        bTest2 b2 = new bTest2();
+        assert b2.test();
+
+        System.out.println("TEST 2 COMPLETE");
+    }
 
     public boolean test(){
         loadVoters();
@@ -52,12 +58,5 @@ public class bTest2 extends BoothTestBench {
         assert !b1.verify(v.getPin() + "1");
 
         return true;
-    }
-
-    public void destroy(){
-        b1.shutdown();
-        b2.shutdown();
-        b3.shutdown();
-        b4.shutdown();
     }
 }
