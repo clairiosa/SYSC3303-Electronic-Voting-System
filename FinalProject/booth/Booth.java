@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -44,7 +45,11 @@ public class Booth extends Thread {
         cmdInProgress = new Object();
         this.districtId = districtId;
         exit = false;
-		
+
+        _candidates = new ArrayBlockingQueue<Candidate[]>(10);
+        _results = new ArrayBlockingQueue<BoothElectionResults>(10);
+        _msgs = new ArrayBlockingQueue<String>(10);
+
 		this.clientServer = new Comm(listenPort);
 		clientServer.connectToParent(parentIP, parentPort);
 		window = new BoothUI(this, districtId);
@@ -53,11 +58,13 @@ public class Booth extends Thread {
     
     public void recv(){
     	Object msg = null;
-    	try {
-			msg = clientServer.getMessageBlocking(10, TimeUnit.MILLISECONDS);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+        while(msg == null) {
+            try {
+                msg = clientServer.getMessageBlocking(10, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     	
     	try {
 	    	if(msg instanceof Candidate[]){
@@ -70,7 +77,6 @@ public class Booth extends Thread {
 	    			window.exit();
 	    			return;
 	    		}
-	    		
 				_msgs.put((String)msg);
 	    	}else{
 	    		System.out.println("unknown type");

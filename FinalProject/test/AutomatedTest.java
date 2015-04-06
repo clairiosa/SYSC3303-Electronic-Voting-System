@@ -22,8 +22,8 @@ public class AutomatedTest {
 
 		Thread masterServer = new Thread() {
 			public void run() {
-				MasterServer.main(new String[] { "2000", "voters.txt",
-						"candidates.txt", "5000" });
+				MasterServer.main(new String[] { "2000", "FinalProject/test/voters.txt",
+						"FinalProject/test/candidates.txt", "5000" });
 			}
 		};
 
