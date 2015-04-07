@@ -37,6 +37,7 @@ public class MasterServer {
 
 	public static void shutdown() throws IOException, InterruptedException {
 		//send message to districts notifying them the election is done
+		electionDone=true;
 		MasterServer.comm.sendMessageClient("end");
 		MasterServer.comm.shutdown();
 	}
@@ -199,9 +200,6 @@ public class MasterServer {
 				e.printStackTrace();
 			}
 		}
-	}
-	public void shutdown(){
-		electionDone=true;
 	}
 
 }
