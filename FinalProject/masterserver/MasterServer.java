@@ -200,5 +200,8 @@ public class MasterServer {
 			}
 		}
 	}
+	public void shutdown(){
+		electionDone=true;
+	}
 
 }
