@@ -16,6 +16,7 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.imageio.ImageIO;
@@ -147,7 +148,7 @@ public class FancyDisplayWindow1 extends JPanel {
 		}
 		
 	public void updateResults(){
-		String s=new String("      2015 Election Results\n"); 
+		String s=new String("2015 Election Results\n");
 		Enumeration<Candidate> it1 = candidates.elements();
      	while(it1.hasMoreElements()) {  //look through the candidates and create dataset 
      		Candidate c = (Candidate) it1.nextElement();

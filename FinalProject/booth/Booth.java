@@ -58,7 +58,7 @@ public class Booth extends Thread {
     }
 
     public void shutdown(){
-        System.out.println("client shutdown");
+        System.out.println("client shutdown" + this);
 
         try {
             clientServer.shutdown();
@@ -66,8 +66,14 @@ public class Booth extends Thread {
             e.printStackTrace();
         }
 
+        try {
+            window.exit();
+        }catch(Exception e){
+            System.out.println("window exit error");
+        }
+
         statusUpdateThread.interrupt();
-        window.exit();
+
     }
     
     public void recv(){
@@ -86,11 +92,14 @@ public class Booth extends Thread {
 	    	}else if(msg instanceof BoothElectionResults){
 	    		_results.put((BoothElectionResults)msg);
 	    	}else if(msg instanceof String){
+
 	    		if(((String)msg).equals("end")){
+                    System.out.println("CLIENT SHUTDOWN");
                     exit = true;
                     shutdown();
 	    			return;
 	    		}
+
 				_msgs.put((String)msg);
 	    	}else{
 	    		System.out.println("unknown type");
@@ -109,9 +118,10 @@ public class Booth extends Thread {
                     window.updateStats(getElectionStatus());
 
                     try {
-                        Thread.sleep(5000);
+                        Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         // TODO Auto-generated catch block
+                        System.out.println("INTERRUPTED");
                         e.printStackTrace();
                     }
 
@@ -122,7 +132,6 @@ public class Booth extends Thread {
         };
 
         statusUpdateThread.start();
-
     }
 
 
@@ -180,6 +189,7 @@ public class Booth extends Thread {
                 this.clientServer.sendMessageParent("status");
             } catch (IOException | InterruptedException e) {
                 // TODO Auto-generated catch block
+                System.out.println("INTERRUPTED");
                 e.printStackTrace();
                 return null;
             }
@@ -189,8 +199,9 @@ public class Booth extends Thread {
             try {
                 res = _results.take();
             } catch (InterruptedException e) {
+                System.out.println("INTERRUPTED");
                 // TODO Auto-generated catch block
-                e.printStackTrace();
+
                 return null;
             }
         	

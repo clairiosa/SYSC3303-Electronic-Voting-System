@@ -170,6 +170,9 @@ public class DistrictServer implements Runnable {
 
 		System.out.println("District Server " + uniqueDistrictId + ": " + "closed");
 		districtComm.sendMessageClient("end");
+
+		Thread.sleep(5000);
+
 		districtComm.shutdown();
 		down = true;
 	}
