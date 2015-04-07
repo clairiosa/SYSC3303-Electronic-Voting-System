@@ -43,22 +43,22 @@ public class ManualTest {
 
         Thread boothServer1 = new Thread() {
             public void run() {
-                Booth.main(new String[] { "127.0.0.1", "2011", "2101" });
+                Booth.main(new String[] { "127.0.0.1", "1", "2011", "2101" });
             }
         };
         Thread boothServer2 = new Thread() {
             public void run() {
-                Booth.main(new String[] { "127.0.0.1", "2011", "2102" });
+                Booth.main(new String[] { "127.0.0.1", "1", "2011", "2102" });
             }
         };
         Thread boothServer3 = new Thread() {
             public void run() {
-                Booth.main(new String[] { "127.0.0.1", "2012", "2103" });
+                Booth.main(new String[] { "127.0.0.1", "2", "2012", "2103" });
             }
         };
         Thread boothServer4 = new Thread() {
             public void run() {
-                Booth.main(new String[] { "127.0.0.1", "2013", "2104" });
+                Booth.main(new String[] { "127.0.0.1", "2q", "2013", "2104" });
             }
         };
 

@@ -4,19 +4,15 @@
 
 package FinalProject.districtserver;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.InetAddress;
 import java.util.Date;
 import java.util.Enumeration;
 
-import FinalProject.Ballot;
-import FinalProject.BoothElectionResult;
-import FinalProject.BoothElectionResults;
-import FinalProject.Credential;
+import FinalProject.electionobjects.Ballot;
+import FinalProject.resultdata.ResultItem;
+import FinalProject.resultdata.BoothElectionResults;
+import FinalProject.electionobjects.Credential;
 import FinalProject.communication.Comm;
 import FinalProject.masterserver.MasterServerInformation;
 import FinalProject.persons.Candidate;
@@ -30,6 +26,8 @@ import FinalProject.persons.Voter;
  * 
  */
 public class DistrictServer implements Runnable {
+
+	private boolean down;
 
 	public static void main(String args[]) {
 		if (args.length >= 4) {
@@ -136,12 +134,12 @@ public class DistrictServer implements Runnable {
 			i++;
 		}
 		//
-		BoothElectionResult[] r = new BoothElectionResult[i];
+		ResultItem[] r = new ResultItem[i];
 
 		c = masterServerInfo.getCandidates().elements();
 		i = 0;
 		while (c.hasMoreElements()) {
-			r[i++] = new BoothElectionResult(c.nextElement(), 0);
+			r[i++] = new ResultItem(c.nextElement(), 0);
 
 		}
 		//
@@ -167,16 +165,28 @@ public class DistrictServer implements Runnable {
 		this.run();
 	}
 
+	public void shutdown() throws IOException, InterruptedException {
+		if(down) return;
+
+		System.out.println("District Server " + uniqueDistrictId + ": " + "closed");
+		districtComm.sendMessageClient("end");
+		districtComm.shutdown();
+		down = true;
+	}
+
 	@Override
 	public void run() {
 		boolean continues = true;
 		while (continues) {
 			try {
+				if(districtComm == null)
+					break;
+
 				// listen for incoming messages. messages can come from booths
 				// or
 				// master server
 				Object recievedMessage = districtComm.getMessageBlocking();
-				System.out.println(recievedMessage);
+//				System.out.println(recievedMessage);
 				// from master server:
 				// Receive MasterServerInformation containing all candidate and
 				// voters
@@ -187,6 +197,11 @@ public class DistrictServer implements Runnable {
 				// "status" -> ElectionResults
 				// Person -> "true" or "false" registration confirmed or not
 				// Ballot -> "true" or "false" vote valid (must be registered)
+
+				if (recievedMessage instanceof BoothElectionResults){}else {
+					System.out.println("INCOMMING");
+					System.out.println(recievedMessage);
+				}
 
 				if (recievedMessage instanceof MasterServerInformation) {
 					if (!fake) {
@@ -256,7 +271,7 @@ public class DistrictServer implements Runnable {
 
 						electionResults.totalVotes++;
 						electionResults.generated = new Date();
-						System.out.println("" + electionResults.toString());
+//						System.out.println("" + electionResults.toString());
 
 						districtComm.sendMessageReply("true");
 						System.out.println("District Server "
@@ -278,14 +293,14 @@ public class DistrictServer implements Runnable {
 								+ uniqueDistrictId + ": " + "Voting failed");
 					}
 
-					if (v.getName().equals("Ellena Jeanbaptiste")) {
-						try {
-							districtComm.shutdown();
-						} catch (InterruptedException e) {
-							System.exit(0);
-						}
-						System.exit(0);
-					}
+//					if (v.getName().equals("Ellena Jeanbaptiste")) {
+//						try {
+//							districtComm.shutdown();
+//						} catch (InterruptedException e) {
+//							System.exit(0);
+//						}
+//						System.exit(0);
+//					}
 
 				} else if (recievedMessage instanceof Credential) {
 					Credential creds = (Credential) recievedMessage;
@@ -334,12 +349,8 @@ public class DistrictServer implements Runnable {
 							i++;
 						}
 						districtComm.sendMessageReply(c);
-					}
-					else if(recievedMessage.equals("end")){
-						System.out.println("District Server "
-								+ uniqueDistrictId + ": " + "closed");
-						districtComm.sendMessageClient("end");
-						districtComm.shutdown();
+					} else if(recievedMessage.equals("end")){
+						shutdown();
 						continues = false;
 					}
 				}
@@ -347,6 +358,12 @@ public class DistrictServer implements Runnable {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		}
+
+		try{
+			shutdown();
+		}catch(Exception e){
+			// do nothing if errors
 		}
 	}
 

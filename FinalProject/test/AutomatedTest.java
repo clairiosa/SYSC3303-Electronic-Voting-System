@@ -22,8 +22,8 @@ public class AutomatedTest {
 
 		Thread masterServer = new Thread() {
 			public void run() {
-				MasterServer.main(new String[] { "2000", "voters.txt",
-						"candidates.txt", "5000" });
+				MasterServer.main(new String[] { "2000", "FinalProject/test/voters.txt",
+						"FinalProject/test/candidates.txt", "5000" });
 			}
 		};
 
@@ -44,7 +44,7 @@ public class AutomatedTest {
 		//
 		Thread boothServer1 = new Thread() {
 			public void run() {
-				Booth.main(new String[] { "127.0.0.1", "2010", "2101" });
+				Booth.main(new String[] { "127.0.0.1", "d1", "2010", "2101" });
 				// Booth.main(new String[]{"127.0.0.1", "2010", "2101",
 				// "./src/FinalProject/test/voters.txt"});
 			}

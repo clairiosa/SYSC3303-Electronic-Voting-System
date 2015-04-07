@@ -6,7 +6,7 @@
  *
  */
 
-package FinalProject;
+package FinalProject.electionobjects;
 
 import java.io.Serializable;
 

@@ -1,4 +1,12 @@
 
+/*
+ *		SYSC 3303 - Electronic Voting System
+ *	David Bews, Jonathan Oommen, Nate Bosscher, Damian Polan
+ *
+ *	ElectionPieDemo.java
+ *
+ */
+
 package FinalProject.masterserver;
 
 import java.awt.Font;
@@ -18,15 +26,13 @@ import org.jfree.ui.RefineryUtilities;
 
 import FinalProject.persons.Candidate;
 
+
 /**
- * A simple demonstration application showing how to create a pie chart using 
- * data from a {@link DefaultPieDataset}.
- */
+ * This class is for the election pie chart    
+ **/
+
 public class ElectionPieDemo extends JFrame {
 
-    /**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	/**
@@ -40,23 +46,17 @@ public class ElectionPieDemo extends JFrame {
     }
 
     /**
-     * Creates a sample dataset.
+     * Creates a sample dataset with the voting percentages of the candidates 
      * 
      * @return A sample dataset.
      */
     private static PieDataset createDataset(ConcurrentHashMap<String, Candidate> candidates) {
         DefaultPieDataset dataset = new DefaultPieDataset();
      	Enumeration<Candidate> it1 = candidates.elements();
-     	while(it1.hasMoreElements()) {
+     	while(it1.hasMoreElements()) {  //look through the candidates and create dataset 
      		Candidate c = (Candidate) it1.nextElement();
      		dataset.setValue(c.getName(), c.getVotingPercentage());
      	}
-        //dataset.setValue("One", new Double(43.2));
-        //dataset.setValue("Two", new Double(10.0));
-        //dataset.setValue("Three", new Double(27.5));
-        //dataset.setValue("Four", new Double(17.5));
-        //dataset.setValue("Five", new Double(11.0));
-        //dataset.setValue("Six", new Double(19.4));
         return dataset;        
     }
     
@@ -96,8 +96,10 @@ public class ElectionPieDemo extends JFrame {
         return new ChartPanel(chart);
     }
     
+    
+    
+    
     /**
-     * Starting point for the demonstration application.
      *
      * @param args  ignored.
      */

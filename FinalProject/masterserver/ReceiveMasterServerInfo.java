@@ -8,12 +8,18 @@
 
 package FinalProject.masterserver;
 
+import java.io.IOException;
 import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import FinalProject.communication.Comm;
 import FinalProject.persons.Candidate;
 import FinalProject.persons.Voter;
+
+/**
+ * This class receives election information from the districts and adds the information to the master hashmap  
+ **/
 
 public class ReceiveMasterServerInfo extends Thread {
 
@@ -23,43 +29,28 @@ public class ReceiveMasterServerInfo extends Thread {
 	public int votes = 0;
 	private boolean electionDone = false;
 	private Comm comm;
-	private int districtCount;
 
 	public ReceiveMasterServerInfo(Comm comm, ConcurrentHashMap<String, Candidate> candidates) {
 		this.comm = comm;
-		districtCount = 0;
 		this.candidates = candidates;
 	}
 
+	//thread run method 
 	public void run() {
 		while (true) {
 			try {
-				Object info = comm.getMessageBlocking();
 
+				Object info = comm.getMessageBlocking(10, TimeUnit.MILLISECONDS); //wait to receive a voter object
+				//if a voter object is received add the vote information 
 				if (info instanceof Voter) {
 					Voter v = (Voter) info;
-					System.out.println("District " + v.getName()
-							+ " Information Received.\n");
-
+					System.out.println("District " + v.getName()+ " Information Received.\n");
 					addInformationVoter(v);
-					districtCount++;
 				}
-
-				// if(info instanceof MasterServerInformation){
-				// MasterServerInformation mInfo =
-				// (MasterServerInformation)info;
-				// System.out.printf("District %d Information Received.\n",mInfo.getDistrictID());
-				// ConcurrentHashMap<String, Candidate> tempCandidates =
-				// mInfo.getCandidates();
-				// addInformation(tempCandidates);
-				// districtCount++;
-				// }
-				// voters = mInfo.getVoters();
-				// tallyVotes();
-
+				//kill thread if the election is done 
 				if (electionDone == true) {
 					System.out.println("Election is completed");
-					System.exit(1);
+					return;
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -70,61 +61,20 @@ public class ReceiveMasterServerInfo extends Thread {
 
 	private void addInformationVoter(Voter v) {
 		Candidate c = candidates.get(v.getCandidate().getName());
-		
 		c.addVote();
 	}
 
-	public int getDistrictCount() {
-		return districtCount;
-	}
 
-	public void addInformation(
-			ConcurrentHashMap<String, Candidate> tempCandidates) {
-		Enumeration<Candidate> it = tempCandidates.elements();
-		while (it.hasMoreElements()) {
-			Candidate c = it.nextElement();
-			candidates.get(c.getName()).addVotes(c.getVoteCount());
-		}
-	}
 
+	//set the election as done 
 	public void setElectionDone(boolean a) {
 		electionDone = a;
 	}
 
-	public void tallyVotes() {
-		/** tally votes from district **/
-		log("Tally");
-		Enumeration<Voter> itV = voters.elements();
-		while (itV.hasMoreElements()) {
-			Voter v = itV.nextElement();
-			log("  " + v.getName());
-			if (v.hasVoted()) {
-				vote(v.getCandidate().getName(), v.getName());
-				votes++;
-			}
-		}
-	}
-
+	//log data 
 	public void log(String s) {
 		OfficialRecord.append(s + '\n');
 		System.out.println(s);
-	}
-
-	public void verify(String candidate, String voter) {
-		Voter v = getVoter(voter);
-		if (v.hasVoted()) { // check that voter hasn't already voted
-			System.out.println(voter + " has already voted.");
-		}
-	}
-
-	/** Record a vote **/
-	public void vote(String cand, String voter) {
-		verify(cand, voter);
-		Candidate c = getCandidate(cand);
-		c.addVote();
-		Voter v = getVoter(voter);
-		v.setVoted(true);
-		log(voter + " voted for " + cand);
 	}
 
 	/**
@@ -151,6 +101,7 @@ public class ReceiveMasterServerInfo extends Thread {
 		return c;
 	}
 
+	//get the candidates hashmap 
 	public ConcurrentHashMap<String, Candidate> getCandidates() {
 		return candidates;
 	}

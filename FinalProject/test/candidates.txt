@@ -1,8 +1,5 @@
-Conservative 
-Jonathan Oommen 
-Liberal 
-Damian Polan 
-NDP 
-Nathan Bosscher 
-Green Party 
-David Bews
+# candidate name, party name
+"Jonathan Oommen", "Conservative"
+"Damian Polan", "Liberal"
+"Nathan Bosscher", "NDP"
+"David Bews", "Green Party"

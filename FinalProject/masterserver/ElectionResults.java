@@ -17,16 +17,17 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
 
-import FinalProject.BoothElectionResult;
-import FinalProject.BoothElectionResults;
+import FinalProject.resultdata.ResultItem;
+import FinalProject.resultdata.BoothElectionResults;
 import FinalProject.communication.Comm;
 import FinalProject.persons.Candidate;
 
+/**
+ * This class is responsible to send peridic election updates    
+ **/
+
 public class ElectionResults extends Thread implements Serializable {
-	/**
-	 * 
-	 */
-	// private static final long serialVersionUID = 1L;
+
 	private ConcurrentHashMap<String, Candidate> candidates = new ConcurrentHashMap<String, Candidate>();
 	private StringBuffer OfficialRecord = new StringBuffer();
 	private int refreshRate;
@@ -43,16 +44,16 @@ public class ElectionResults extends Thread implements Serializable {
 
 	public void run() {
 		while (true) {
-			displayResults();
-
 			try {
 
 				comm.sendMessageClient(toBoothResults()); // send periodic
 															// results
 				Thread.sleep(refreshRate);
+
 				if (electionDone == true) {
 					comm.sendMessageClient(toBoothResults()); // send final results
-					System.exit(1);
+					comm.sendMessageClient("end");
+					break;
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -63,9 +64,10 @@ public class ElectionResults extends Thread implements Serializable {
 		}
 
 	}
-
+	
+	//convert an ElectionResults object to a BoothelectionResults object 
 	public BoothElectionResults toBoothResults() {
-		BoothElectionResult[] ber = new BoothElectionResult[candidates.size()];
+		ResultItem[] ber = new ResultItem[candidates.size()];
 		Date d = new Date();
 		int vCount = 0;
 
@@ -74,7 +76,7 @@ public class ElectionResults extends Thread implements Serializable {
 		while (it.hasMoreElements()) {
 			Candidate c = (Candidate) it.nextElement();
 			vCount += c.getVoteCount();
-			ber[i] = new BoothElectionResult(c, c.getVoteCount());
+			ber[i] = new ResultItem(c, c.getVoteCount());
 			i++;
 		}
 
@@ -82,10 +84,13 @@ public class ElectionResults extends Thread implements Serializable {
 
 	}
 
+	//set the election as done 
 	public void setElectionDone(boolean a) {
 		electionDone = a;
 	}
 
+	
+	//write the election results to a file 
 	public void outputResults() {
 		BufferedWriter writer = null;
 
@@ -98,7 +103,12 @@ public class ElectionResults extends Thread implements Serializable {
 			double votingPercentage;
 			while (it.hasMoreElements()) {
 				Candidate c = it.nextElement();
-				votingPercentage = (c.getVoteCount() / c.getTotalVotes()) * 100;
+
+				if(c.getTotalVotes() != 0)
+					votingPercentage = (c.getVoteCount() / c.getTotalVotes()) * 100;
+				else
+					votingPercentage = 0;
+
 				writer.write("  " + c.getName() + " (" + c.getParty() + ") "
 						+ c.getVoteCount() + " " + votingPercentage);
 				writer.newLine();
@@ -115,6 +125,7 @@ public class ElectionResults extends Thread implements Serializable {
 
 	}
 
+	//display the results on the console 
 	public void displayResults() {
 		/** Report the vote count for each candidate **/
 		log("Tally");
@@ -132,6 +143,7 @@ public class ElectionResults extends Thread implements Serializable {
 
 	}
 
+	//log data 
 	public void log(String s) {
 		OfficialRecord.append(s + '\n');
 		System.out.println(s);

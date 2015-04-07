@@ -30,6 +30,9 @@ java FinalProject\test\CommTest
 
     COMPILING AND RUNNING INDIVIDUAL PORTIONS
 
+javac -cp "FinalProject/jfrrchart/*:." FinalProject/masterserver/MasterServer.java
+javac -cp "FinalProject\jfrrchart\*;." FinalProject\masterserver\MasterServer.java
+
 Master Server:
 javac FinalProject\masterserver\MasterServer.java
 java FinalProject\masterserver\MasterServer <Listen Port> <Voter Filename> <Candidates Filename> <Election Refresh Rate (ms)>

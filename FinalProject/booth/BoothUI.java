@@ -6,7 +6,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
-import FinalProject.BoothElectionResults;
+import FinalProject.resultdata.BoothElectionResults;
 import FinalProject.persons.Candidate;
 import FinalProject.persons.Voter;
 
@@ -42,10 +42,16 @@ class BoothUI extends JPanel implements ActionListener{
 
     private JTable tblResults;
 
-    public BoothUI(Booth model){
+	private JFrame frame;
+
+	private String districtId;
+
+    public BoothUI(Booth model, String districtId){
         super();
+        
         this.model = model;
         tblResults = null;
+        this.districtId = districtId;
 //		c.addLayoutComponent(this, "layoutComponent");
     }
 
@@ -59,8 +65,8 @@ class BoothUI extends JPanel implements ActionListener{
         setBackground(new Color(255, 255, 255));
         setLocation(300,0);
 
-        JFrame frame = new JFrame("Voter Booth");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame = new JFrame("Voter Booth");
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setPreferredSize(new Dimension(800, 400));
 
         GroupLayout layout = new GroupLayout(frame.getContentPane());
@@ -102,6 +108,7 @@ class BoothUI extends JPanel implements ActionListener{
         JButton btnRegister = new JButton("Register"); btnRegister.addActionListener(this);
         JButton btnVerify = new JButton("Verify"); btnVerify.addActionListener(this);
         JButton btnVote = new JButton("Vote"); btnVote.addActionListener(this);
+        JLabel lbl = new JLabel(districtId);
 
         txtFirstName = new JTextField(); txtFirstName.setColumns(10);
         txtLastName = new JTextField(); txtLastName.setColumns(10);
@@ -205,6 +212,9 @@ class BoothUI extends JPanel implements ActionListener{
 
     public void showRegister(){
         lblRegisterStatus.setText("");
+        txtFirstName.setText("");
+        txtLastName.setText("");
+
         CardLayout layout = (CardLayout)(this.getLayout());
         layout.show(this, "register");
     }
@@ -301,4 +311,9 @@ class BoothUI extends JPanel implements ActionListener{
                 break;
         }
     }
+
+	public void exit() {
+        if(frame != null)
+		    frame.dispose();
+	}
 }

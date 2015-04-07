@@ -1,3 +1,11 @@
+/*
+ *		SYSC 3303 - Electronic Voting System
+ *	David Bews, Jonathan Oommen, Nate Bosscher, Damian Polan
+ *
+ *	ElectionBarDemo.java
+ *
+ */
+
 
 package FinalProject.masterserver;
 
@@ -24,27 +32,23 @@ import org.jfree.ui.RefineryUtilities;
 import FinalProject.persons.Candidate;
 
 
-
-
 /**
-063 * A simple demonstration application showing how to create a bar chart.
-064 */
+ * This class is for the election pie chart    
+ **/
+
 public class ElectionBarDemo extends JFrame {
 
     private static final long serialVersionUID = 1L;
 
     static {
-        // set a theme using the new shadow generator feature available in
-        // 1.0.14 - for backwards compatibility it is not enabled by default
-        ChartFactory.setChartTheme(new StandardChartTheme("JFree/Shadow",
-                true));
+        ChartFactory.setChartTheme(new StandardChartTheme("JFree/Shadow",true));
     }
 
     /**
-077     * Creates a new demo instance.
-078     *
-079     * @param title  the frame title.
-080     */
+    * Creates a new demo instance.
+    *
+    * @param title  the frame title.
+    */
     public ElectionBarDemo(String title,ConcurrentHashMap<String, Candidate> candidates) {
         super(title);
         CategoryDataset dataset = createDataset(candidates);
@@ -67,23 +71,22 @@ public class ElectionBarDemo extends JFrame {
      	int projected = 0; 
      	int totalVotes=0;
      	int size = candidates.size();
-     	while(it.hasMoreElements()) {
+     	while(it.hasMoreElements()) {  //get the overall number of total votes 
      		Candidate c = (Candidate) it.nextElement();
      		totalVotes+=c.getVoteCount();
      	}
- 		projected=totalVotes/size;
- 		//projected=Candidate.totalVotes/size;
+ 		projected=totalVotes/size;  //get the projected number of votes for each candidate by taking the average 
      	Enumeration<Candidate> it1 = candidates.elements();
-     	while(it1.hasMoreElements()) {
+     	while(it1.hasMoreElements()) { //add values to the table 
      		Candidate c = (Candidate) it1.nextElement();
      		dataset.addValue(projected,"Projected", c.getName()+"("+c.getParty()+")");
             dataset.addValue(c.getVoteCount(), "Actual", c.getName()+"("+c.getParty()+")");
-     	}
+     	} 
         return dataset;
     }
 
     /**
-     * Creates a sample chart.
+     * Creates election data chart 
      *
      * @param dataset  the dataset.
 110     *
@@ -93,17 +96,9 @@ public class ElectionBarDemo extends JFrame {
         JFreeChart chart = ChartFactory.createBarChart(
             "Canadian Election: Voting Results", null /* x-axis label*/, 
                 "Votes" /* y-axis label */, dataset);
-        chart.addSubtitle(new TextTitle("Subtitle"));
+        chart.addSubtitle(new TextTitle("Dathonian Core Technologies"));
         chart.setBackgroundPaint(Color.white);
         CategoryPlot plot = (CategoryPlot) chart.getPlot();
-
-        // ******************************************************************
-        //  More than 150 demo applications are included with the JFreeChart
-        //  Developer Guide...for more information, see:
-        //
-        //  >   http://www.object-refinery.com/jfreechart/guide.html
-        //
-        // ******************************************************************
 
         NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
         rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
@@ -112,11 +107,12 @@ public class ElectionBarDemo extends JFrame {
         chart.getLegend().setFrame(BlockBorder.NONE);
         return chart;
     }
-
+    
+    
     /**
      * Starting point for the demonstration application.
      *
-     * @param args  ignored.
+     * 
      */
     public static void main(String[] args) {
     	ConcurrentHashMap<String, Candidate> candidates=new ConcurrentHashMap<String,Candidate>();
@@ -132,5 +128,7 @@ public class ElectionBarDemo extends JFrame {
         RefineryUtilities.centerFrameOnScreen(demo);
         demo.setVisible(true);
     }
+
+
 
 }
