@@ -39,11 +39,13 @@ public class FancyDisplayWindow1 extends JPanel {
 
 	private JLabel image_label;
 	private ConcurrentHashMap<String, Candidate> candidates;  
+	private JTextArea results;
 
 
 	// Constructors for the FacyDisplayWindow 
 	protected FancyDisplayWindow1(ConcurrentHashMap<String, Candidate> candidates) {
 		this.candidates=candidates;
+		results = new JTextArea();
 		this.initialize();
 	}
 	
@@ -59,8 +61,17 @@ public class FancyDisplayWindow1 extends JPanel {
 					  "Dathonian Core Technologies is the independent, non-partisan agency responsible for conducting\n" +
 					  "federal elections and referendums in Canada.\n\n\n");
 		field.setBackground(null);
+		
+		
+		 
+		results.setEditable(false);
+		results.setFont(font);
+
+		
+		
 		//get GUI backgroup photo 
 		String path = "FinalProject/images/election-year-2015.png";
+		//String path = "./election-year-2015.png";
         File file = new File(path);
         BufferedImage image=null;
         try {
@@ -104,11 +115,26 @@ public class FancyDisplayWindow1 extends JPanel {
 		
 		//add components to the JFrame 
 		add(field, BorderLayout.SOUTH);
+		add(results, BorderLayout.SOUTH);
 		add(image_label, BorderLayout.CENTER);
 		add(pieGraphButton, BorderLayout.WEST);
 		add(barGraphButton, BorderLayout.WEST);
 		this.setVisible(true);
+		
+		new Thread(new Runnable() {
+			public void run() {
+				while(true){
+					try {
+						updateResults();
+						Thread.sleep(500);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}).start();
 	}
+	
 	
 	//get the candidates information 
 	public ConcurrentHashMap<String, Candidate> getCandidates(){
@@ -119,6 +145,20 @@ public class FancyDisplayWindow1 extends JPanel {
 		public void setCandidates(ConcurrentHashMap<String, Candidate> cands){
 			candidates=cands;
 		}
+		
+	public void updateResults(){
+		String s=new String("      2015 Election Results\n"); 
+		Enumeration<Candidate> it1 = candidates.elements();
+     	while(it1.hasMoreElements()) {  //look through the candidates and create dataset 
+     		Candidate c = (Candidate) it1.nextElement();
+     		s=s+c.getName()+"("+c.getParty()+")"+": "+c.getVoteCount()+ "("+c.getVotingPercentage()+")"    +"\n";
+     	}
+		results.setText(s);
+		results.setBackground(null);
+		this.updateUI();
+		
+	}
+
 
 
 
