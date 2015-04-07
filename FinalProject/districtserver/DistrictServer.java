@@ -152,7 +152,7 @@ public class DistrictServer implements Runnable {
 	 * Starts the server
 	 */
 	private void start() {
-		System.out.println("DistrictServer Started\n");
+		System.out.println("DistrictServer Started");
 		try {
 			districtComm = new Comm(port);
 			districtComm.connectToParent(InetAddress.getByName(masterAddress),
@@ -170,6 +170,9 @@ public class DistrictServer implements Runnable {
 
 		System.out.println("District Server " + uniqueDistrictId + ": " + "closed");
 		districtComm.sendMessageClient("end");
+
+		Thread.sleep(5000);
+
 		districtComm.shutdown();
 		down = true;
 	}
@@ -198,14 +201,8 @@ public class DistrictServer implements Runnable {
 				// Person -> "true" or "false" registration confirmed or not
 				// Ballot -> "true" or "false" vote valid (must be registered)
 
-				if (recievedMessage instanceof BoothElectionResults){}else {
-					System.out.println("INCOMMING");
-					System.out.println(recievedMessage);
-				}
-
 				if (recievedMessage instanceof MasterServerInformation) {
 					if (!fake) {
-						System.out.println("Received voter information.");
 						this.masterServerInfo = (MasterServerInformation) recievedMessage;
 
 						Enumeration<Voter> it = ((MasterServerInformation) recievedMessage)

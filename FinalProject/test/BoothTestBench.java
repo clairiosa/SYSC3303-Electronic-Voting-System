@@ -48,8 +48,6 @@ public class BoothTestBench {
 
         m.start();
 
-        System.out.println("Master started");
-
         try {
             Thread.sleep(100);
         } catch (InterruptedException e) {
@@ -59,8 +57,6 @@ public class BoothTestBench {
         d0.start();
         d1.start();
         d2.start();
-
-        System.out.println("Districts started");
 
         try {
             Thread.sleep(100);

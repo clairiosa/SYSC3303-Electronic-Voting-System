@@ -15,6 +15,8 @@ public class bTest2 extends BoothTestBench {
         bTest2 b2 = new bTest2();
         assert b2.test();
 
+        b2.destroy();
+
         System.out.println("TEST 2 COMPLETE");
     }
 

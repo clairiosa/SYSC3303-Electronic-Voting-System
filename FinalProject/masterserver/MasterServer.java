@@ -47,7 +47,7 @@ public class MasterServer {
 
 	public static void main(String args[]) {
 
-		System.out.println("MasterServer Started\n");
+		System.out.println("MasterServer Started");
 		final MasterServerInformation lists = new MasterServerInformation();  //election information to be passed to districts 
 		ConcurrentHashMap<String, Candidate> candidates;
 		
@@ -172,7 +172,7 @@ public class MasterServer {
 			electionUpdateThread.join();
 			receiveThread.join();
 		}catch (Exception e) {
-			System.out.println(e.getMessage());
+//			System.out.println(e.getMessage());
 		} finally { //shutdown comm when everything is finished 
 			try {
 				comm.shutdown();
