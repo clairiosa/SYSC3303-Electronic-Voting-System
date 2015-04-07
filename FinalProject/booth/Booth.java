@@ -36,7 +36,8 @@ public class Booth extends Thread {
     
     private final BoothUI window; 
     private boolean exit;
-    
+    private Thread statusUpdateThread;
+
 
     public Booth(String parentServer, String districtId, int port, int listenPort) throws UnknownHostException, IOException, InterruptedException{
         parentIP = InetAddress.getByName(parentServer);
@@ -57,12 +58,15 @@ public class Booth extends Thread {
     }
 
     public void shutdown(){
+        System.out.println("client shutdown");
+
         try {
             clientServer.shutdown();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
+        statusUpdateThread.interrupt();
         window.exit();
     }
     
@@ -82,7 +86,7 @@ public class Booth extends Thread {
 	    	}else if(msg instanceof BoothElectionResults){
 	    		_results.put((BoothElectionResults)msg);
 	    	}else if(msg instanceof String){
-	    		if(((String)msg).equals("done")){
+	    		if(((String)msg).equals("end")){
                     exit = true;
                     shutdown();
 	    			return;
@@ -99,9 +103,9 @@ public class Booth extends Thread {
     public void run(){
         window.start();
 
-        (new Thread() {
+        statusUpdateThread = new Thread() {
             public void run() {
-                while(true){
+                while (true) {
                     window.updateStats(getElectionStatus());
 
                     try {
@@ -110,11 +114,15 @@ public class Booth extends Thread {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
-                    
-                    if(exit)
-                    	return;
+
+                    if (exit)
+                        return;
                 }
-            }}).start();
+            }
+        };
+
+        statusUpdateThread.start();
+
     }
 
 
@@ -187,79 +195,6 @@ public class Booth extends Thread {
             }
         	
             return res;
-        }
-    }
-
-    public void testCommand(Candidate[] c, String pin, String user){
-        int index = (int)(Math.random() * c.length % 1);
-
-        Voter v = new Voter(user, null);
-
-        if(register(v)){
-            System.out.print("Registered ");
-            if(verify(pin)){
-                System.out.print("Verified ");
-
-                if(vote(c[index])){
-                    System.out.print("Voted for " + c[index].getName());
-                }else{
-                    System.out.println("VOTE ERROR");
-                    System.exit(-1);
-                }
-            }else{
-                System.out.println("VERIFY ERROR");
-                System.exit(-1);
-            }
-        }else{
-            System.out.println("Couldn't register");
-        }
-
-        if (v.getName().equals("Ellena Jeanbaptiste")) {
-            try {
-                clientServer.shutdown();
-            } catch (InterruptedException e) {
-                System.exit(0);
-            }
-            System.exit(0);
-        }
-
-        System.out.print("\n");
-    }
-
-    public void parse(String userFile){
-        Candidate[] c = getCandidates();
-        File votersFile = new File (userFile);
-
-        try{
-            FileReader fr = new FileReader(votersFile);
-            BufferedReader br = new BufferedReader(fr);
-            try {
-                StringBuilder sb = new StringBuilder();
-                String line = br.readLine();
-
-                while (line != null) {
-                    sb.append(line);
-                    sb.append(System.lineSeparator());
-                    line = br.readLine();
-                }
-                String everything = sb.toString();
-
-                String lst[] = everything.split("\r\n");
-
-                for(int i=0; i < lst.length-1;i++){
-                    testCommand(c, lst[i], lst[i+1]);
-                }
-
-            } finally {
-                br.close();
-            }
-        }catch(FileNotFoundException e){
-            System.out.println("file doesn't exist");
-            System.exit(-1);
-            return;
-        }catch(IOException e){
-            e.printStackTrace();
-            return;
         }
     }
 
@@ -375,13 +310,7 @@ public class Booth extends Thread {
         }
 
         if(args.length == 5){
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            booth.parse(args[4]);
+            System.out.println("Invalid args");
         }else{
             booth.run();
         }

@@ -49,9 +49,11 @@ public class ElectionResults extends Thread implements Serializable {
 				comm.sendMessageClient(toBoothResults()); // send periodic
 															// results
 				Thread.sleep(refreshRate);
+
 				if (electionDone == true) {
 					comm.sendMessageClient(toBoothResults()); // send final results
-					System.exit(1);
+					comm.sendMessageClient("end");
+					break;
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
@@ -101,7 +103,12 @@ public class ElectionResults extends Thread implements Serializable {
 			double votingPercentage;
 			while (it.hasMoreElements()) {
 				Candidate c = it.nextElement();
-				votingPercentage = (c.getVoteCount() / c.getTotalVotes()) * 100;
+
+				if(c.getTotalVotes() != 0)
+					votingPercentage = (c.getVoteCount() / c.getTotalVotes()) * 100;
+				else
+					votingPercentage = 0;
+
 				writer.write("  " + c.getName() + " (" + c.getParty() + ") "
 						+ c.getVoteCount() + " " + votingPercentage);
 				writer.newLine();

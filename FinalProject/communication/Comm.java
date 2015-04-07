@@ -101,6 +101,8 @@ public class Comm implements CommInterface {
      */
     @Override
     public void shutdown() throws InterruptedException {
+        System.out.println("shutting connection");
+
         listener.disconnect();
         listenThread.join();
     }

@@ -1,6 +1,6 @@
 package FinalProject.test;
 
-import FinalProject.VoterReader;
+import FinalProject.filereaders.VoterReader;
 import FinalProject.booth.Booth;
 import FinalProject.districtserver.DistrictServer;
 import FinalProject.masterserver.MasterServer;
@@ -13,31 +13,33 @@ import java.util.Stack;
  * Created by natebosscher on 15-04-06.
  */
 public class BoothTestBench {
+    private final Thread m,d0,d1,d2;
     protected Booth b1, b2, b3, b4;
+
     // voter by district
     protected Stack<Voter> vd1, vd2, vd3;
 
     public BoothTestBench(){
-        Thread m = new Thread() {
+        m = new Thread() {
             public void run() {
                 MasterServer.main(new String[] { "2000", "FinalProject/test/voters.txt",
                         "FinalProject/test/candidates.txt", "5000" });
             }
         };
 
-        Thread d0 = new Thread() {
+        d0 = new Thread() {
             public void run() {
                 DistrictServer.main(new String[] { "2011", "127.0.0.1", "2000",
                         "0" });
             }
         };
-        Thread d1 = new Thread() {
+        d1 = new Thread() {
             public void run() {
                 DistrictServer.main(new String[] { "2012", "127.0.0.1", "2000",
                         "1" });
             }
         };
-        Thread d2 = new Thread() {
+        d2 = new Thread() {
             public void run() {
                 DistrictServer.main(new String[] { "2013", "127.0.0.1", "2000",
                         "2" });
@@ -77,6 +79,11 @@ public class BoothTestBench {
             return;
         }
 
+        b1.run();
+        b2.run();
+        b3.run();
+        b4.run();
+
         try {
             Thread.sleep(3000);
         } catch (InterruptedException e) {
@@ -108,10 +115,24 @@ public class BoothTestBench {
     }
 
     public void destroy(){
-        MasterServer.reset();
-        b1.shutdown();
-        b2.shutdown();
-        b3.shutdown();
-        b4.shutdown();
+        try {
+            MasterServer.shutdown();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        try {
+            m.join();
+            d0.join();
+            d1.join();
+            d2.join();
+
+            b1.join();
+            b2.join();
+            b3.join();
+            b4.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

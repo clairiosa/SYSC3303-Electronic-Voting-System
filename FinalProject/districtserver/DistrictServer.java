@@ -4,11 +4,7 @@
 
 package FinalProject.districtserver;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.InetAddress;
 import java.util.Date;
 import java.util.Enumeration;
@@ -30,6 +26,8 @@ import FinalProject.persons.Voter;
  * 
  */
 public class DistrictServer implements Runnable {
+
+	private boolean down;
 
 	public static void main(String args[]) {
 		if (args.length >= 4) {
@@ -167,13 +165,22 @@ public class DistrictServer implements Runnable {
 		this.run();
 	}
 
+	public void shutdown() throws IOException, InterruptedException {
+		if(down) return;
+
+		System.out.println("District Server " + uniqueDistrictId + ": " + "closed");
+		districtComm.sendMessageClient("end");
+		districtComm.shutdown();
+		down = true;
+	}
+
 	@Override
 	public void run() {
 		boolean continues = true;
 		while (continues) {
 			try {
-				if(Thread.interrupted() || districtComm == null)
-					return;
+				if(districtComm == null)
+					break;
 
 				// listen for incoming messages. messages can come from booths
 				// or
@@ -190,6 +197,11 @@ public class DistrictServer implements Runnable {
 				// "status" -> ElectionResults
 				// Person -> "true" or "false" registration confirmed or not
 				// Ballot -> "true" or "false" vote valid (must be registered)
+
+				if (recievedMessage instanceof BoothElectionResults){}else {
+					System.out.println("INCOMMING");
+					System.out.println(recievedMessage);
+				}
 
 				if (recievedMessage instanceof MasterServerInformation) {
 					if (!fake) {
@@ -281,14 +293,14 @@ public class DistrictServer implements Runnable {
 								+ uniqueDistrictId + ": " + "Voting failed");
 					}
 
-					if (v.getName().equals("Ellena Jeanbaptiste")) {
-						try {
-							districtComm.shutdown();
-						} catch (InterruptedException e) {
-							System.exit(0);
-						}
-						System.exit(0);
-					}
+//					if (v.getName().equals("Ellena Jeanbaptiste")) {
+//						try {
+//							districtComm.shutdown();
+//						} catch (InterruptedException e) {
+//							System.exit(0);
+//						}
+//						System.exit(0);
+//					}
 
 				} else if (recievedMessage instanceof Credential) {
 					Credential creds = (Credential) recievedMessage;
@@ -337,12 +349,8 @@ public class DistrictServer implements Runnable {
 							i++;
 						}
 						districtComm.sendMessageReply(c);
-					}
-					else if(recievedMessage.equals("end")){
-						System.out.println("District Server "
-								+ uniqueDistrictId + ": " + "closed");
-						districtComm.sendMessageClient("end");
-						districtComm.shutdown();
+					} else if(recievedMessage.equals("end")){
+						shutdown();
 						continues = false;
 					}
 				}
@@ -350,6 +358,12 @@ public class DistrictServer implements Runnable {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		}
+
+		try{
+			shutdown();
+		}catch(Exception e){
+			// do nothing if errors
 		}
 	}
 

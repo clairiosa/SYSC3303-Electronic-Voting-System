@@ -1,7 +1,7 @@
 package FinalProject.test;
 
-import FinalProject.CandidateReader;
-import FinalProject.VoterReader;
+import FinalProject.filereaders.CandidateReader;
+import FinalProject.filereaders.VoterReader;
 import FinalProject.masterserver.MasterServer;
 import FinalProject.test.BoothTestBench;
 import FinalProject.persons.Voter;
@@ -22,12 +22,6 @@ public class bTest1 extends BoothTestBench {
         bTest1 b1 = new bTest1();
         System.out.println("Test 1 Instantiated");
         assert b1.test();
-
-        try {
-            System.setIn(new ByteArrayInputStream("done".getBytes("UTF-8")));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
 
         b1.destroy();
 

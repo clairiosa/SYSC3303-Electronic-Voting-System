@@ -35,10 +35,9 @@ public class MasterServer {
 
 	static Comm comm;
 
-	public static void shutdown() throws IOException, InterruptedException {
+	public static void shutdown() throws Exception {
 		//send message to districts notifying them the election is done
-		MasterServer.comm.sendMessageClient("end");
-		MasterServer.comm.shutdown();
+		electionDone=true;
 	}
 
 	public static void reset(){
@@ -51,7 +50,7 @@ public class MasterServer {
 		System.out.println("MasterServer Started\n");
 		final MasterServerInformation lists = new MasterServerInformation();  //election information to be passed to districts 
 		ConcurrentHashMap<String, Candidate> candidates;
-		
+
 		//ensure all the needed arguments have been received 
 		if (args.length < 4) {
 			System.out
@@ -69,7 +68,7 @@ public class MasterServer {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		
+
 		//create a thread to wait for the conclusion of the election via Console Input 
 		try {
 
@@ -83,7 +82,6 @@ public class MasterServer {
 						s = scanner.nextLine();
 						if (s.trim().equalsIgnoreCase("done")) {
 							electionDone = true;
-							shutdown();
 							//launch the Graphical User Interface with the election results 
 //							EventQueue.invokeLater(new Runnable() {
 //								public void run() {
@@ -106,22 +104,22 @@ public class MasterServer {
 		} catch (Exception e) { //catch a general exception 
 			e.printStackTrace();
 		}
-		
-		
+
+
 		//initialize all the election information in a MasterServerInformation object and send to all districts 
 		try {
 			//get Command Line information 
 			refreshRate = Integer.valueOf(args[3]);
 			String votersFile = new String(args[1]);
 			String candidatesFile = new String(args[2]);
-			
+
 			//get the voter information into a hashmap by reading a file containing the information of all the voters  
 			try {
 				VoterReader vReader = new VoterReader(votersFile);
 				vReader.parse();
 				ArrayList<Voter> vList = vReader.voters;
-				for(Voter v:vList){
-					lists.addVoter(v);	
+				for (Voter v : vList) {
+					lists.addVoter(v);
 				}
 			} catch (Exception e) {  //notify user there was an error reading the voter file 
 				System.out.println("Error reading voters file.");
@@ -135,8 +133,8 @@ public class MasterServer {
 				CandidateReader cReader = new CandidateReader(candidatesFile);
 				cReader.parse();
 				ArrayList<Candidate> cList = cReader.candidates;
-				for(Candidate c:cList){
-					lists.addCandidate(c);	
+				for (Candidate c : cList) {
+					lists.addCandidate(c);
 				}
 			} catch (Exception e) {  //notify user there was an error reading the candidate file 
 				System.out.println("Error reading Candidates file.");
@@ -156,7 +154,7 @@ public class MasterServer {
 			/* Receiving District Server info */
 			/*************************************/
 			ReceiveMasterServerInfo receiveThread = new ReceiveMasterServerInfo(comm, lists.candidates); //create and start the thread to receive district updates 
-			receiveThread.start();  
+			receiveThread.start();
 			// Thread.sleep(10000); // make sure at least some results are in
 			candidates = receiveThread.getCandidates();
 
@@ -171,8 +169,8 @@ public class MasterServer {
 						framer1 frame = new framer1(lists.candidates);
 						frame.setVisible(true);
 //						while(true){
-							Thread.sleep(refreshRate);
-							frame.setCandidates(lists.candidates);
+						Thread.sleep(refreshRate);
+						frame.setCandidates(lists.candidates);
 //						}
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -186,11 +184,12 @@ public class MasterServer {
 
 			electionUpdateThread.outputResults();  //write election results to a file 
 			electionUpdateThread.setElectionDone(true);  //notify thread the election is done 
-			receiveThread.setElectionDone(true); //notify thread the election is done 
+			receiveThread.setElectionDone(true); //notify thread the election is done
 
-		}
+			electionUpdateThread.join();
+			receiveThread.join();
 
-		catch (Exception e) {
+		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		} finally { //shutdown comm when everything is finished 
 			try {
@@ -198,10 +197,7 @@ public class MasterServer {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+			return;
 		}
 	}
-	public void shutdown(){
-		electionDone=true;
-	}
-
 }

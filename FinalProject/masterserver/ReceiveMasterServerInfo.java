@@ -8,8 +8,10 @@
 
 package FinalProject.masterserver;
 
+import java.io.IOException;
 import java.util.Enumeration;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import FinalProject.communication.Comm;
 import FinalProject.persons.Candidate;
@@ -37,7 +39,8 @@ public class ReceiveMasterServerInfo extends Thread {
 	public void run() {
 		while (true) {
 			try {
-				Object info = comm.getMessageBlocking(); //wait to receive a voter object 
+
+				Object info = comm.getMessageBlocking(10, TimeUnit.MILLISECONDS); //wait to receive a voter object
 				//if a voter object is received add the vote information 
 				if (info instanceof Voter) {
 					Voter v = (Voter) info;
@@ -47,7 +50,7 @@ public class ReceiveMasterServerInfo extends Thread {
 				//kill thread if the election is done 
 				if (electionDone == true) {
 					System.out.println("Election is completed");
-					System.exit(1);
+					return;
 				}
 			} catch (InterruptedException e) {
 				e.printStackTrace();
