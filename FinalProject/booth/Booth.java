@@ -185,6 +185,7 @@ public class Booth extends Thread {
             return r;
         }else{
         	BoothElectionResults res = null;
+
             try {
                 this.clientServer.sendMessageParent("status");
             } catch (IOException | InterruptedException e) {

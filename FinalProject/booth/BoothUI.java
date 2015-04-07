@@ -163,8 +163,9 @@ class BoothUI extends JPanel implements ActionListener{
     public void updateStats(BoothElectionResults r){
         if(tblResults == null)
             return;
+
         if(r == null){
-            System.out.println("STATS ERROR");
+//            System.out.println("STATS ERROR");
             return;
         }
 
@@ -241,8 +242,6 @@ class BoothUI extends JPanel implements ActionListener{
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        System.out.println(e.getActionCommand());
-
         switch(e.getActionCommand()){
             case "Vote":
 
