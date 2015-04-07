@@ -36,8 +36,18 @@ public class Candidate extends Voter {
 		totalVotes++;
 	}
 
-	public double getVotingPercentage() {
-		return 100 * ((double) voteCount / (double) totalVotes);
+	public static double round(double value, int places) {
+	    if (places < 0) throw new IllegalArgumentException();
+
+	    long factor = (long) Math.pow(10, places);
+	    value = value * factor;
+	    long tmp = Math.round(value);
+	    return (double) tmp / factor;
+	}
+	
+	public double getVotingPercentage(){
+		votingPercentage = ((double)voteCount/(double)totalVotes)*100;
+		return round(votingPercentage,2);
 	}
 
 	public boolean setVotingPercentage(double amt) {

@@ -82,10 +82,8 @@ public class framer1 extends JFrame {
 		candidates=new ConcurrentHashMap<String,Candidate>();
     	Candidate c1=new Candidate("Jonathan Oommen", "Conservative");
     	Candidate c2=new Candidate("David Bews", "Liberal");
-    	c1.setVoteCount(5000);
-    	c2.setVoteCount(7000);
-       	c1.setVotingPercentage(44.0);
-       	c2.setVotingPercentage(56.0);
+    	c1.addVotes(5000);
+    	c2.addVotes(7000);
     	candidates.put(c1.getName(), c1);
     	candidates.put(c2.getName(), c2);
 		
@@ -100,7 +98,20 @@ public class framer1 extends JFrame {
 				}
 			}
 		});
-	}
+		
+     	while(true){
+     		try {
+				Thread.sleep(1000);
+	     		Enumeration<Candidate> it1 = candidates.elements();
+	     		while(it1.hasMoreElements()) {  //look through the candidates and create dataset 
+	     			Candidate c = (Candidate) it1.nextElement();
+	     			c.addVotes(1000);
+	     		}
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+     	}	
+     }
 
 
 }
