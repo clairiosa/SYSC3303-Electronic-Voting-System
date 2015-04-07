@@ -83,20 +83,7 @@ public class MasterServer {
 						Scanner scanner = new Scanner(System.in);
 						s = scanner.nextLine();
 						if (s.trim().equalsIgnoreCase("done")) {
-							electionDone = true;
 							shutdown();
-							//launch the Graphical User Interface with the election results 
-//							EventQueue.invokeLater(new Runnable() {
-//								public void run() {
-//									try {
-//										framer1 frame = new framer1(lists.candidates);
-//										frame.setVisible(true);
-//									} catch (Exception e) {
-//										e.printStackTrace();
-//									}
-//								}
-//							});
-							// System.exit(1);
 						}
 					} catch (Exception e) {
 						e.printStackTrace();
@@ -158,7 +145,6 @@ public class MasterServer {
 			/*************************************/
 			ReceiveMasterServerInfo receiveThread = new ReceiveMasterServerInfo(comm, lists.candidates); //create and start the thread to receive district updates 
 			receiveThread.start();  
-			// Thread.sleep(10000); // make sure at least some results are in
 			candidates = receiveThread.getCandidates();
 
 			// periodically update displayed results and send preliminary
@@ -171,10 +157,6 @@ public class MasterServer {
 					try {
 						framer1 frame = new framer1(lists.candidates);
 						frame.setVisible(true);
-//						while(true){
-							Thread.sleep(refreshRate);
-							frame.setCandidates(lists.candidates);
-//						}
 					} catch (Exception e) {
 						e.printStackTrace();
 					}
