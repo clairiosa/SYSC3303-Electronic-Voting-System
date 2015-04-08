@@ -38,14 +38,18 @@ public class Booth extends Thread {
     private boolean exit;
     private Thread statusUpdateThread;
 
-
     public Booth(String parentServer, String districtId, int port, int listenPort) throws UnknownHostException, IOException, InterruptedException{
+        this(parentServer, districtId, port, listenPort, false);
+    }
+
+    public Booth(String parentServer, String districtId, int port, int listenPort, boolean isTesting) throws UnknownHostException, IOException, InterruptedException{
         parentIP = InetAddress.getByName(parentServer);
         parentPort = port;
         dummyData = false;
         cmdInProgress = new Object();
         this.districtId = districtId;
         exit = false;
+        statusUpdateThread = null;
 
         _candidates = new ArrayBlockingQueue<Candidate[]>(10);
         _results = new ArrayBlockingQueue<BoothElectionResults>(10);
@@ -53,8 +57,13 @@ public class Booth extends Thread {
 
 		this.clientServer = new Comm(listenPort);
 		clientServer.connectToParent(parentIP, parentPort);
-		window = new BoothUI(this, districtId);
-		Thread.sleep(5000);
+
+        if(!isTesting) {
+            window = new BoothUI(this, districtId);
+            Thread.sleep(5000);
+        }else{
+            window = null;
+        }
     }
 
     public void shutdown(){
@@ -64,39 +73,55 @@ public class Booth extends Thread {
             e.printStackTrace();
         }
 
-        try {
-            window.exit();
-        }catch(Exception e){
-            System.out.println("window exit error");
+        if(statusUpdateThread != null) {
+            try {
+                window.exit();
+            }catch(Exception e){}
+
+            statusUpdateThread.interrupt();
         }
 
-        statusUpdateThread.interrupt();
-
+        System.out.println("Booth shutdown");
     }
     
-    public void recv(){
+    public boolean recv(){
     	Object msg = null;
+        int i = 0;
+
         while(msg == null) {
             try {
                 msg = clientServer.getMessageBlocking(10, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {}
+
+            if(i == 100)
+                return false;
+
+            i++;
         }
     	
     	try {
 	    	if(msg instanceof Candidate[]){
+                System.out.println("Got candidate list");
 	    		_candidates.put((Candidate[])msg);
 	    	}else if(msg instanceof BoothElectionResults){
+                System.out.println("Got election results");
 	    		_results.put((BoothElectionResults)msg);
 	    	}else if(msg instanceof String){
 
-	    		if(((String)msg).equals("end")){
-                    System.out.println("CLIENT SHUTDOWN");
+                if(((String)msg).equals("end")){
+                    System.out.println("Got terminate");
                     exit = true;
                     shutdown();
-	    			return;
+	    			return false;
 	    		}
+
+                System.out.println("Got string '" + msg + "'");
 
 				_msgs.put((String)msg);
 	    	}else{
@@ -105,22 +130,28 @@ public class Booth extends Thread {
     	} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+
+        return true;
     }
 
     public void run(){
+        System.out.println("Booth Started");
+
+        if(window != null)
         window.start();
 
         statusUpdateThread = new Thread() {
             public void run() {
                 while (true) {
-                    window.updateStats(getElectionStatus());
+                    if(window != null)
+                        window.updateStats(getElectionStatus());
+                    else
+                        getElectionStatus();
 
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
                         // TODO Auto-generated catch block
-                        System.out.println("INTERRUPTED");
-                        e.printStackTrace();
                     }
 
                     if (exit)
@@ -153,17 +184,20 @@ public class Booth extends Thread {
                 return null;
             }
             
-            recv();
+            if(recv()) {
 
-            Candidate[] res = null;
-			try {
-				res = _candidates.take();
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+                Candidate[] res = null;
+                try {
+                    res = _candidates.take();
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
 
-            return res;
+                return res;
+            }else{
+                return null;
+            }
         }
     }
 
@@ -182,45 +216,46 @@ public class Booth extends Thread {
 
             return r;
         }else{
-        	BoothElectionResults res = null;
+            BoothElectionResults res = null;
 
-            try {
-                this.clientServer.sendMessageParent("status");
-            } catch (IOException | InterruptedException e) {
-                // TODO Auto-generated catch block
-                System.out.println("INTERRUPTED");
-                e.printStackTrace();
-                return null;
+            synchronized(cmdInProgress) {
+                try {
+                    this.clientServer.sendMessageParent("status");
+                } catch (IOException | InterruptedException e) {
+                    // TODO Auto-generated catch block
+//                System.out.println("INTERRUPTED");
+                    e.printStackTrace();
+                    return null;
+                }
+
+                recv();
             }
-            
-            recv();
-            
+
             try {
                 res = _results.take();
             } catch (InterruptedException e) {
-                System.out.println("INTERRUPTED");
-                // TODO Auto-generated catch block
-
                 return null;
             }
-        	
+
             return res;
         }
     }
 
     public boolean register(Voter p){
-        String s;
+        String s = "";
 
-        try {
-            this.clientServer.sendMessageParent(p);
-        } catch (IOException | InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return false;
+        synchronized(cmdInProgress) {
+
+            try {
+                this.clientServer.sendMessageParent(p);
+            } catch (IOException | InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return false;
+            }
+
+            recv();
         }
-
-        recv();
-        
         try {
             s = _msgs.take();
         } catch (InterruptedException e) {
@@ -230,24 +265,26 @@ public class Booth extends Thread {
         }
 
         this.voter = p;
-        
+
         return s.equals("true");
     }
 
     public boolean verify(String pin){
-        Credential c = new Credential(voter.getName(), pin);
         String s;
-        
-        try {
-            this.clientServer.sendMessageParent(c);
-        } catch (IOException | InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return false;
-        }
-        
-        recv();
 
+        synchronized(cmdInProgress) {
+            Credential c = new Credential(voter.getName(), pin);
+
+            try {
+                this.clientServer.sendMessageParent(c);
+            } catch (IOException | InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return false;
+            }
+
+            recv();
+        }
         try {
             s = _msgs.take();
         } catch (InterruptedException e) {
@@ -255,7 +292,9 @@ public class Booth extends Thread {
             e.printStackTrace();
             return false;
         }
+
         return s.equals("true");
+
     }
 
     public boolean vote(Candidate c){
@@ -277,14 +316,14 @@ public class Booth extends Thread {
             }
 
             recv();
+        }
 
-            try {
-                s = _msgs.take();
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                return false;
-            }
+        try {
+            s = _msgs.take();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return false;
         }
 
         this.voter = null;

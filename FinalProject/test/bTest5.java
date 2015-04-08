@@ -13,7 +13,8 @@ public class bTest5 extends BoothTestBench {
      */
     public static void main(String[] args){
         bTest5 b5 = new bTest5();
-        assert b5.test();
+        boolean ret = b5.test();
+        assert ret == true;
 
         System.out.println("TEST 5 COMPLETE");
 
@@ -30,6 +31,7 @@ public class bTest5 extends BoothTestBench {
         System.out.println("TEST 5 REMOVED");
     }
 
+    @Override
     public boolean test(){
         loadVoters();
         CandidateReader dr = new CandidateReader("FinalProject/test/candidates.txt");

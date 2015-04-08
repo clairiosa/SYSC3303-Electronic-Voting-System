@@ -13,7 +13,7 @@ public class BoothTest {
 
     public static void main(String args[]) throws InterruptedException {
         Thread t;
-/*
+
         t = (new Thread() {
             public void run() {
                 bTest1.main(null);
@@ -57,7 +57,7 @@ public class BoothTest {
         });
 
         t.start();
-        t.join(); */
+        t.join();
 
         System.out.println("-----------------------");
         Thread.sleep(5000);

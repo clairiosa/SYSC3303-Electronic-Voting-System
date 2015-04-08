@@ -219,12 +219,16 @@ public class DistrictServer implements Runnable {
 
 					}
 				} else if (recievedMessage instanceof BoothElectionResults) {
-
+					System.out.println("District: received election results");
 					this.electionResults = (BoothElectionResults) recievedMessage;
 				} else if (recievedMessage instanceof Person) { // register the
 					// person
 					System.out.println("Registering Person");
 					String nm = ((Person) recievedMessage).getName();
+					if(this.masterServerInfo == null || nm == null){
+						int a = 0;
+					}
+
 					Voter localVoter = this.masterServerInfo.getVoter(nm);
 
 					if (localVoter != null
@@ -233,9 +237,7 @@ public class DistrictServer implements Runnable {
 							&& !localVoter.getRegistered()) {
 						localVoter.setRegistered(true);
 						districtComm.sendMessageReply("true");
-						System.out.println("District Server "
-								+ uniqueDistrictId + ": "
-								+ "Registered Successful");
+						System.out.println("District Server " + uniqueDistrictId + ": " + "Registered Successful");
 					} else {
 						districtComm.sendMessageReply("false");
 						System.out.println("Not Registered");
@@ -286,8 +288,7 @@ public class DistrictServer implements Runnable {
 
 					} else {
 						districtComm.sendMessageReply("false");
-						System.out.println("District Server "
-								+ uniqueDistrictId + ": " + "Voting failed");
+						System.out.println("District Server " + uniqueDistrictId + ": " + "Voting failed");
 					}
 
 //					if (v.getName().equals("Ellena Jeanbaptiste")) {
@@ -301,8 +302,8 @@ public class DistrictServer implements Runnable {
 
 				} else if (recievedMessage instanceof Credential) {
 					Credential creds = (Credential) recievedMessage;
-					System.out.println("District Server " + uniqueDistrictId
-							+ ": " + "Checking Credentials");
+					System.out.println("District Server " + uniqueDistrictId + ": " + "Checking Credentials");
+
 					// check user match
 					if (masterServerInfo.getVoter(creds.getUser()).getUser()
 							.equals(creds.getUser())
@@ -310,28 +311,20 @@ public class DistrictServer implements Runnable {
 									.getPin().equals(creds.getPin())) {
 
 						districtComm.sendMessageReply("true");
-						System.out
-								.println("District Server " + uniqueDistrictId
-										+ ": " + "Credentials valid");
+						System.out.println("District Server " + uniqueDistrictId + ": " + "Credentials valid");
 					} else {
 						districtComm.sendMessageReply("false");
-						System.out.println("District Server "
-								+ uniqueDistrictId + ": "
-								+ "Credentials failed");
+						System.out.println("District Server " + uniqueDistrictId + ": " + "Credentials failed");
 					}
 
 				} else if (recievedMessage instanceof String) {
 					if (recievedMessage.equals("status")) {
 						// send back the ElectionResults to booth
-
-//						System.out.println("District Server "
-//								+ uniqueDistrictId + ": " + "Sending Status");
+						System.out.println("District sending status");
 						districtComm.sendMessageReply(electionResults);
 					} else if (recievedMessage.equals("candidates")) {
 
-						System.out.println("District Server "
-								+ uniqueDistrictId + ": "
-								+ "Sending Candidates");
+						System.out.println("District Server " + uniqueDistrictId + ": " + "Sending Candidates");
 						Candidate[] c = new Candidate[masterServerInfo
 								.getCandidates().size()];
 
@@ -349,6 +342,8 @@ public class DistrictServer implements Runnable {
 					} else if(recievedMessage.equals("end")){
 						shutdown();
 						continues = false;
+					} else {
+						System.out.println("Unhandled string " + recievedMessage);
 					}
 				}
 

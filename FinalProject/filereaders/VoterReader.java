@@ -26,7 +26,7 @@ public class VoterReader extends CSVFileReader {
             BufferedReader br1 = new BufferedReader(new InputStreamReader(fis1));
             Voter v = null;
             String[] cols;
-            String name, address, postal, city, province, district, pin;
+            String name, address, postal, city, province, district, pin, user;
             String line;
             int i = 0;
 
@@ -36,6 +36,7 @@ public class VoterReader extends CSVFileReader {
 
                     if(cols.length == 7) {
                         name = clean(cols[0]);
+                        user = name;
                         address = clean(cols[1]);
                         postal = clean(cols[2]);
                         city = clean(cols[3]);
@@ -43,7 +44,7 @@ public class VoterReader extends CSVFileReader {
                         district = clean(cols[5]);
                         pin = clean(cols[6]);
 
-                        v = new Voter(name, address, postal, city, province, district, null, pin, null, null, false, false);
+                        v = new Voter(name, address, postal, city, province, district, user, pin, null, null, false, false);
 
                         voters.add(v);
                     }else{

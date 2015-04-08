@@ -23,7 +23,7 @@ public class BoothTestBench {
         m = new Thread() {
             public void run() {
                 MasterServer.main(new String[] { "2000", "FinalProject/test/voters.txt",
-                        "FinalProject/test/candidates.txt", "5000" });
+                        "FinalProject/test/candidates.txt", "10000" });
             }
         };
 
@@ -65,10 +65,10 @@ public class BoothTestBench {
         }
 
         try {
-            b1 = new Booth("127.0.0.1", "d1", Integer.parseInt("2011"), Integer.parseInt("2101"));
-            b2 = new Booth("127.0.0.1", "d2", Integer.parseInt("2012"), Integer.parseInt("2102"));
-            b3 = new Booth("127.0.0.1", "d3", Integer.parseInt("2013"), Integer.parseInt("2203"));
-            b4 = new Booth("127.0.0.1", "d3", Integer.parseInt("2013"), Integer.parseInt("2204"));
+            b1 = new Booth("127.0.0.1", "d1", Integer.parseInt("2011"), Integer.parseInt("2101"), true);
+            b2 = new Booth("127.0.0.1", "d2", Integer.parseInt("2012"), Integer.parseInt("2102"), true);
+            b3 = new Booth("127.0.0.1", "d3", Integer.parseInt("2013"), Integer.parseInt("2203"), true);
+            b4 = new Booth("127.0.0.1", "d3", Integer.parseInt("2013"), Integer.parseInt("2204"), true);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -91,6 +91,8 @@ public class BoothTestBench {
 
     protected void loadVoters(){
         VoterReader vr = new VoterReader("FinalProject/test/voters.txt");
+        vr.parse();
+
         vd1 = new Stack<>();
         vd2 = new Stack<>();
         vd3 = new Stack<>();
@@ -132,5 +134,11 @@ public class BoothTestBench {
         }
 
         MasterServer.reset();
+
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
