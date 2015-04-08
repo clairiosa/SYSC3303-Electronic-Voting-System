@@ -324,8 +324,8 @@ public class DistrictServer implements Runnable {
 					if (recievedMessage.equals("status")) {
 						// send back the ElectionResults to booth
 
-						System.out.println("District Server "
-								+ uniqueDistrictId + ": " + "Sending Status");
+//						System.out.println("District Server "
+//								+ uniqueDistrictId + ": " + "Sending Status");
 						districtComm.sendMessageReply(electionResults);
 					} else if (recievedMessage.equals("candidates")) {
 

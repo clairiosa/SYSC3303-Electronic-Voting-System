@@ -19,14 +19,10 @@ public class BoothTest {
             }
         });
         t.start();
-
-        Thread.sleep(1000);
         t.join();
 
         System.out.println("-----------------------");
-
-        Thread.sleep(3000);
-
+        Thread.sleep(5000);
 
         t = (new Thread() {
             public void run() {
@@ -35,6 +31,35 @@ public class BoothTest {
         });
 
         t.start();
+        t.join();
 
+        /*
+        System.out.println("-----------------------");
+        Thread.sleep(5000);
+
+        t = (new Thread() {
+            public void run() {
+                bTest3.main(null);
+            }
+        });
+
+        t.start();
+        t.join();
+
+        System.out.println("-----------------------");
+        Thread.sleep(5000);
+
+        t = (new Thread() {
+            public void run() {
+                bTest4.main(null);
+            }
+        });
+
+        t.start();
+        t.join();
+
+        System.out.println("-----------------------");
+        Thread.sleep(5000);
+*/
     }
 }

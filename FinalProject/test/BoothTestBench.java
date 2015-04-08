@@ -130,5 +130,7 @@ public class BoothTestBench {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        MasterServer.reset();
     }
 }
