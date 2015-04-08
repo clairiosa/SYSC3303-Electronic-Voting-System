@@ -247,6 +247,7 @@ class BoothUI extends JPanel implements ActionListener{
             case "Vote":
 
                 if(candidates.length == 0){
+                    if(model.isTesting)
                     System.out.println("Load candidates");
                     return;
                 }
@@ -271,6 +272,7 @@ class BoothUI extends JPanel implements ActionListener{
                     i++;
                 }
 
+                if(model.isTesting)
                 System.out.println("No one selected");
 
                 break;

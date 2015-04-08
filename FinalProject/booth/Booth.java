@@ -22,6 +22,7 @@ import FinalProject.persons.Voter;
 
 public class Booth extends Thread {
     final private Comm clientServer;
+    public final boolean isTesting;
     private Voter voter;
 
     private InetAddress parentIP;
@@ -50,6 +51,8 @@ public class Booth extends Thread {
         this.districtId = districtId;
         exit = false;
         statusUpdateThread = null;
+
+        this.isTesting = isTesting;
 
         _candidates = new ArrayBlockingQueue<Candidate[]>(10);
         _results = new ArrayBlockingQueue<BoothElectionResults>(10);
@@ -81,7 +84,8 @@ public class Booth extends Thread {
             statusUpdateThread.interrupt();
         }
 
-        System.out.println("Booth shutdown");
+        if(isTesting)
+            System.out.println("Booth shutdown");
     }
     
     public boolean recv(){
@@ -107,24 +111,28 @@ public class Booth extends Thread {
     	
     	try {
 	    	if(msg instanceof Candidate[]){
+                if(isTesting)
                 System.out.println("Got candidate list");
 	    		_candidates.put((Candidate[])msg);
 	    	}else if(msg instanceof BoothElectionResults){
+                if(isTesting)
                 System.out.println("Got election results");
 	    		_results.put((BoothElectionResults)msg);
 	    	}else if(msg instanceof String){
 
                 if(((String)msg).equals("end")){
+                    if(isTesting)
                     System.out.println("Got terminate");
                     exit = true;
                     shutdown();
 	    			return false;
 	    		}
-
+                if(isTesting)
                 System.out.println("Got string '" + msg + "'");
 
 				_msgs.put((String)msg);
 	    	}else{
+                if(isTesting)
 	    		System.out.println("unknown type");
 	    	}
     	} catch (InterruptedException e) {
@@ -135,6 +143,7 @@ public class Booth extends Thread {
     }
 
     public void run(){
+        if(isTesting)
         System.out.println("Booth Started");
 
         if(window != null)
@@ -319,6 +328,7 @@ public class Booth extends Thread {
 
     public boolean vote(Candidate c){
         if(this.voter == null){
+            if(isTesting)
             System.out.println("Unknown State");
             return false;
         }

@@ -24,11 +24,11 @@ public class bTest5 extends BoothTestBench {
             e.printStackTrace();
         }
         
-        MasterServer.frame.dispose();
+//        MasterServer.frame.dispose();
 
-        b5.destroy();
+//        b5.destroy();
 
-        System.out.println("TEST 5 REMOVED");
+//        System.out.println("TEST 5 REMOVED");
     }
 
     @Override
