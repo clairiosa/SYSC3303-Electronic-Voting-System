@@ -15,9 +15,17 @@ public class bTest2 extends BoothTestBench {
         bTest2 b2 = new bTest2();
         assert b2.test();
 
+        System.out.println("TEST 2 COMPLETE");
+
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         b2.destroy();
 
-        System.out.println("TEST 2 COMPLETE");
+        System.out.println("TEST 2 REMOVED");
     }
 
     public boolean test(){
@@ -26,39 +34,47 @@ public class bTest2 extends BoothTestBench {
 
         Voter v;
 
+        // verify at booth 1
         v = vd1.pop();
         b1.register(v);
         assert b1.verify(v.getPin());
 
+        // verify at booth 2
         v = vd2.pop();
         b2.register(v);
         assert b2.verify(v.getPin());
 
+        // verify at booth 3
         v = vd3.pop();
         b3.register(v);
         assert b3.verify(v.getPin());
 
+        // verify at booth 4
         v = vd3.pop();
         b4.register(v);
         assert b4.verify(v.getPin());
 
-
+        // verify with incorrect pin at booth 4
         v = vd3.pop();
         b4.register(v);
         assert !b4.verify(v.getPin() + "1");
 
+        // verify with incorrect pin at booth 3
         v = vd3.pop();
         b3.register(v);
         assert !b3.verify(v.getPin() + "1");
 
+        // verify with incorrect pin at booth 2
         v = vd2.pop();
         b2.register(v);
         assert !b2.verify(v.getPin() + "1");
 
+        // verify with incorrect pin at booth 1
         v = vd1.pop();
         b1.register(v);
         assert !b1.verify(v.getPin() + "1");
 
+        // complete
         return true;
     }
 }

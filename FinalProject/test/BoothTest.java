@@ -11,7 +11,7 @@ import java.io.UnsupportedEncodingException;
  */
 public class BoothTest {
 
-    public static void main(String args[]) {
+    public static void main(String args[]) throws InterruptedException {
 
         Thread t = (new Thread() {
             public void run() {
@@ -20,25 +20,13 @@ public class BoothTest {
         });
         t.start();
 
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            t.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        Thread.sleep(1000);
+        t.join();
 
         System.out.println("-----------------------");
 
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+        Thread.sleep(3000);
+
 
         t = (new Thread() {
             public void run() {
@@ -47,7 +35,6 @@ public class BoothTest {
         });
 
         t.start();
-
 
     }
 }

@@ -23,9 +23,18 @@ public class bTest1 extends BoothTestBench {
         System.out.println("Test 1 Instantiated");
         assert b1.test();
 
-        b1.destroy();
 
         System.out.println("TEST 1 COMPLETE");
+
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        b1.destroy();
+
+        System.out.println("TEST 1 REMOVED");
     }
 
     public boolean test() {
@@ -34,31 +43,37 @@ public class bTest1 extends BoothTestBench {
 
         Voter v;
 
+        // can't register twice, covers case of voting twice
         v = vd1.pop();
         assert b1.register(v);
         assert !b1.register(v);
 
+        // can't register in an incorrect district before correct registration
         v = vd1.pop();
         assert !b2.register(v);
         assert !b3.register(v);
         assert b1.register(v);
 
+        // can't register in an incorrect district after correct registration
         v = vd2.pop();
         assert b2.register(v);
         assert !b2.register(v);
         assert !b1.register(v);
         assert !b3.register(v);
 
+        // can't register in an incorrect district before or after correct registration
         v = vd3.pop();
         assert !b2.register(v);
         assert b3.register(v);
         assert !b4.register(v);
 
+        // can't register in an incorrect district before or after correct registration
         v = vd3.pop();
         assert !b2.register(v);
         assert b4.register(v);
         assert !b3.register(v);
 
+        // complete
         return true;
     }
 }
