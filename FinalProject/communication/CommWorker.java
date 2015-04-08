@@ -170,6 +170,11 @@ class CommWorker implements Runnable{
                 e.printStackTrace();
             }
         }
+        synchronized(connection.waitAckSync) {
+            connection.setAckResultReady(true);
+            connection.setAckResult(CommError.ERROR_CONNECTION_CLOSED);
+            connection.waitAckSync.notify();
+        }
     }
 
 
