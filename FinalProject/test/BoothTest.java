@@ -12,8 +12,9 @@ import java.io.UnsupportedEncodingException;
 public class BoothTest {
 
     public static void main(String args[]) throws InterruptedException {
-
-        Thread t = (new Thread() {
+        Thread t;
+/*
+        t = (new Thread() {
             public void run() {
                 bTest1.main(null);
             }
@@ -52,6 +53,18 @@ public class BoothTest {
         t = (new Thread() {
             public void run() {
                 bTest4.main(null);
+            }
+        });
+
+        t.start();
+        t.join(); */
+
+        System.out.println("-----------------------");
+        Thread.sleep(5000);
+
+        t = (new Thread() {
+            public void run() {
+                bTest5.main(null);
             }
         });
 

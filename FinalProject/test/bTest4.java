@@ -1,6 +1,7 @@
 package FinalProject.test;
 
 import FinalProject.filereaders.CandidateReader;
+import FinalProject.masterserver.MasterServer;
 import FinalProject.persons.Voter;
 
 /**
@@ -21,6 +22,8 @@ public class bTest4 extends BoothTestBench {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        MasterServer.frame.dispose();
 
         b4.destroy();
 

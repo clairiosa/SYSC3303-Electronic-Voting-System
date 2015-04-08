@@ -29,6 +29,8 @@ import FinalProject.persons.Voter;
 public class MasterServer {
 	public static boolean electionDone = false;
 	public static int refreshRate;
+	public static framer1 frame;
+
 	public MasterServer() {
 
 	}
@@ -154,7 +156,7 @@ public class MasterServer {
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
 					try {
-						framer1 frame = new framer1(lists.candidates);
+						frame = new framer1(lists.candidates);
 						frame.setVisible(true);
 					} catch (Exception e) {
 						e.printStackTrace();

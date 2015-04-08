@@ -32,6 +32,8 @@ public class bTest1 extends BoothTestBench {
             e.printStackTrace();
         }
 
+        MasterServer.frame.dispose();
+
         b1.destroy();
 
         System.out.println("TEST 1 REMOVED");
