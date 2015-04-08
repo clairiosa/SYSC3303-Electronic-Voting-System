@@ -43,7 +43,8 @@ public class ElectionBarDemo extends JFrame {
     static {
         ChartFactory.setChartTheme(new StandardChartTheme("JFree/Shadow",true));
     }
-
+    private JFreeChart chart;
+    private ChartPanel chartPanel;
     /**
     * Creates a new demo instance.
     *
@@ -52,12 +53,26 @@ public class ElectionBarDemo extends JFrame {
     public ElectionBarDemo(String title,ConcurrentHashMap<String, Candidate> candidates) {
         super(title);
         CategoryDataset dataset = createDataset(candidates);
-        JFreeChart chart = createChart(dataset);
-        ChartPanel chartPanel = new ChartPanel(chart);
+         chart = createChart(dataset);
+        chartPanel = new ChartPanel(chart);
         chartPanel.setFillZoomRectangle(true);
         chartPanel.setMouseWheelEnabled(true);
         chartPanel.setPreferredSize(new Dimension(500, 270));
         setContentPane(chartPanel);
+    }
+    
+    public void updateData(ConcurrentHashMap<String, Candidate> candidates)
+    {
+    	CategoryDataset dataset = createDataset(candidates);
+        chart = createChart(dataset);
+        chartPanel = new ChartPanel(chart);
+        chartPanel.setFillZoomRectangle(true);
+        chartPanel.setMouseWheelEnabled(true);
+        chartPanel.setPreferredSize(new Dimension(500, 270));
+        setContentPane(chartPanel);
+        revalidate();
+        
+        
     }
 
     /**
