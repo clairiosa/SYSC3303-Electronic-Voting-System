@@ -20,6 +20,7 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PiePlot;
+import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
 import org.jfree.data.general.PieDataset;
 import org.jfree.ui.RefineryUtilities;
@@ -59,6 +60,15 @@ public class ElectionPieDemo extends JFrame {
      	}
         return dataset;        
     }
+    
+    public void updateData(ConcurrentHashMap<String, Candidate> candidates)
+    {
+    	setContentPane(createDemoPanel(candidates));
+    	 revalidate();
+    }
+    
+    
+    
     
     /**
      * Creates a chart.
