@@ -59,7 +59,7 @@ public class FancyDisplayWindow1 extends JPanel {
 	//initialize the Graphical User Interface 
 	private void initialize() {
 		Dimension size = new Dimension(175, 25);
-		Dimension image_size = new Dimension(640,480);
+		Dimension image_size = new Dimension(640,250);
 		JTextArea field = new JTextArea(); 
 		field.setEditable(false);
 		Font font = new Font("Courier", Font.BOLD,20);
