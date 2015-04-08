@@ -41,6 +41,10 @@ public class FancyDisplayWindow1 extends JPanel {
 	private JLabel image_label;
 	private ConcurrentHashMap<String, Candidate> candidates;  
 	private JTextArea results;
+	private ElectionBarDemo demo;
+	private ElectionPieDemo demo1;
+	private boolean piegraph; 
+	private boolean bargraph; 
 
 
 	// Constructors for the FacyDisplayWindow 
@@ -48,12 +52,14 @@ public class FancyDisplayWindow1 extends JPanel {
 		this.candidates=candidates;
 		results = new JTextArea();
 		this.initialize();
+		piegraph=false; 
+		bargraph=false;
 	}
 	
 	//initialize the Graphical User Interface 
 	private void initialize() {
 		Dimension size = new Dimension(175, 25);
-		Dimension image_size = new Dimension(775,535);
+		Dimension image_size = new Dimension(640,480);
 		JTextArea field = new JTextArea(); 
 		field.setEditable(false);
 		Font font = new Font("Courier", Font.BOLD,20);
@@ -89,10 +95,11 @@ public class FancyDisplayWindow1 extends JPanel {
 		pieGraphButton.addActionListener(new ActionListener() {
 			//when the button is clicked 
 			public void actionPerformed(ActionEvent evt) {
-		    	ElectionPieDemo demo1 = new ElectionPieDemo("2015 Election Percentages", candidates);
+				demo1 = new ElectionPieDemo("2015 Election Percentages", candidates);
 		        demo1.pack();
 		        RefineryUtilities.centerFrameOnScreen(demo1);
 		        demo1.setVisible(true);
+		        piegraph=true;
 			}
 		});
 
@@ -103,10 +110,11 @@ public class FancyDisplayWindow1 extends JPanel {
 		barGraphButton.addActionListener(new ActionListener() {
 			//when the button is clicked make the chart with the data 
 			public void actionPerformed(ActionEvent evt) {
-		        ElectionBarDemo demo = new ElectionBarDemo("2015 Canadian Election", candidates);
+		        demo = new ElectionBarDemo("2015 Canadian Election", candidates);
 		        demo.pack();
 		        RefineryUtilities.centerFrameOnScreen(demo);
 		        demo.setVisible(true);
+		    	bargraph = true;
 			}
 		});
 
@@ -134,7 +142,25 @@ public class FancyDisplayWindow1 extends JPanel {
 				}
 			}
 		}).start();
+		
+		
+		new Thread(new Runnable() {
+			public void run() {
+				while(true){
+					try {
+						updateGraphs();
+						Thread.sleep(2000);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}).start();
+	
 	}
+	
+	
+	
 	
 	
 	//get the candidates information 
@@ -157,9 +183,21 @@ public class FancyDisplayWindow1 extends JPanel {
 		results.setText(s);
 		results.setBackground(null);
 		this.updateUI();
-		
+
 	}
 
+	public void updateGraphs(){
+		if(bargraph && piegraph){
+			demo.updateData(candidates);
+			demo.invalidate();
+			demo1.updateData(candidates);
+			demo1.invalidate();
+
+	    	
+
+		}
+		
+	}
 
 
 
