@@ -14,7 +14,7 @@ public class bTest4 extends BoothTestBench {
         bTest4 b4 = new bTest4();
         assert b4.test();
 
-        System.out.println("TEST 3 COMPLETE");
+        System.out.println("TEST 4 COMPLETE");
 
         try {
             Thread.sleep(5000);
@@ -24,7 +24,7 @@ public class bTest4 extends BoothTestBench {
 
         b4.destroy();
 
-        System.out.println("TEST 3 REMOVED");
+        System.out.println("TEST 4 REMOVED");
     }
 
     public boolean test(){

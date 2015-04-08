@@ -33,7 +33,7 @@ public class BoothTest {
         t.start();
         t.join();
 
-        /*
+
         System.out.println("-----------------------");
         Thread.sleep(5000);
 
@@ -60,6 +60,7 @@ public class BoothTest {
 
         System.out.println("-----------------------");
         Thread.sleep(5000);
-*/
+
+        System.exit(0);
     }
 }

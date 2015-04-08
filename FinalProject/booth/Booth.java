@@ -58,8 +58,6 @@ public class Booth extends Thread {
     }
 
     public void shutdown(){
-        System.out.println("client shutdown" + this);
-
         try {
             clientServer.shutdown();
         } catch (InterruptedException e) {
