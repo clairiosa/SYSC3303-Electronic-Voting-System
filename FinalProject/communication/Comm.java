@@ -152,7 +152,8 @@ public class Comm implements CommInterface {
      */
     @Override
     public int sendMessageParent(Object obj) throws IOException, InterruptedException {
-        if (parentConnection != null) {
+        if (parentConnection != null && parentConnection.getWorkerThread().isAlive()) {
+            System.out.println( parentConnection.getWorkerThread().isAlive());
             DatagramPacket outgoingPacket = Packets.craftPacket(obj, parentConnection.getAddress(), parentConnection.getPort());
             parentConnection.putOutgoingBlocking(outgoingPacket);
 
@@ -165,6 +166,8 @@ public class Comm implements CommInterface {
                 parentConnection.setAckResultReady(false);
             }
             return 0;
+        } else {
+            parentConnection = null;
         }
         return CommError.ERROR_NO_PARENT;
     }

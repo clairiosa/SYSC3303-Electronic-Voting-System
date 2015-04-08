@@ -21,5 +21,7 @@ final class CommError {
     static final int ERROR_NO_PARENT = 1001;
     static final int ERROR_NO_CLIENTS = 1002;
     static final int ERROR_REJECT_CONNECTION = 1003;
+    static final int ERROR_CONNECTION_CLOSED = 1003;
+
 
 }
