@@ -189,6 +189,7 @@ class BoothUI extends JPanel implements ActionListener{
 
         model.addRow(new Object[]{ "Total", t });
         model.addRow(new Object[]{ "Updated", dt });
+        model.addRow(new Object[]{ "District", this.model.districtId });
 
         tblResults.setModel(model);
         tblResults.repaint();

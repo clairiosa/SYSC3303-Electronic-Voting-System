@@ -25,7 +25,7 @@ public class Booth extends Thread {
     private Voter voter;
 
     private InetAddress parentIP;
-    private String districtId;
+    public String districtId;
     private int parentPort;
     private Object cmdInProgress;
     private boolean dummyData;
@@ -139,6 +139,26 @@ public class Booth extends Thread {
 
         if(window != null)
         window.start();
+
+
+//        String res;
+//
+//        synchronized(cmdInProgress) {
+//            try {
+//                this.clientServer.sendMessageParent("district");
+//                recv();
+//            } catch (IOException | InterruptedException e) {
+//                // TODO Auto-generated catch block
+//                //System.out.println("INTERRUPTED");
+//                //e.printStackTrace();
+//            }
+//        }
+//
+//        try {
+//            res = _msgs.take();
+//            this.districtId = res;
+//        } catch (InterruptedException e) {
+//        }
 
         statusUpdateThread = new Thread() {
             public void run() {
