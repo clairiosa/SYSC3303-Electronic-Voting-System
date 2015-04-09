@@ -27,8 +27,13 @@ import FinalProject.persons.Voter;
  */
 public class DistrictServer implements Runnable {
 
+	//maintains the shutting down state
 	private boolean down;
 
+	/**
+	 * Runs the district server with the given params
+	 * @param args
+	 */
 	public static void main(String args[]) {
 		if (args.length >= 4) {
 			DistrictServer district = new DistrictServer(
@@ -50,16 +55,20 @@ public class DistrictServer implements Runnable {
 	private String masterAddress;
 	private int masterPort;
 	private int port;
-	private String uniqueDistrictId;
+	private String uniqueDistrictId; //each district has a unique identifier
 
 	// election data table. The table contains the profile of each voter and the
 	// list of candidates.
-	MasterServerInformation masterServerInfo; // TEMPORARY until MasterServer
+	private MasterServerInformation masterServerInfo; // TEMPORARY until MasterServer
 												// rework
 
 	// Election results. pulled from master server
 	// ElectionResults results;
 	private BoothElectionResults electionResults;
+
+
+	//data is faked when set to true. Only for solo testing purposes
+	private boolean fake = false;
 
 	/**
 	 * Constructor
@@ -77,8 +86,11 @@ public class DistrictServer implements Runnable {
 		this.uniqueDistrictId = uniqueDistrictId;
 	}
 
-	boolean fake = false;
-
+	/**
+	 * Fakes the given master server information
+	 * @param candidatePath
+	 * @param voterPath
+	 */
 	private void fakeData(String candidatePath, String voterPath) {
 
 		// from MasterServer.java
@@ -149,7 +161,7 @@ public class DistrictServer implements Runnable {
 	}
 
 	/**
-	 * Starts the server
+	 * Starts the server on the set port
 	 */
 	private void start() {
 		// System.out.println("DistrictServer Started");
@@ -165,6 +177,11 @@ public class DistrictServer implements Runnable {
 		this.run();
 	}
 
+	/**
+	 * Safely shuts the closes this district server
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
 	public void shutdown() throws IOException, InterruptedException {
 		if (down)
 			return;
@@ -179,6 +196,11 @@ public class DistrictServer implements Runnable {
 		down = true;
 	}
 
+	
+	/**
+	 * Main thread function.
+	 * Maintains all connections to clients and master server. 
+	 */
 	@Override
 	public void run() {
 		boolean continues = true;
