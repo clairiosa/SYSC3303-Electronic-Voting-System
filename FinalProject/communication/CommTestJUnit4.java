@@ -84,16 +84,13 @@ public class CommTestJUnit4 {
         Object receivedObject = comm1.getMessageBlocking();
         String receivedString = (String) receivedObject;
         assertEquals(sentObject, receivedString);
-        System.out.println("1");
 
         int test = comm1.sendMessageParent(sentObject);
         assertEquals(CommError.ERROR_NO_PARENT, test);
         comm1.shutdown();
-        System.out.println("1");
 
         test = comm2.sendMessageParent(sentObject);
         assertEquals(CommError.ERROR_CONNECTION_CLOSED, test);
-        System.out.println("1");
 
 
 

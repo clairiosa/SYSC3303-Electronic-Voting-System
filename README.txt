@@ -5,21 +5,26 @@ Authors: David Bews, Jonathan Oommen, Nate Bosscher, Damian Polan
 
     UML DIAGRAMS AND COMMUNICATION PROTOCOL INFORMATION
 
-The component diagrams can be found in INFO/
-A sequence diagram for the communication protocol can be found in INFO/
-A brief explanation of the communication protocol can be found in INFO/CommunicationOverview.txt
+documents.zip Contains the UML Diagrams and Report.
+FinalProject.zip Contains the code.
 
 
 
-~~~~Run the following from the directory FinalProject\ resides in.~~~~
+~~~~Run the following from the PARENT directory of FinalProject\ ~~~~
 
 
     COMPILING AND RUNNING OVERALL AUTOMATED TEST
 
-javac FinalProject\test\AutomatedTest.java
-java FinalProject\test\AutomatedTest
+javac -cp "FinalProject\jfrrchart\*;." FinalProject\test\BoothTest.java
+java FinalProject.test.BoothTest
 
-The output will appear as election-results.txt
+
+
+    COMPILING AND RUNNING MANUAL TEST
+
+javac -cp "FinalProject\jfrrchart\*;." FinalProject\test\ManualTest.java
+java FinalProject.test.ManualTest
+
 
 
     COMPILING AND RUNNING COMMUNICATION PROTOCOL AUTOMATED TEST
@@ -28,14 +33,13 @@ javac FinalProject\test\CommTest.java
 java FinalProject\test\CommTest
 
 
+
     COMPILING AND RUNNING INDIVIDUAL PORTIONS
 
-javac -cp "FinalProject/jfrrchart/*:." FinalProject/masterserver/MasterServer.java
-javac -cp "FinalProject\jfrrchart\*;." FinalProject\masterserver\MasterServer.java
 
 Master Server:
-javac FinalProject\masterserver\MasterServer.java
-java FinalProject\masterserver\MasterServer <Listen Port> <Voter Filename> <Candidates Filename> <Election Refresh Rate (ms)>
+javac -cp "FinalProject\jfrrchart\*;." FinalProject\masterserver\MasterServer.java
+java FinalProject.masterserver.MasterServer <port> <voterFilename> <CandidatesFilename> <refreshrate>
 
 District Server:
 javac FinalProject\districtserver\DistrictServer.java

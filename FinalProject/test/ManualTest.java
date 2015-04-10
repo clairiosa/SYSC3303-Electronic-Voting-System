@@ -58,7 +58,7 @@ public class ManualTest {
         };
         Thread boothServer4 = new Thread() {
             public void run() {
-                Booth.main(new String[] { "127.0.0.1", "2q", "2013", "2104" });
+                Booth.main(new String[] { "127.0.0.1", "3", "2013", "2104" });
             }
         };
 

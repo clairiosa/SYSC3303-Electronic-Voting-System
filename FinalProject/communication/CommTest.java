@@ -6,7 +6,7 @@
  *
  *	FinalProject.communication.CommTest.java
  *
- * Example class showing how to use Comm.java
+ * A class that runs unit-tests for the communication class.
  *
  */
 
